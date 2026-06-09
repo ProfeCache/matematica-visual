@@ -1,1165 +1,230 @@
-html = r"""<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Restos en la recta numérica - celular</title>
+from pathlib import Path
+import re
 
-  <style>
-    :root {
-      --dark: #020617;
-      --text: #0f172a;
-      --muted: #64748b;
-      --card: #ffffff;
-      --soft: #f8fafc;
-      --line: #dbe4f0;
-      --blue: #2563eb;
-      --blue-soft: #dbeafe;
-      --green: #16a34a;
-      --green-soft: #dcfce7;
-      --red: #ef4444;
-      --red-soft: #fee2e2;
-      --shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
-    }
+src = Path("/mnt/data/restos-celular-desplazable.html")
+html = src.read_text(encoding="utf-8")
 
-    * {
+# 1) Bloqueo general del desborde horizontal.
+html = html.replace(
+"""    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }""",
+"""    * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
 
+    html,
     body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }"""
+)
+
+# 2) Refuerzo del body para evitar cualquier scroll horizontal del documento.
+html = html.replace(
+"""    body {
+      margin: 0;
+      min-height: 100vh;""",
+"""    body {
       margin: 0;
       min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 10% 5%, rgba(37, 99, 235, 0.18), transparent 28%),
-        radial-gradient(circle at 90% 0%, rgba(22, 163, 74, 0.13), transparent 26%),
-        linear-gradient(180deg, #edf4ff 0%, #f8fafc 55%, #e2e8f0 100%);
-      padding: 10px;
-    }
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;"""
+)
 
-    .app {
-      width: min(520px, 100%);
-      margin: 0 auto;
-      border-radius: 28px;
-      background: var(--soft);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-    }
+# 3) App completamente contenida dentro del viewport.
+html = html.replace(
+"""    .app {
+      width: min(520px, 100%);""",
+"""    .app {
+      width: 100%;
+      max-width: 520px;
+      min-width: 0;"""
+)
 
-    .hero {
-      padding: 22px 18px 18px;
-      color: #ffffff;
-      background:
-        radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.27), transparent 30%),
-        radial-gradient(circle at 86% 6%, rgba(99, 102, 241, 0.27), transparent 30%),
-        linear-gradient(135deg, #020617 0%, #0f172a 60%, #111827 100%);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 11px;
-      border-radius: 999px;
-      color: #bfdbfe;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-    }
-
-    .badge span {
-      width: 8px;
-      height: 8px;
-      border-radius: 99px;
-      background: #38bdf8;
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
-    }
-
-    h1 {
-      margin: 14px 0 8px;
-      font-size: 27px;
-      line-height: 1.05;
-      letter-spacing: -0.75px;
-    }
-
-    .hero p {
-      margin: 0;
-      color: #cbd5e1;
-      font-size: 13.5px;
-      line-height: 1.45;
-    }
-
-    .content {
+# 4) Aseguramos que cards, grids y contenedores no impongan ancho mínimo.
+html = html.replace(
+"""    .content {
       padding: 12px;
       display: grid;
       gap: 12px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
-    }
-
-    .inputs {
+    }""",
+"""    .content {
       padding: 12px;
-    }
-
-    .input-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #475569;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.45px;
-      text-transform: uppercase;
-    }
-
-    input {
+      gap: 12px;
       width: 100%;
-      border: 1px solid #cbd5e1;
-      background: #f8fafc;
-      color: var(--text);
-      border-radius: 16px;
-      padding: 13px 11px;
-      outline: none;
-      font-size: 22px;
-      font-weight: 900;
-      text-align: center;
-    }
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+    }"""
+)
 
-    input:focus {
-      background: white;
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
-    }
+html = html.replace(
+"""    .card {
+      background: var(--card);""",
+"""    .card {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      background: var(--card);"""
+)
 
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 11px;
-    }
+html = html.replace(
+"""    .input-grid {
+      display: grid;""",
+"""    .input-grid {
+      width: 100%;
+      min-width: 0;
+      display: grid;"""
+)
 
-    .btn {
-      border: none;
-      border-radius: 16px;
-      padding: 13px 10px;
-      color: white;
-      font-size: 14px;
-      font-weight: 900;
-      cursor: pointer;
-      touch-action: manipulation;
-      user-select: none;
-    }
+html = html.replace(
+"""    .buttons {
+      display: grid;""",
+"""    .buttons {
+      width: 100%;
+      min-width: 0;
+      display: grid;"""
+)
 
-    .btn:active {
-      transform: scale(0.985);
-    }
+html = html.replace(
+"""    .stats {
+      display: grid;""",
+"""    .stats {
+      width: 100%;
+      min-width: 0;
+      display: grid;"""
+)
 
-    .blue {
-      background: linear-gradient(135deg, #2563eb, #4f46e5);
-      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
-    }
-
-    .green {
-      background: linear-gradient(135deg, #16a34a, #0f766e);
-      box-shadow: 0 8px 18px rgba(22, 163, 74, 0.18);
-    }
-
-    .dark {
-      background: linear-gradient(135deg, #334155, #0f172a);
-    }
-
-    .red {
-      background: linear-gradient(135deg, #dc2626, #991b1b);
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-top: 11px;
-    }
-
-    .stat {
-      border-radius: 17px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 10px 7px;
-      text-align: center;
-    }
-
-    .stat .label {
-      margin-bottom: 4px;
-      color: var(--muted);
-      font-size: 9.5px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.35px;
-    }
-
-    .stat .value {
-      font-size: 21px;
-      font-weight: 950;
-      letter-spacing: -0.4px;
-    }
-
-    .stat.blueText .value { color: var(--blue); }
-    .stat.greenText .value { color: var(--green); }
-    .stat.redText .value { color: #dc2626; }
-
-    .visual-card {
+html = html.replace(
+"""    .visual-card {
       padding: 10px;
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .toolbar .btn {
-      min-width: 46px;
-      padding: 11px 12px;
-      border-radius: 15px;
-    }
-
-    .status {
-      flex: 1;
-      text-align: center;
-      padding: 10px 8px;
-      border-radius: 999px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1d4ed8;
-      font-size: 12px;
-      font-weight: 900;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .canvas-wrap {
-      position: relative;
-      border-radius: 21px;
-      overflow: hidden;
-      border: 1px solid #cbd5e1;
-      background:
-        radial-gradient(circle at 16% 10%, rgba(219, 234, 254, 0.9), transparent 31%),
-        radial-gradient(circle at 85% 5%, rgba(220, 252, 231, 0.72), transparent 28%),
-        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    }
-
-    canvas {
+    }""",
+"""    .visual-card {
+      padding: 10px;
       width: 100%;
-      height: 500px;
-      display: block;
-      background: transparent;
-      touch-action: none;
-      cursor: grab;
-    }
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }"""
+)
 
-    canvas:active {
-      cursor: grabbing;
-    }
+html = html.replace(
+"""    .toolbar {
+      display: flex;""",
+"""    .toolbar {
+      width: 100%;
+      min-width: 0;
+      display: flex;"""
+)
 
-    .drag-hint {
-      position: absolute;
-      left: 50%;
-      bottom: 12px;
-      transform: translateX(-50%);
-      padding: 7px 10px;
-      border-radius: 999px;
-      color: #475569;
-      background: rgba(255, 255, 255, 0.84);
-      border: 1px solid #e2e8f0;
-      font-size: 11px;
-      font-weight: 900;
-      pointer-events: none;
-      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-    }
+html = html.replace(
+"""    .canvas-wrap {
+      position: relative;""",
+"""    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      contain: layout paint;
+      isolation: isolate;"""
+)
 
-    .edge {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 34px;
-      pointer-events: none;
-      z-index: 3;
-    }
+# 5) El canvas nunca define ancho extra.
+html = html.replace(
+"""    canvas {
+      width: 100%;""",
+"""    canvas {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;"""
+)
 
-    .edge.left {
-      left: 0;
-      background: linear-gradient(90deg, rgba(255,255,255,0.96), rgba(255,255,255,0));
-    }
-
-    .edge.right {
-      right: 0;
-      background: linear-gradient(270deg, rgba(255,255,255,0.96), rgba(255,255,255,0));
-    }
-
-    .result {
-      margin-top: 10px;
-      border-radius: 20px;
-      background: #0f172a;
-      color: white;
-      padding: 14px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .result-text {
-      color: #cbd5e1;
-      line-height: 1.42;
-      font-size: 13.5px;
-    }
-
-    .result-text b {
-      color: white;
-    }
-
-    .result-formula {
-      border-radius: 17px;
-      padding: 12px;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.13);
-    }
-
-    .result-formula .top {
-      color: #93c5fd;
-      font-size: 10.5px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .result-formula .bottom {
-      color: #22c55e;
-      font-size: 28px;
-      font-weight: 950;
-    }
-
-    .cycle {
-      padding: 12px;
-    }
-
-    .cycle-title {
-      margin: 0 0 9px;
-      color: #1e293b;
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-    .cycle-row {
+# 6) El ciclo de restos se desplaza internamente y no agranda la página.
+html = html.replace(
+"""    .cycle-row {
       display: flex;
       gap: 7px;
+      overflow-x: auto;""",
+"""    .cycle-row {
+      display: flex;
+      gap: 7px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
       overflow-x: auto;
-      padding-bottom: 3px;
-      scrollbar-width: thin;
-    }
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;"""
+)
 
-    .chip {
-      flex: 0 0 auto;
-      width: 43px;
-      height: 50px;
-      border-radius: 15px;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      display: grid;
-      place-items: center;
-      font-weight: 950;
-      color: var(--text);
-    }
-
-    .chip.zero {
-      background: var(--green-soft);
-      border-color: #86efac;
-      color: #166534;
-    }
-
-    .chip.selected {
-      background: var(--blue-soft);
-      border-color: #60a5fa;
-      color: #1d4ed8;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-    }
-
-    @media (max-width: 370px) {
-      body {
-        padding: 6px;
-      }
-
-      .app {
-        border-radius: 22px;
-      }
-
-      .hero {
-        padding: 18px 14px 15px;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      .content {
-        padding: 9px;
-      }
-
-      .btn {
-        font-size: 13px;
-        padding: 12px 8px;
-      }
-
-      canvas {
-        height: 470px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (min-width: 700px) {
-      .app {
+# 7) En pantallas grandes también dejamos seguro el ancho.
+html = html.replace(
+"""      .app {
         width: min(900px, 100%);
-      }
+      }""",
+"""      .app {
+        width: 100%;
+        max-width: 900px;
+      }"""
+)
 
-      .content {
+html = html.replace(
+"""      .content {
         grid-template-columns: 320px 1fr;
         align-items: start;
-      }
-
-      .inputs {
-        position: sticky;
-        top: 12px;
-      }
-
-      .visual-card {
-        grid-row: span 2;
-      }
-
-      canvas {
-        height: 560px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <main class="app">
-    <section class="hero">
-      <div class="badge"><span></span> Recta desplazable</div>
-      <h1>División mental con restos</h1>
-      <p>La interfaz mantiene su tamaño. Si hay muchos números, arrastrá la recta con el dedo.</p>
-    </section>
-
-    <section class="content">
-      <section class="card inputs">
-        <div class="input-grid">
-          <div>
-            <label for="numero">Número</label>
-            <input id="numero" type="number" min="0" step="1" value="200" />
-          </div>
-
-          <div>
-            <label for="divisor">Divisor</label>
-            <input id="divisor" type="number" min="2" max="30" step="1" value="6" />
-          </div>
-        </div>
-
-        <div class="buttons">
-          <button id="calcular" class="btn blue">Calcular</button>
-          <button id="reset" class="btn dark">Reiniciar</button>
-          <button id="prev" class="btn dark">Anterior</button>
-          <button id="next" class="btn green">Siguiente</button>
-          <button id="auto" class="btn blue">Animar</button>
-          <button id="finish" class="btn green">Resultado</button>
-        </div>
-
-        <div class="stats">
-          <div class="stat blueText">
-            <div class="label">Resto</div>
-            <div id="statResto" class="value">2</div>
-          </div>
-
-          <div class="stat greenText">
-            <div class="label">Múltiplo</div>
-            <div id="statMultiplo" class="value">204</div>
-          </div>
-
-          <div class="stat redText">
-            <div class="label">Pasos</div>
-            <div id="statPasos" class="value">4</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card visual-card">
-        <div class="toolbar">
-          <button id="softPrev" class="btn dark">←</button>
-          <div id="status" class="status">Listo para iniciar</div>
-          <button id="softNext" class="btn green">→</button>
-        </div>
-
-        <div class="canvas-wrap">
-          <canvas id="canvas"></canvas>
-          <div class="edge left"></div>
-          <div class="edge right"></div>
-          <div id="dragHint" class="drag-hint">arrastrá la recta ↔</div>
-        </div>
-
-        <div class="result">
-          <div id="resultText" class="result-text"></div>
-
-          <div class="result-formula">
-            <div class="top">Conclusión</div>
-            <div id="resultFormula" class="bottom">r = 2</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card cycle">
-        <h2 class="cycle-title">Ciclo de restos</h2>
-        <div id="cycle" class="cycle-row"></div>
-      </section>
-    </section>
-  </main>
-
-  <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
-    const inputNumero = document.getElementById("numero");
-    const inputDivisor = document.getElementById("divisor");
-
-    const btnCalcular = document.getElementById("calcular");
-    const btnReset = document.getElementById("reset");
-    const btnPrev = document.getElementById("prev");
-    const btnNext = document.getElementById("next");
-    const btnAuto = document.getElementById("auto");
-    const btnFinish = document.getElementById("finish");
-    const btnSoftPrev = document.getElementById("softPrev");
-    const btnSoftNext = document.getElementById("softNext");
-
-    const cycleBox = document.getElementById("cycle");
-    const statusBox = document.getElementById("status");
-    const resultText = document.getElementById("resultText");
-    const resultFormula = document.getElementById("resultFormula");
-    const dragHint = document.getElementById("dragHint");
-
-    const statResto = document.getElementById("statResto");
-    const statMultiplo = document.getElementById("statMultiplo");
-    const statPasos = document.getElementById("statPasos");
-
-    let numero = 200;
-    let divisor = 6;
-    let resto = 2;
-    let pasos = 4;
-    let objetivo = 204;
-    let pasoActual = 0;
-    let autoTimer = null;
-
-    let panX = 0;
-    let isDragging = false;
-    let lastPointerX = 0;
-
-    let geo = {
-      W: 360,
-      H: 500,
-      inicio: 0,
-      fin: 10,
-      baseLeft: 0,
-      unit: 56,
-      minPan: 0,
-      maxPan: 0
-    };
-
-    function mod(a, b) {
-      return ((a % b) + b) % b;
-    }
-
-    function leer() {
-      numero = parseInt(inputNumero.value, 10);
-      divisor = parseInt(inputDivisor.value, 10);
-
-      if (Number.isNaN(numero) || numero < 0) numero = 0;
-      if (Number.isNaN(divisor) || divisor < 2) divisor = 2;
-      if (divisor > 30) divisor = 30;
-
-      inputNumero.value = numero;
-      inputDivisor.value = divisor;
-
-      resto = mod(numero, divisor);
-      pasos = resto === 0 ? 0 : divisor - resto;
-      objetivo = numero + pasos;
-
-      if (pasoActual > pasos) pasoActual = pasos;
-    }
-
-    function calcularGeo() {
-      const rect = canvas.getBoundingClientRect();
-      const W = rect.width || canvas.clientWidth || 360;
-      const H = rect.height || canvas.clientHeight || 500;
-
-      const anterior = numero - resto;
-
-      let inicio = anterior - 2;
-      let fin = objetivo + 2;
-
-      if (fin - inicio < 8) {
-        const centro = Math.round((inicio + fin) / 2);
-        inicio = centro - 4;
-        fin = centro + 4;
-      }
-
-      const unit = W < 380 ? 58 : 64;
-      const baseLeft = 44;
-      const contentWidth = (fin - inicio) * unit;
-      const viewportLeft = 34;
-      const viewportRight = W - 34;
-      const viewportWidth = viewportRight - viewportLeft;
-
-      let minPan;
-      let maxPan;
-
-      if (contentWidth <= viewportWidth) {
-        const centered = viewportLeft + (viewportWidth - contentWidth) / 2 - baseLeft;
-        minPan = centered;
-        maxPan = centered;
-      } else {
-        maxPan = viewportLeft - baseLeft;
-        minPan = viewportRight - (baseLeft + contentWidth);
-      }
-
-      geo = { W, H, inicio, fin, baseLeft, unit, minPan, maxPan };
-      clampPan();
-    }
-
-    function clampPan() {
-      if (panX < geo.minPan) panX = geo.minPan;
-      if (panX > geo.maxPan) panX = geo.maxPan;
-    }
-
-    function xOf(n) {
-      return geo.baseLeft + (n - geo.inicio) * geo.unit + panX;
-    }
-
-    function centerOn(n) {
-      const raw = geo.W / 2 - (geo.baseLeft + (n - geo.inicio) * geo.unit);
-      panX = raw;
-      clampPan();
-    }
-
-    function ensureVisible(n) {
-      const x = xOf(n);
-      const margin = 72;
-
-      if (x < margin) {
-        panX += margin - x;
-      }
-
-      if (x > geo.W - margin) {
-        panX -= x - (geo.W - margin);
-      }
-
-      clampPan();
-    }
-
-    function detenerAuto() {
-      if (autoTimer !== null) {
-        clearInterval(autoTimer);
-        autoTimer = null;
-        btnAuto.textContent = "Animar";
-        btnAuto.className = "btn blue";
-      }
-    }
-
-    function reiniciar() {
-      detenerAuto();
-      leer();
-      pasoActual = 0;
-      calcularGeo();
-      centerOn(numero);
-      actualizar();
-    }
-
-    function finalizar() {
-      detenerAuto();
-      leer();
-      pasoActual = pasos;
-      calcularGeo();
-      ensureVisible(objetivo);
-      actualizar();
-    }
-
-    function avanzar() {
-      detenerAuto();
-      leer();
-
-      if (pasoActual < pasos) {
-        pasoActual++;
-      }
-
-      calcularGeo();
-      ensureVisible(numero + pasoActual);
-      actualizar();
-    }
-
-    function retroceder() {
-      detenerAuto();
-      leer();
-
-      if (pasoActual > 0) {
-        pasoActual--;
-      }
-
-      calcularGeo();
-      ensureVisible(numero + pasoActual);
-      actualizar();
-    }
-
-    function animar() {
-      leer();
-
-      if (autoTimer !== null) {
-        detenerAuto();
-        return;
-      }
-
-      pasoActual = 0;
-      calcularGeo();
-      centerOn(numero);
-      actualizar();
-
-      btnAuto.textContent = "Detener";
-      btnAuto.className = "btn red";
-
-      autoTimer = setInterval(() => {
-        leer();
-
-        if (pasoActual < pasos) {
-          pasoActual++;
-          calcularGeo();
-          ensureVisible(numero + pasoActual);
-          actualizar();
-        } else {
-          detenerAuto();
-        }
-      }, 700);
-    }
-
-    function actualizarCiclo() {
-      let html = "";
-
-      for (let r = 0; r < divisor; r++) {
-        let cls = "chip";
-        if (r === 0) cls += " zero";
-        if (r === resto) cls += " selected";
-
-        html += `<div class="${cls}">${r}</div>`;
-      }
-
-      html += `<div class="chip zero">0</div>`;
-      cycleBox.innerHTML = html;
-    }
-
-    function actualizarPaneles() {
-      statResto.textContent = resto;
-      statMultiplo.textContent = objetivo;
-      statPasos.textContent = pasos;
-
-      const actual = numero + pasoActual;
-
-      if (pasos === 0) {
-        statusBox.textContent = `${numero} ya es múltiplo de ${divisor}`;
-        resultText.innerHTML = `
-          <b>${numero}</b> ya tiene resto 0 al dividirlo por <b>${divisor}</b>.
-        `;
-        resultFormula.textContent = "r = 0";
-        return;
-      }
-
-      if (pasoActual === 0) {
-        statusBox.textContent = `Inicio: ${numero}`;
-        resultText.innerHTML = `
-          Desde <b>${numero}</b>, avanzamos hasta encontrar el próximo múltiplo de <b>${divisor}</b>.
-        `;
-      }
-
-      else if (pasoActual < pasos) {
-        statusBox.textContent = `${pasoActual} de ${pasos} pasos`;
-        resultText.innerHTML = `
-          Posición actual: <b>${actual}</b>. Arrastrá la recta si querés ver el recorrido completo.
-        `;
-      }
-
-      else {
-        statusBox.textContent = `Llegada: ${objetivo}`;
-        resultText.innerHTML = `
-          Desde <b>${numero}</b> se avanzaron <b>${pasos}</b> lugares hasta <b>${objetivo}</b>.
-          Entonces: <b>${divisor} − ${pasos} = ${resto}</b>.
-        `;
-      }
-
-      resultFormula.textContent = `r = ${resto}`;
-    }
-
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-
-      const fallbackWidth = Math.max(320, canvas.parentElement ? canvas.parentElement.clientWidth : 360);
-      const fallbackHeight = 500;
-
-      const cssWidth = rect.width > 0 ? rect.width : fallbackWidth;
-      const cssHeight = rect.height > 0 ? rect.height : fallbackHeight;
-
-      canvas.width = cssWidth * dpr;
-      canvas.height = cssHeight * dpr;
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      leer();
-      calcularGeo();
-      clampPan();
-      dibujar();
-    }
-
-    window.addEventListener("resize", () => {
-      calcularGeo();
-      ensureVisible(numero + pasoActual);
-      resizeCanvas();
-      actualizar();
-    });
-
-    function rr(x, y, w, h, r, fill, stroke, width = 1.5) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
-
-      if (fill) {
-        ctx.fillStyle = fill;
-        ctx.fill();
-      }
-
-      if (stroke) {
-        ctx.strokeStyle = stroke;
-        ctx.lineWidth = width;
-        ctx.stroke();
-      }
-
-      ctx.restore();
-    }
-
-    function text(t, x, y, size = 14, color = "#0f172a", align = "left", bold = false) {
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.font = `${bold ? "800 " : "500 "}${size}px Arial`;
-      ctx.textAlign = align;
-      ctx.fillText(t, x, y);
-      ctx.restore();
-    }
-
-    function line(x1, y1, x2, y2, color = "#0f172a", width = 1, dashed = false) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = width;
-      ctx.lineCap = "round";
-      if (dashed) ctx.setLineDash([7, 6]);
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function arrow(x1, y1, x2, y2, color = "#334155", width = 2) {
-      const angle = Math.atan2(y2 - y1, x2 - x1);
-      const head = 9;
-
-      line(x1, y1, x2, y2, color, width);
-
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - head * Math.cos(angle - Math.PI / 6), y2 - head * Math.sin(angle - Math.PI / 6));
-      ctx.lineTo(x2 - head * Math.cos(angle + Math.PI / 6), y2 - head * Math.sin(angle + Math.PI / 6));
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-    }
-
-    function dot(x, y, r, fill, stroke = "#ffffff", width = 3) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fillStyle = fill;
-      ctx.fill();
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = width;
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function dibujar() {
-      leer();
-      calcularGeo();
-
-      const W = geo.W;
-      const H = geo.H;
-
-      ctx.clearRect(0, 0, W, H);
-
-      const actual = numero + pasoActual;
-      const xN = xOf(numero);
-      const xO = xOf(objetivo);
-      const xA = xOf(actual);
-
-      const yAxis = H * 0.48;
-      const yTrack = yAxis - 54;
-      const yResto = yAxis + 74;
-
-      rr(16, 18, W - 32, 72, 20, "rgba(255,255,255,.86)", "#dbeafe", 1.5);
-      text("Recorrido", 32, 48, 19, "#0f172a", "left", true);
-      text(`${numero} ÷ ${divisor}`, 32, 72, 16, "#475569", "left", true);
-
-      rr(W - 140, 31, 112, 36, 15, "#eff6ff", "#bfdbfe", 1.5);
-      text(`${actual}`, W - 84, 54, 18, "#1d4ed8", "center", true);
-
-      // La base de la recta queda fija; los números se desplazan encima.
-      line(24, yAxis, W - 24, yAxis, "#94a3b8", 4);
-      arrow(W - 43, yAxis, W - 18, yAxis, "#94a3b8", 4);
-
-      if (pasos > 0) {
-        line(xN, yTrack, xO, yTrack, "#dbeafe", 10);
-        line(xN, yTrack, xA, yTrack, "#22c55e", 10);
-        arrow(xN, yTrack, xA, yTrack, "#16a34a", 3);
-      }
-
-      for (let s = 0; s < pasoActual; s++) {
-        const x1 = xOf(numero + s);
-        const x2 = xOf(numero + s + 1);
-
-        if (x2 < -80 || x1 > W + 80) continue;
-
-        const xm = (x1 + x2) / 2;
-        const rad = Math.abs(x2 - x1) / 2;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.strokeStyle = "#16a34a";
-        ctx.lineWidth = 2.4;
-        ctx.arc(xm, yAxis - 23, rad, Math.PI, 0);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      for (let n = geo.inicio; n <= geo.fin; n++) {
-        const x = xOf(n);
-
-        if (x < -90 || x > W + 90) continue;
-
-        const r = mod(n, divisor);
-
-        const isN = n === numero;
-        const isO = n === objetivo;
-        const isA = n === actual;
-        const isM = r === 0;
-
-        let tickColor = "#64748b";
-        let tickWidth = 1.7;
-        let tickHeight = 12;
-
-        if (isM) {
-          tickColor = "#22c55e";
-          tickWidth = 3;
-          tickHeight = 18;
-        }
-
-        if (isN) {
-          tickColor = "#2563eb";
-          tickWidth = 4;
-          tickHeight = 23;
-        }
-
-        if (isA) {
-          tickColor = "#ef4444";
-          tickWidth = 4;
-          tickHeight = 27;
-        }
-
-        line(x, yAxis - tickHeight, x, yAxis + tickHeight, tickColor, tickWidth);
-        text(String(n), x, yAxis + 40, 12.5, "#0f172a", "center", isN || isO || isA);
-
-        let fill = "#ffffff";
-        let stroke = "#cbd5e1";
-        let color = "#475569";
-
-        if (isM) {
-          fill = "#dcfce7";
-          stroke = "#86efac";
-          color = "#166534";
-        }
-
-        if (isN) {
-          fill = "#dbeafe";
-          stroke = "#60a5fa";
-          color = "#1d4ed8";
-        }
-
-        if (isA) {
-          fill = "#fee2e2";
-          stroke = "#fca5a5";
-          color = "#991b1b";
-        }
-
-        rr(x - 18, yResto - 15, 36, 29, 11, fill, stroke, 1.2);
-        text("r" + r, x, yResto + 5, 12, color, "center", true);
-      }
-
-      // Etiquetas principales: solo se dibujan si están cerca de la ventana visible.
-      if (xN > -80 && xN < W + 80) {
-        line(xN, yAxis - 72, xN, yAxis - 22, "#93c5fd", 1.8, true);
-        rr(xN - 41, yAxis - 108, 82, 36, 14, "#dbeafe", "#93c5fd", 1.2);
-        text("inicio", xN, yAxis - 86, 13, "#1d4ed8", "center", true);
-        dot(xN, yAxis, 11, "#2563eb");
-      }
-
-      if (xO > -90 && xO < W + 90) {
-        line(xO, yAxis - 112, xO, yAxis - 22, "#86efac", 1.8, true);
-        rr(xO - 48, yAxis - 151, 96, 41, 14, "#dcfce7", "#86efac", 1.2);
-        text("múltiplo", xO, yAxis - 126, 13, "#166534", "center", true);
-        dot(xO, yAxis, 11, "#22c55e");
-      }
-
-      if (xA > -90 && xA < W + 90) {
-        dot(xA, yAxis, 14, "#ef4444");
-      }
-
-      const boxY = H - 72;
-      rr(16, boxY, W - 32, 48, 17, "#0f172a", "#1e293b", 1.5);
-
-      let message = "";
-
-      if (pasos === 0) {
-        message = `${numero} ya es múltiplo de ${divisor}`;
-      } else if (pasoActual === 0) {
-        message = `Partimos de ${numero}`;
-      } else if (pasoActual < pasos) {
-        message = `${pasoActual} de ${pasos} pasos`;
-      } else {
-        message = `${divisor} − ${pasos} = ${resto}`;
-      }
-
-      text(message, W / 2, boxY + 30, 16, "#e2e8f0", "center", true);
-
-      const canPan = Math.abs(geo.maxPan - geo.minPan) > 1;
-      dragHint.style.display = canPan ? "block" : "none";
-    }
-
-    function actualizar() {
-      leer();
-      calcularGeo();
-      actualizarCiclo();
-      actualizarPaneles();
-      dibujar();
-    }
-
-    canvas.addEventListener("pointerdown", (event) => {
-      isDragging = true;
-      lastPointerX = event.clientX;
-      canvas.setPointerCapture(event.pointerId);
-      event.preventDefault();
-    });
-
-    canvas.addEventListener("pointermove", (event) => {
-      if (!isDragging) return;
-
-      const dx = event.clientX - lastPointerX;
-      lastPointerX = event.clientX;
-
-      panX += dx;
-      clampPan();
-      dibujar();
-
-      event.preventDefault();
-    });
-
-    canvas.addEventListener("pointerup", (event) => {
-      isDragging = false;
-      try {
-        canvas.releasePointerCapture(event.pointerId);
-      } catch (e) {}
-    });
-
-    canvas.addEventListener("pointercancel", () => {
-      isDragging = false;
-    });
-
-    btnCalcular.addEventListener("click", reiniciar);
-    btnReset.addEventListener("click", reiniciar);
-    btnPrev.addEventListener("click", retroceder);
-    btnNext.addEventListener("click", avanzar);
-    btnSoftPrev.addEventListener("click", retroceder);
-    btnSoftNext.addEventListener("click", avanzar);
-    btnAuto.addEventListener("click", animar);
-    btnFinish.addEventListener("click", finalizar);
-
-    inputNumero.addEventListener("change", reiniciar);
+      }""",
+"""      .content {
+        grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+        align-items: start;
+      }"""
+)
+
+# 8) Ajuste JS: el divisor puede ser mayor sin estirar visualmente, porque el paso horizontal queda acotado.
+html = html.replace(
+"""      const unit = W < 380 ? 58 : 64;""",
+"""      // Tamaño fijo por marca de la recta. Si hay muchos números, se arrastra.
+      // No se agranda la interfaz: solo aumenta la tira interna desplazable.
+      const unit = W < 380 ? 56 : 62;"""
+)
+
+# 9) Si el usuario cambia divisor/número, centramos en el número inicial y no dejamos pan anterior raro.
+html = html.replace(
+"""    inputNumero.addEventListener("change", reiniciar);
+    inputDivisor.addEventListener("change", reiniciar);""",
+"""    inputNumero.addEventListener("change", reiniciar);
     inputDivisor.addEventListener("change", reiniciar);
+    inputNumero.addEventListener("input", () => {
+      detenerAuto();
+    });
+    inputDivisor.addEventListener("input", () => {
+      detenerAuto();
+    });"""
+)
 
-    function iniciarApp() {
+# 10) Mejora extra: en resize no repetimos cadenas que puedan generar inconsistencias.
+html = html.replace(
+"""    window.addEventListener("resize", () => {
+      calcularGeo();
+      ensureVisible(numero + pasoActual);
       resizeCanvas();
-      reiniciar();
+      actualizar();
+    });""",
+"""    window.addEventListener("resize", () => {
+      leer();
+      resizeCanvas();
+      calcularGeo();
+      ensureVisible(numero + pasoActual);
+      actualizar();
+    });"""
+)
 
-      setTimeout(() => {
-        resizeCanvas();
-        actualizar();
-      }, 120);
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", iniciarApp);
-    } else {
-      iniciarApp();
-    }
-  </script>
-</body>
-</html>
-"""
-
-path = "/mnt/data/restos-celular-desplazable.html"
-with open(path, "w", encoding="utf-8") as f:
-    f.write(html)
-
-path
-
+out = Path("/mnt/data/restos-celular-sin-desborde.html")
+out.write_text(html, encoding="utf-8")
+str(out), out.stat().st_size
 
