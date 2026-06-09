@@ -1,0 +1,1096 @@
+html = r"""<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>División mental con recta numérica</title>
+
+  <style>
+    :root {
+      --bg-dark: #020617;
+      --bg-panel: #ffffff;
+      --bg-soft: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --red: #ef4444;
+      --red-soft: #fee2e2;
+      --slate: #334155;
+      --border: #e2e8f0;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(37, 99, 235, 0.14), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(22, 163, 74, 0.12), transparent 26%),
+        linear-gradient(180deg, #eef6ff 0%, #f8fafc 45%, #e2e8f0 100%);
+      padding: 18px;
+    }
+
+    .app {
+      width: min(1220px, 100%);
+      margin: 0 auto;
+      background: var(--bg-dark);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(148, 163, 184, 0.26);
+    }
+
+    .hero {
+      padding: 32px 34px;
+      background:
+        radial-gradient(circle at 14% 22%, rgba(56, 189, 248, 0.26), transparent 30%),
+        radial-gradient(circle at 84% 10%, rgba(99, 102, 241, 0.28), transparent 28%),
+        linear-gradient(135deg, #020617 0%, #0f172a 56%, #111827 100%);
+      color: #ffffff;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 22px;
+      align-items: flex-start;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #bfdbfe;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.35px;
+    }
+
+    .badge-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.95);
+    }
+
+    .hero h1 {
+      max-width: 760px;
+      margin: 18px 0 10px 0;
+      font-size: clamp(29px, 4vw, 46px);
+      line-height: 1.04;
+      letter-spacing: -1.2px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #cbd5e1;
+      max-width: 800px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .formula-pill {
+      min-width: 270px;
+      padding: 18px 20px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+
+    .formula-pill .small {
+      color: #93c5fd;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 7px;
+      letter-spacing: 0.4px;
+    }
+
+    .formula-pill .big {
+      font-size: 23px;
+      font-weight: 950;
+      color: white;
+    }
+
+    .body {
+      padding: 22px;
+      background: #f8fafc;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 315px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel,
+    .visual-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel + .panel {
+      margin-top: 16px;
+    }
+
+    .panel-title {
+      margin: 0 0 14px 0;
+      font-size: 17px;
+      color: #1e293b;
+      font-weight: 900;
+      letter-spacing: -0.25px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 14px 15px;
+      font-size: 22px;
+      font-weight: 900;
+      color: #0f172a;
+      outline: none;
+      transition: 0.15s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+      background: white;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 16px;
+      padding: 13px 12px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      color: white;
+      transition: transform 0.08s ease, opacity 0.08s ease, box-shadow 0.08s ease;
+      user-select: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+    }
+
+    .success {
+      background: linear-gradient(135deg, #16a34a, #0f766e);
+      box-shadow: 0 10px 20px rgba(22, 163, 74, 0.18);
+    }
+
+    .dark {
+      background: linear-gradient(135deg, #334155, #0f172a);
+    }
+
+    .danger {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+
+    .stat-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      border-radius: 18px;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+
+    .stat-label {
+      color: #64748b;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.45px;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 25px;
+      font-weight: 950;
+      color: #0f172a;
+    }
+
+    .stat.blue .stat-value { color: var(--blue); }
+    .stat.green .stat-value { color: var(--green); }
+    .stat.red .stat-value { color: #dc2626; }
+
+    .cycle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .chip {
+      width: 46px;
+      height: 54px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chip .letter {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 900;
+    }
+
+    .chip .number {
+      font-size: 19px;
+      color: #0f172a;
+      font-weight: 950;
+    }
+
+    .chip.zero {
+      background: var(--green-soft);
+      border-color: #86efac;
+    }
+
+    .chip.selected {
+      background: var(--blue-soft);
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13);
+    }
+
+    .visual-card {
+      padding: 16px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar-left {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar .btn {
+      padding: 11px 15px;
+    }
+
+    .mini-status {
+      padding: 10px 13px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 13px;
+      font-weight: 950;
+      border: 1px solid #bfdbfe;
+    }
+
+    canvas {
+      width: 100%;
+      height: 560px;
+      display: block;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(219, 234, 254, 0.72), transparent 25%),
+        radial-gradient(circle at 88% 10%, rgba(224, 231, 255, 0.75), transparent 24%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #cbd5e1;
+    }
+
+    .result {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 18px;
+      border-radius: 22px;
+      background: #0f172a;
+      color: white;
+    }
+
+    .result-text {
+      line-height: 1.5;
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+
+    .result-text b {
+      color: white;
+    }
+
+    .result-formula {
+      min-width: 230px;
+      text-align: center;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .result-formula .top {
+      color: #93c5fd;
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .result-formula .bottom {
+      font-size: 28px;
+      font-weight: 950;
+      color: #22c55e;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: #64748b;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 950px) {
+      body {
+        padding: 10px;
+      }
+
+      .app {
+        border-radius: 22px;
+      }
+
+      .hero {
+        padding: 24px 20px;
+      }
+
+      .hero-top {
+        flex-direction: column;
+      }
+
+      .formula-pill {
+        width: 100%;
+      }
+
+      .body {
+        padding: 14px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .button-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .result {
+        grid-template-columns: 1fr;
+      }
+
+      canvas {
+        height: 620px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        align-items: stretch;
+      }
+
+      .toolbar-left,
+      .toolbar-left .btn,
+      .mini-status {
+        width: 100%;
+      }
+
+      .hero h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="badge">
+            <span class="badge-dot"></span>
+            RECTA NUMÉRICA INTERACTIVA
+          </div>
+
+          <h1>División mental: encontrar el resto sin hacer la cuenta completa</h1>
+
+          <p>
+            Una visualización pensada para explicar el movimiento desde un número inicial hasta el próximo múltiplo del divisor.
+            El recorrido permite reconstruir el resto dentro del ciclo.
+          </p>
+        </div>
+
+        <div class="formula-pill">
+          <div class="small">IDEA VISUAL</div>
+          <div class="big">resto = divisor − pasos</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="body">
+      <div class="layout">
+        <aside>
+          <div class="panel">
+            <h2 class="panel-title">Configuración</h2>
+
+            <div class="field">
+              <label for="numero">Número inicial</label>
+              <input id="numero" type="number" min="0" step="1" value="200" />
+            </div>
+
+            <div class="field">
+              <label for="divisor">Divisor</label>
+              <input id="divisor" type="number" min="2" max="30" step="1" value="6" />
+            </div>
+
+            <div class="button-grid">
+              <button id="calcular" class="btn primary">Calcular</button>
+              <button id="reset" class="btn dark">Reiniciar</button>
+              <button id="prev" class="btn dark">Anterior</button>
+              <button id="next" class="btn success">Siguiente</button>
+            </div>
+
+            <div class="button-grid">
+              <button id="auto" class="btn primary">Animar</button>
+              <button id="finish" class="btn success">Resultado</button>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat blue">
+                <div class="stat-label">Resto</div>
+                <div id="statResto" class="stat-value">2</div>
+              </div>
+
+              <div class="stat green">
+                <div class="stat-label">Próximo múltiplo</div>
+                <div id="statMultiplo" class="stat-value">204</div>
+              </div>
+
+              <div class="stat red">
+                <div class="stat-label">Pasos hasta resto 0</div>
+                <div id="statPasos" class="stat-value">4</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2 class="panel-title">Ciclo de restos</h2>
+            <div id="cycle" class="cycle-row"></div>
+          </div>
+        </aside>
+
+        <section class="visual-card">
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <button id="softPrev" class="btn dark">← Retroceder</button>
+              <button id="softNext" class="btn success">Avanzar →</button>
+            </div>
+
+            <div id="status" class="mini-status">
+              Listo para iniciar
+            </div>
+          </div>
+
+          <canvas id="canvas"></canvas>
+
+          <div class="result">
+            <div id="resultText" class="result-text"></div>
+
+            <div class="result-formula">
+              <div class="top">CONCLUSIÓN</div>
+              <div id="resultFormula" class="bottom">r = 2</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="footer-note">
+        Herramienta visual para trabajar restos, múltiplos y ciclos en aritmética modular.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const inputNumero = document.getElementById("numero");
+    const inputDivisor = document.getElementById("divisor");
+
+    const btnCalcular = document.getElementById("calcular");
+    const btnReset = document.getElementById("reset");
+    const btnPrev = document.getElementById("prev");
+    const btnNext = document.getElementById("next");
+    const btnAuto = document.getElementById("auto");
+    const btnFinish = document.getElementById("finish");
+
+    const btnSoftPrev = document.getElementById("softPrev");
+    const btnSoftNext = document.getElementById("softNext");
+
+    const cycleBox = document.getElementById("cycle");
+    const statusBox = document.getElementById("status");
+    const resultText = document.getElementById("resultText");
+    const resultFormula = document.getElementById("resultFormula");
+
+    const statResto = document.getElementById("statResto");
+    const statMultiplo = document.getElementById("statMultiplo");
+    const statPasos = document.getElementById("statPasos");
+
+    let numero = 200;
+    let divisor = 6;
+    let resto = 2;
+    let pasos = 4;
+    let objetivo = 204;
+    let pasoActual = 0;
+    let autoTimer = null;
+
+    function mod(a, b) {
+      return ((a % b) + b) % b;
+    }
+
+    function leer() {
+      numero = parseInt(inputNumero.value);
+      divisor = parseInt(inputDivisor.value);
+
+      if (Number.isNaN(numero) || numero < 0) numero = 0;
+      if (Number.isNaN(divisor) || divisor < 2) divisor = 2;
+      if (divisor > 30) divisor = 30;
+
+      inputNumero.value = numero;
+      inputDivisor.value = divisor;
+
+      resto = mod(numero, divisor);
+      pasos = resto === 0 ? 0 : divisor - resto;
+      objetivo = numero + pasos;
+
+      if (pasoActual > pasos) pasoActual = pasos;
+    }
+
+    function detenerAuto() {
+      if (autoTimer !== null) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+        btnAuto.textContent = "Animar";
+        btnAuto.className = "btn primary";
+      }
+    }
+
+    function reiniciar() {
+      detenerAuto();
+      leer();
+      pasoActual = 0;
+      actualizar();
+    }
+
+    function finalizar() {
+      detenerAuto();
+      leer();
+      pasoActual = pasos;
+      actualizar();
+    }
+
+    function avanzar() {
+      detenerAuto();
+      leer();
+
+      if (pasoActual < pasos) {
+        pasoActual++;
+      }
+
+      actualizar();
+    }
+
+    function retroceder() {
+      detenerAuto();
+      leer();
+
+      if (pasoActual > 0) {
+        pasoActual--;
+      }
+
+      actualizar();
+    }
+
+    function animar() {
+      leer();
+
+      if (autoTimer !== null) {
+        detenerAuto();
+        return;
+      }
+
+      pasoActual = 0;
+      actualizar();
+
+      btnAuto.textContent = "Detener";
+      btnAuto.className = "btn danger";
+
+      autoTimer = setInterval(() => {
+        leer();
+
+        if (pasoActual < pasos) {
+          pasoActual++;
+          actualizar();
+        } else {
+          detenerAuto();
+        }
+      }, 760);
+    }
+
+    function actualizarCiclo() {
+      const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let html = "";
+
+      for (let r = 0; r < divisor; r++) {
+        let cls = "chip";
+
+        if (r === 0) cls += " zero";
+        if (r === resto) cls += " selected";
+
+        html += `
+          <div class="${cls}">
+            <div class="letter">${letras[r] || ""}</div>
+            <div class="number">${r}</div>
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="chip zero">
+          <div class="letter">A</div>
+          <div class="number">0</div>
+        </div>
+      `;
+
+      cycleBox.innerHTML = html;
+    }
+
+    function actualizarPaneles() {
+      statResto.textContent = resto;
+      statMultiplo.textContent = objetivo;
+      statPasos.textContent = pasos;
+
+      const actual = numero + pasoActual;
+
+      if (pasos === 0) {
+        statusBox.textContent = `${numero} ya es múltiplo de ${divisor}`;
+        resultText.innerHTML = `
+          <b>${numero}</b> ya tiene resto 0 al dividirlo por <b>${divisor}</b>.
+          No hace falta avanzar en la recta numérica porque el número inicial ya coincide con un múltiplo.
+        `;
+        resultFormula.textContent = "r = 0";
+        return;
+      }
+
+      if (pasoActual === 0) {
+        statusBox.textContent = `Inicio: ubicado en ${numero}`;
+        resultText.innerHTML = `
+          El número inicial es <b>${numero}</b>. Para hallar el resto, se observa cuántos pasos
+          hay que avanzar hasta llegar al próximo múltiplo de <b>${divisor}</b>.
+        `;
+      }
+
+      else if (pasoActual < pasos) {
+        statusBox.textContent = `Avance: ${pasoActual} de ${pasos} pasos`;
+        resultText.innerHTML = `
+          La posición actual es <b>${actual}</b>. Todavía no se llegó al múltiplo buscado.
+          El recorrido muestra la distancia que falta para volver al resto 0.
+        `;
+      }
+
+      else {
+        statusBox.textContent = `Llegada: ${objetivo} tiene resto 0`;
+        resultText.innerHTML = `
+          Desde <b>${numero}</b> se avanzaron <b>${pasos}</b> lugares hasta llegar a
+          <b>${objetivo}</b>, que es múltiplo de <b>${divisor}</b>. Por eso el resto inicial se obtiene con:
+          <b>${divisor} − ${pasos} = ${resto}</b>.
+        `;
+      }
+
+      resultFormula.textContent = `r = ${resto}`;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dibujar();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    function rr(x, y, w, h, r, fill, stroke, width = 1.5) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+
+      if (fill) {
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = width;
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function text(t, x, y, size = 14, color = "#0f172a", align = "left", bold = false) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.font = `${bold ? "800 " : "500 "}${size}px Inter, Arial, sans-serif`;
+      ctx.textAlign = align;
+      ctx.fillText(t, x, y);
+      ctx.restore();
+    }
+
+    function line(x1, y1, x2, y2, color = "#0f172a", width = 1, dashed = false) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+
+      if (dashed) {
+        ctx.setLineDash([8, 7]);
+      }
+
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function arrow(x1, y1, x2, y2, color = "#334155", width = 2) {
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const head = 11;
+
+      line(x1, y1, x2, y2, color, width);
+
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(
+        x2 - head * Math.cos(angle - Math.PI / 6),
+        y2 - head * Math.sin(angle - Math.PI / 6)
+      );
+      ctx.lineTo(
+        x2 - head * Math.cos(angle + Math.PI / 6),
+        y2 - head * Math.sin(angle + Math.PI / 6)
+      );
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function dot(x, y, r, fill, stroke = "#ffffff", width = 3) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = width;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawShadowDot(x, y, r, fill) {
+      ctx.save();
+      ctx.shadowColor = fill;
+      ctx.shadowBlur = 18;
+      dot(x, y, r, fill, "#ffffff", 3);
+      ctx.restore();
+    }
+
+    function dibujar() {
+      leer();
+
+      const W = canvas.clientWidth;
+      const H = canvas.clientHeight;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const actual = numero + pasoActual;
+      const restoActual = mod(actual, divisor);
+
+      const anterior = numero - resto;
+      let inicio = anterior - 2;
+      let fin = objetivo + 2;
+
+      if (fin - inicio < 10) {
+        const centro = Math.round((inicio + fin) / 2);
+        inicio = centro - 5;
+        fin = centro + 5;
+      }
+
+      const left = 66;
+      const right = 66;
+      const width = W - left - right;
+
+      const yAxis = H * 0.52;
+      const yTrack = yAxis - 60;
+      const yResto = yAxis + 76;
+
+      function xOf(n) {
+        return left + ((n - inicio) / (fin - inicio)) * width;
+      }
+
+      const xN = xOf(numero);
+      const xO = xOf(objetivo);
+      const xA = xOf(actual);
+
+      rr(28, 28, W - 56, 86, 24, "rgba(255,255,255,.86)", "#dbeafe", 1.5);
+      text("Visualización del recorrido", 54, 63, 20, "#0f172a", "left", true);
+      text(`${numero} dividido por ${divisor}`, 54, 90, 16, "#475569", "left", false);
+
+      rr(W - 266, 42, 210, 48, 18, "#eff6ff", "#bfdbfe", 1.5);
+      text(`posición actual: ${actual}`, W - 161, 72, 16, "#1d4ed8", "center", true);
+
+      line(left - 18, yAxis, W - right + 18, yAxis, "#94a3b8", 4);
+      arrow(W - right - 8, yAxis, W - right + 28, yAxis, "#94a3b8", 4);
+
+      if (pasos > 0) {
+        line(xN, yTrack, xO, yTrack, "#dbeafe", 12);
+        line(xN, yTrack, xA, yTrack, "#22c55e", 12);
+        arrow(xN, yTrack, xA, yTrack, "#16a34a", 4);
+      }
+
+      for (let s = 0; s < pasoActual; s++) {
+        const x1 = xOf(numero + s);
+        const x2 = xOf(numero + s + 1);
+        const xm = (x1 + x2) / 2;
+        const rad = Math.abs(x2 - x1) / 2;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = "#16a34a";
+        ctx.lineWidth = 3;
+        ctx.arc(xm, yAxis - 28, rad, Math.PI, 0);
+        ctx.stroke();
+        ctx.restore();
+
+        text("+1", xm, yAxis - 45, 13, "#15803d", "center", true);
+      }
+
+      for (let n = inicio; n <= fin; n++) {
+        const x = xOf(n);
+        const r = mod(n, divisor);
+
+        const isN = n === numero;
+        const isO = n === objetivo;
+        const isA = n === actual;
+        const isM = r === 0;
+
+        let tickColor = "#64748b";
+        let tickWidth = 2;
+        let tickHeight = 14;
+
+        if (isM) {
+          tickColor = "#22c55e";
+          tickWidth = 4;
+          tickHeight = 22;
+        }
+
+        if (isN) {
+          tickColor = "#2563eb";
+          tickWidth = 5;
+          tickHeight = 26;
+        }
+
+        if (isA) {
+          tickColor = "#ef4444";
+          tickWidth = 5;
+          tickHeight = 30;
+        }
+
+        line(x, yAxis - tickHeight, x, yAxis + tickHeight, tickColor, tickWidth);
+        text(String(n), x, yAxis + 47, 14, "#0f172a", "center", isN || isO || isA);
+
+        let fill = "#ffffff";
+        let stroke = "#cbd5e1";
+        let color = "#475569";
+
+        if (isM) {
+          fill = "#dcfce7";
+          stroke = "#86efac";
+          color = "#166534";
+        }
+
+        if (isN) {
+          fill = "#dbeafe";
+          stroke = "#60a5fa";
+          color = "#1d4ed8";
+        }
+
+        if (isA) {
+          fill = "#fee2e2";
+          stroke = "#fca5a5";
+          color = "#991b1b";
+        }
+
+        rr(x - 25, yResto - 19, 50, 36, 14, fill, stroke, 1.5);
+        text("r " + r, x, yResto + 5, 14, color, "center", true);
+      }
+
+      line(xN, yAxis - 102, xN, yAxis - 21, "#93c5fd", 2, true);
+      rr(xN - 78, yAxis - 151, 156, 50, 18, "#dbeafe", "#93c5fd", 1.5);
+      text("número inicial", xN, yAxis - 130, 12, "#1d4ed8", "center", true);
+      text(String(numero), xN, yAxis - 109, 20, "#1d4ed8", "center", true);
+
+      line(xO, yAxis - 142, xO, yAxis - 21, "#86efac", 2, true);
+      rr(xO - 80, yAxis - 194, 160, 56, 18, "#dcfce7", "#86efac", 1.5);
+      text("próximo múltiplo", xO, yAxis - 171, 12, "#166534", "center", true);
+      text(String(objetivo), xO, yAxis - 149, 20, "#166534", "center", true);
+
+      drawShadowDot(xA, yAxis, 16, "#ef4444");
+      line(xA, yAxis + 25, xA, yAxis + 112, "#fecaca", 2, true);
+      rr(xA - 75, yAxis + 114, 150, 52, 18, "#fee2e2", "#fca5a5", 1.5);
+      text("posición actual", xA, yAxis + 136, 12, "#991b1b", "center", true);
+      text(String(actual), xA, yAxis + 158, 20, "#991b1b", "center", true);
+
+      drawShadowDot(xN, yAxis, 13, "#2563eb");
+      drawShadowDot(xO, yAxis, 13, "#22c55e");
+
+      const boxY = H - 86;
+      rr(28, boxY, W - 56, 58, 20, "#0f172a", "#1e293b", 1.5);
+
+      let message = "";
+
+      if (pasos === 0) {
+        message = `${numero} ya es múltiplo de ${divisor}: el resto es 0.`;
+      } else if (pasoActual === 0) {
+        message = `Se parte de ${numero}. El objetivo es llegar al próximo múltiplo de ${divisor}.`;
+      } else if (pasoActual < pasos) {
+        message = `Se avanzaron ${pasoActual} de ${pasos} pasos. La posición actual deja resto ${restoActual}.`;
+      } else {
+        message = `Se llegó a ${objetivo}. Como se avanzaron ${pasos} pasos, el resto es ${divisor} − ${pasos} = ${resto}.`;
+      }
+
+      text(message, W / 2, boxY + 36, 17, "#e2e8f0", "center", true);
+    }
+
+    function actualizar() {
+      leer();
+      actualizarCiclo();
+      actualizarPaneles();
+      dibujar();
+    }
+
+    btnCalcular.addEventListener("click", reiniciar);
+    btnReset.addEventListener("click", reiniciar);
+    btnPrev.addEventListener("click", retroceder);
+    btnNext.addEventListener("click", avanzar);
+    btnSoftPrev.addEventListener("click", retroceder);
+    btnSoftNext.addEventListener("click", avanzar);
+    btnAuto.addEventListener("click", animar);
+    btnFinish.addEventListener("click", finalizar);
+
+    inputNumero.addEventListener("change", reiniciar);
+    inputDivisor.addEventListener("change", reiniciar);
+
+    window.addEventListener("load", () => {
+      resizeCanvas();
+      reiniciar();
+    });
+  </script>
+</body>
+</html>
+"""
+
+path = "/mnt/data/index.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html)
+
+path
