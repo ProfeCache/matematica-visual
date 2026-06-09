@@ -1,14 +1,13 @@
-<!DOCTYPE html>
+html = r"""<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Restos en la recta numérica - versión celular</title>
+  <title>Restos en la recta numérica - celular</title>
 
   <style>
     :root {
       --dark: #020617;
-      --dark-2: #0f172a;
       --text: #0f172a;
       --muted: #64748b;
       --card: #ffffff;
@@ -26,10 +25,6 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
@@ -260,16 +255,63 @@
       text-overflow: ellipsis;
     }
 
-    canvas {
-      width: 100%;
-      height: 500px;
-      display: block;
+    .canvas-wrap {
+      position: relative;
       border-radius: 21px;
+      overflow: hidden;
       border: 1px solid #cbd5e1;
       background:
         radial-gradient(circle at 16% 10%, rgba(219, 234, 254, 0.9), transparent 31%),
         radial-gradient(circle at 85% 5%, rgba(220, 252, 231, 0.72), transparent 28%),
         linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    canvas {
+      width: 100%;
+      height: 500px;
+      display: block;
+      background: transparent;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    canvas:active {
+      cursor: grabbing;
+    }
+
+    .drag-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: #475569;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid #e2e8f0;
+      font-size: 11px;
+      font-weight: 900;
+      pointer-events: none;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .edge {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 34px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .edge.left {
+      left: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.96), rgba(255,255,255,0));
+    }
+
+    .edge.right {
+      right: 0;
+      background: linear-gradient(270deg, rgba(255,255,255,0.96), rgba(255,255,255,0));
     }
 
     .result {
@@ -424,9 +466,9 @@
 <body>
   <main class="app">
     <section class="hero">
-      <div class="badge"><span></span> Recta numérica interactiva</div>
+      <div class="badge"><span></span> Recta desplazable</div>
       <h1>División mental con restos</h1>
-      <p>Avanzá desde el número inicial hasta el próximo múltiplo y observá cómo se reconstruye el resto.</p>
+      <p>La interfaz mantiene su tamaño. Si hay muchos números, arrastrá la recta con el dedo.</p>
     </section>
 
     <section class="content">
@@ -477,7 +519,12 @@
           <button id="softNext" class="btn green">→</button>
         </div>
 
-        <canvas id="canvas"></canvas>
+        <div class="canvas-wrap">
+          <canvas id="canvas"></canvas>
+          <div class="edge left"></div>
+          <div class="edge right"></div>
+          <div id="dragHint" class="drag-hint">arrastrá la recta ↔</div>
+        </div>
 
         <div class="result">
           <div id="resultText" class="result-text"></div>
@@ -516,6 +563,7 @@
     const statusBox = document.getElementById("status");
     const resultText = document.getElementById("resultText");
     const resultFormula = document.getElementById("resultFormula");
+    const dragHint = document.getElementById("dragHint");
 
     const statResto = document.getElementById("statResto");
     const statMultiplo = document.getElementById("statMultiplo");
@@ -528,6 +576,21 @@
     let objetivo = 204;
     let pasoActual = 0;
     let autoTimer = null;
+
+    let panX = 0;
+    let isDragging = false;
+    let lastPointerX = 0;
+
+    let geo = {
+      W: 360,
+      H: 500,
+      inicio: 0,
+      fin: 10,
+      baseLeft: 0,
+      unit: 56,
+      minPan: 0,
+      maxPan: 0
+    };
 
     function mod(a, b) {
       return ((a % b) + b) % b;
@@ -551,6 +614,75 @@
       if (pasoActual > pasos) pasoActual = pasos;
     }
 
+    function calcularGeo() {
+      const rect = canvas.getBoundingClientRect();
+      const W = rect.width || canvas.clientWidth || 360;
+      const H = rect.height || canvas.clientHeight || 500;
+
+      const anterior = numero - resto;
+
+      let inicio = anterior - 2;
+      let fin = objetivo + 2;
+
+      if (fin - inicio < 8) {
+        const centro = Math.round((inicio + fin) / 2);
+        inicio = centro - 4;
+        fin = centro + 4;
+      }
+
+      const unit = W < 380 ? 58 : 64;
+      const baseLeft = 44;
+      const contentWidth = (fin - inicio) * unit;
+      const viewportLeft = 34;
+      const viewportRight = W - 34;
+      const viewportWidth = viewportRight - viewportLeft;
+
+      let minPan;
+      let maxPan;
+
+      if (contentWidth <= viewportWidth) {
+        const centered = viewportLeft + (viewportWidth - contentWidth) / 2 - baseLeft;
+        minPan = centered;
+        maxPan = centered;
+      } else {
+        maxPan = viewportLeft - baseLeft;
+        minPan = viewportRight - (baseLeft + contentWidth);
+      }
+
+      geo = { W, H, inicio, fin, baseLeft, unit, minPan, maxPan };
+      clampPan();
+    }
+
+    function clampPan() {
+      if (panX < geo.minPan) panX = geo.minPan;
+      if (panX > geo.maxPan) panX = geo.maxPan;
+    }
+
+    function xOf(n) {
+      return geo.baseLeft + (n - geo.inicio) * geo.unit + panX;
+    }
+
+    function centerOn(n) {
+      const raw = geo.W / 2 - (geo.baseLeft + (n - geo.inicio) * geo.unit);
+      panX = raw;
+      clampPan();
+    }
+
+    function ensureVisible(n) {
+      const x = xOf(n);
+      const margin = 72;
+
+      if (x < margin) {
+        panX += margin - x;
+      }
+
+      if (x > geo.W - margin) {
+        panX -= x - (geo.W - margin);
+      }
+
+      clampPan();
+    }
+
     function detenerAuto() {
       if (autoTimer !== null) {
         clearInterval(autoTimer);
@@ -564,6 +696,8 @@
       detenerAuto();
       leer();
       pasoActual = 0;
+      calcularGeo();
+      centerOn(numero);
       actualizar();
     }
 
@@ -571,20 +705,34 @@
       detenerAuto();
       leer();
       pasoActual = pasos;
+      calcularGeo();
+      ensureVisible(objetivo);
       actualizar();
     }
 
     function avanzar() {
       detenerAuto();
       leer();
-      if (pasoActual < pasos) pasoActual++;
+
+      if (pasoActual < pasos) {
+        pasoActual++;
+      }
+
+      calcularGeo();
+      ensureVisible(numero + pasoActual);
       actualizar();
     }
 
     function retroceder() {
       detenerAuto();
       leer();
-      if (pasoActual > 0) pasoActual--;
+
+      if (pasoActual > 0) {
+        pasoActual--;
+      }
+
+      calcularGeo();
+      ensureVisible(numero + pasoActual);
       actualizar();
     }
 
@@ -597,6 +745,8 @@
       }
 
       pasoActual = 0;
+      calcularGeo();
+      centerOn(numero);
       actualizar();
 
       btnAuto.textContent = "Detener";
@@ -607,6 +757,8 @@
 
         if (pasoActual < pasos) {
           pasoActual++;
+          calcularGeo();
+          ensureVisible(numero + pasoActual);
           actualizar();
         } else {
           detenerAuto();
@@ -655,7 +807,7 @@
       else if (pasoActual < pasos) {
         statusBox.textContent = `${pasoActual} de ${pasos} pasos`;
         resultText.innerHTML = `
-          Posición actual: <b>${actual}</b>. Todavía falta avanzar para llegar al múltiplo.
+          Posición actual: <b>${actual}</b>. Arrastrá la recta si querés ver el recorrido completo.
         `;
       }
 
@@ -674,7 +826,7 @@
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
 
-      const fallbackWidth = Math.max(320, canvas.parentElement ? canvas.parentElement.clientWidth - 20 : 360);
+      const fallbackWidth = Math.max(320, canvas.parentElement ? canvas.parentElement.clientWidth : 360);
       const fallbackHeight = 500;
 
       const cssWidth = rect.width > 0 ? rect.width : fallbackWidth;
@@ -684,10 +836,19 @@
       canvas.height = cssHeight * dpr;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      leer();
+      calcularGeo();
+      clampPan();
       dibujar();
     }
 
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", () => {
+      calcularGeo();
+      ensureVisible(numero + pasoActual);
+      resizeCanvas();
+      actualizar();
+    });
 
     function rr(x, y, w, h, r, fill, stroke, width = 1.5) {
       ctx.save();
@@ -770,40 +931,21 @@
 
     function dibujar() {
       leer();
+      calcularGeo();
 
-      const rect = canvas.getBoundingClientRect();
-      const W = rect.width || canvas.clientWidth || 360;
-      const H = rect.height || canvas.clientHeight || 500;
+      const W = geo.W;
+      const H = geo.H;
 
       ctx.clearRect(0, 0, W, H);
 
       const actual = numero + pasoActual;
-      const anterior = numero - resto;
-
-      let inicio = anterior - 1;
-      let fin = objetivo + 1;
-
-      if (fin - inicio < 8) {
-        const centro = Math.round((inicio + fin) / 2);
-        inicio = centro - 4;
-        fin = centro + 4;
-      }
-
-      const left = 34;
-      const right = 34;
-      const width = W - left - right;
+      const xN = xOf(numero);
+      const xO = xOf(objetivo);
+      const xA = xOf(actual);
 
       const yAxis = H * 0.48;
       const yTrack = yAxis - 54;
       const yResto = yAxis + 74;
-
-      function xOf(n) {
-        return left + ((n - inicio) / (fin - inicio)) * width;
-      }
-
-      const xN = xOf(numero);
-      const xO = xOf(objetivo);
-      const xA = xOf(actual);
 
       rr(16, 18, W - 32, 72, 20, "rgba(255,255,255,.86)", "#dbeafe", 1.5);
       text("Recorrido", 32, 48, 19, "#0f172a", "left", true);
@@ -812,8 +954,9 @@
       rr(W - 140, 31, 112, 36, 15, "#eff6ff", "#bfdbfe", 1.5);
       text(`${actual}`, W - 84, 54, 18, "#1d4ed8", "center", true);
 
-      line(left - 8, yAxis, W - right + 8, yAxis, "#94a3b8", 4);
-      arrow(W - right - 2, yAxis, W - right + 16, yAxis, "#94a3b8", 4);
+      // La base de la recta queda fija; los números se desplazan encima.
+      line(24, yAxis, W - 24, yAxis, "#94a3b8", 4);
+      arrow(W - 43, yAxis, W - 18, yAxis, "#94a3b8", 4);
 
       if (pasos > 0) {
         line(xN, yTrack, xO, yTrack, "#dbeafe", 10);
@@ -824,6 +967,9 @@
       for (let s = 0; s < pasoActual; s++) {
         const x1 = xOf(numero + s);
         const x2 = xOf(numero + s + 1);
+
+        if (x2 < -80 || x1 > W + 80) continue;
+
         const xm = (x1 + x2) / 2;
         const rad = Math.abs(x2 - x1) / 2;
 
@@ -836,8 +982,11 @@
         ctx.restore();
       }
 
-      for (let n = inicio; n <= fin; n++) {
+      for (let n = geo.inicio; n <= geo.fin; n++) {
         const x = xOf(n);
+
+        if (x < -90 || x > W + 90) continue;
+
         const r = mod(n, divisor);
 
         const isN = n === numero;
@@ -896,17 +1045,24 @@
         text("r" + r, x, yResto + 5, 12, color, "center", true);
       }
 
-      line(xN, yAxis - 72, xN, yAxis - 22, "#93c5fd", 1.8, true);
-      rr(xN - 41, yAxis - 108, 82, 36, 14, "#dbeafe", "#93c5fd", 1.2);
-      text("inicio", xN, yAxis - 86, 13, "#1d4ed8", "center", true);
+      // Etiquetas principales: solo se dibujan si están cerca de la ventana visible.
+      if (xN > -80 && xN < W + 80) {
+        line(xN, yAxis - 72, xN, yAxis - 22, "#93c5fd", 1.8, true);
+        rr(xN - 41, yAxis - 108, 82, 36, 14, "#dbeafe", "#93c5fd", 1.2);
+        text("inicio", xN, yAxis - 86, 13, "#1d4ed8", "center", true);
+        dot(xN, yAxis, 11, "#2563eb");
+      }
 
-      line(xO, yAxis - 112, xO, yAxis - 22, "#86efac", 1.8, true);
-      rr(xO - 48, yAxis - 151, 96, 41, 14, "#dcfce7", "#86efac", 1.2);
-      text("múltiplo", xO, yAxis - 126, 13, "#166534", "center", true);
+      if (xO > -90 && xO < W + 90) {
+        line(xO, yAxis - 112, xO, yAxis - 22, "#86efac", 1.8, true);
+        rr(xO - 48, yAxis - 151, 96, 41, 14, "#dcfce7", "#86efac", 1.2);
+        text("múltiplo", xO, yAxis - 126, 13, "#166534", "center", true);
+        dot(xO, yAxis, 11, "#22c55e");
+      }
 
-      dot(xN, yAxis, 11, "#2563eb");
-      dot(xO, yAxis, 11, "#22c55e");
-      dot(xA, yAxis, 14, "#ef4444");
+      if (xA > -90 && xA < W + 90) {
+        dot(xA, yAxis, 14, "#ef4444");
+      }
 
       const boxY = H - 72;
       rr(16, boxY, W - 32, 48, 17, "#0f172a", "#1e293b", 1.5);
@@ -924,14 +1080,49 @@
       }
 
       text(message, W / 2, boxY + 30, 16, "#e2e8f0", "center", true);
+
+      const canPan = Math.abs(geo.maxPan - geo.minPan) > 1;
+      dragHint.style.display = canPan ? "block" : "none";
     }
 
     function actualizar() {
       leer();
+      calcularGeo();
       actualizarCiclo();
       actualizarPaneles();
       dibujar();
     }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      isDragging = true;
+      lastPointerX = event.clientX;
+      canvas.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (!isDragging) return;
+
+      const dx = event.clientX - lastPointerX;
+      lastPointerX = event.clientX;
+
+      panX += dx;
+      clampPan();
+      dibujar();
+
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("pointerup", (event) => {
+      isDragging = false;
+      try {
+        canvas.releasePointerCapture(event.pointerId);
+      } catch (e) {}
+    });
+
+    canvas.addEventListener("pointercancel", () => {
+      isDragging = false;
+    });
 
     btnCalcular.addEventListener("click", reiniciar);
     btnReset.addEventListener("click", reiniciar);
@@ -948,6 +1139,7 @@
     function iniciarApp() {
       resizeCanvas();
       reiniciar();
+
       setTimeout(() => {
         resizeCanvas();
         actualizar();
@@ -962,4 +1154,12 @@
   </script>
 </body>
 </html>
+"""
+
+path = "/mnt/data/restos-celular-desplazable.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html)
+
+path
+
 
