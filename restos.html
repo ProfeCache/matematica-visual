@@ -1,4 +1,4 @@
-html = r"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -662,7 +662,7 @@ html = r"""<!DOCTYPE html>
       else {
         statusBox.textContent = `Llegada: ${objetivo}`;
         resultText.innerHTML = `
-          Desde <b>${numero}</b> se avanzaron <b>${pasos}</b> lugares hasta <b>${objetivo</b>.
+          Desde <b>${numero}</b> se avanzaron <b>${pasos}</b> lugares hasta <b>${objetivo}</b>.
           Entonces: <b>${divisor} − ${pasos} = ${resto}</b>.
         `;
       }
@@ -674,8 +674,14 @@ html = r"""<!DOCTYPE html>
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
 
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      const fallbackWidth = Math.max(320, canvas.parentElement ? canvas.parentElement.clientWidth - 20 : 360);
+      const fallbackHeight = 500;
+
+      const cssWidth = rect.width > 0 ? rect.width : fallbackWidth;
+      const cssHeight = rect.height > 0 ? rect.height : fallbackHeight;
+
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       dibujar();
@@ -765,8 +771,9 @@ html = r"""<!DOCTYPE html>
     function dibujar() {
       leer();
 
-      const W = canvas.clientWidth;
-      const H = canvas.clientHeight;
+      const rect = canvas.getBoundingClientRect();
+      const W = rect.width || canvas.clientWidth || 360;
+      const H = rect.height || canvas.clientHeight || 500;
 
       ctx.clearRect(0, 0, W, H);
 
@@ -938,21 +945,21 @@ html = r"""<!DOCTYPE html>
     inputNumero.addEventListener("change", reiniciar);
     inputDivisor.addEventListener("change", reiniciar);
 
-    window.addEventListener("load", () => {
+    function iniciarApp() {
       resizeCanvas();
       reiniciar();
-    });
+      setTimeout(() => {
+        resizeCanvas();
+        actualizar();
+      }, 120);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", iniciarApp);
+    } else {
+      iniciarApp();
+    }
   </script>
 </body>
 </html>
-"""
-
-# Fix a small template typo before saving
-html = html.replace("${objetivo</b>", "${objetivo}</b>")
-
-path = "/mnt/data/restos-celular.html"
-with open(path, "w", encoding="utf-8") as f:
-    f.write(html)
-
-path
 
