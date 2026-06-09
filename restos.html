@@ -1,230 +1,1152 @@
 from pathlib import Path
-import re
 
-src = Path("/mnt/data/restos-celular-desplazable.html")
-html = src.read_text(encoding="utf-8")
+html = r"""<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Restos en la recta - celular</title>
 
-# 1) Bloqueo general del desborde horizontal.
-html = html.replace(
-"""    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }""",
-"""    * {
+  <style>
+    :root {
+      --dark: #020617;
+      --dark2: #0f172a;
+      --card: #ffffff;
+      --soft: #f8fafc;
+      --line: #dbe4f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --red: #ef4444;
+      --red-soft: #fee2e2;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+    }
+
+    * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
 
     html,
     body {
+      margin: 0;
       width: 100%;
       max-width: 100%;
       overflow-x: hidden;
-    }"""
-)
+    }
 
-# 2) Refuerzo del body para evitar cualquier scroll horizontal del documento.
-html = html.replace(
-"""    body {
-      margin: 0;
-      min-height: 100vh;""",
-"""    body {
-      margin: 0;
+    body {
       min-height: 100vh;
-      width: 100%;
-      max-width: 100%;
-      overflow-x: hidden;"""
-)
+      padding: 10px;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 5%, rgba(37, 99, 235, 0.18), transparent 28%),
+        radial-gradient(circle at 90% 0%, rgba(22, 163, 74, 0.13), transparent 26%),
+        linear-gradient(180deg, #edf4ff 0%, #f8fafc 55%, #e2e8f0 100%);
+    }
 
-# 3) App completamente contenida dentro del viewport.
-html = html.replace(
-"""    .app {
-      width: min(520px, 100%);""",
-"""    .app {
+    .app {
       width: 100%;
       max-width: 520px;
-      min-width: 0;"""
-)
+      margin: 0 auto;
+      background: var(--soft);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
 
-# 4) Aseguramos que cards, grids y contenedores no impongan ancho mínimo.
-html = html.replace(
-"""    .content {
-      padding: 12px;
-      display: grid;
-      gap: 12px;
-    }""",
-"""    .content {
-      padding: 12px;
-      display: grid;
-      gap: 12px;
+    .hero {
+      padding: 22px 18px 18px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.27), transparent 30%),
+        radial-gradient(circle at 86% 6%, rgba(99, 102, 241, 0.27), transparent 30%),
+        linear-gradient(135deg, #020617 0%, #0f172a 60%, #111827 100%);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      color: #bfdbfe;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .badge span {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: #38bdf8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
+    }
+
+    h1 {
+      margin: 14px 0 8px;
+      font-size: 27px;
+      line-height: 1.05;
+      letter-spacing: -0.75px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 13.5px;
+      line-height: 1.45;
+    }
+
+    .content {
       width: 100%;
       max-width: 100%;
-      min-width: 0;
+      padding: 12px;
+      display: grid;
+      gap: 12px;
       overflow-x: hidden;
-    }"""
-)
+    }
 
-html = html.replace(
-"""    .card {
-      background: var(--card);""",
-"""    .card {
+    .card {
       width: 100%;
       max-width: 100%;
       min-width: 0;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
       overflow: hidden;
-      background: var(--card);"""
-)
+    }
 
-html = html.replace(
-"""    .input-grid {
-      display: grid;""",
-"""    .input-grid {
+    .controls {
+      padding: 12px;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.45px;
+      text-transform: uppercase;
+    }
+
+    input {
       width: 100%;
       min-width: 0;
-      display: grid;"""
-)
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: var(--text);
+      border-radius: 16px;
+      padding: 13px 9px;
+      outline: none;
+      font-size: 22px;
+      font-weight: 900;
+      text-align: center;
+    }
 
-html = html.replace(
-"""    .buttons {
-      display: grid;""",
-"""    .buttons {
-      width: 100%;
-      min-width: 0;
-      display: grid;"""
-)
+    input:focus {
+      background: white;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+    }
 
-html = html.replace(
-"""    .stats {
-      display: grid;""",
-"""    .stats {
-      width: 100%;
-      min-width: 0;
-      display: grid;"""
-)
+    .buttons {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 9px;
+      margin-top: 11px;
+    }
 
-html = html.replace(
-"""    .visual-card {
-      padding: 10px;
-    }""",
-"""    .visual-card {
-      padding: 10px;
-      width: 100%;
-      max-width: 100%;
+    .btn {
+      border: none;
+      border-radius: 16px;
+      padding: 13px 9px;
+      color: white;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.985);
+    }
+
+    .blue {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+    }
+
+    .green {
+      background: linear-gradient(135deg, #16a34a, #0f766e);
+      box-shadow: 0 8px 18px rgba(22, 163, 74, 0.18);
+    }
+
+    .dark {
+      background: linear-gradient(135deg, #334155, #0f172a);
+    }
+
+    .red {
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 11px;
+    }
+
+    .stat {
       min-width: 0;
+      border-radius: 17px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
+    .stat .label {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 9.5px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+    }
+
+    .stat .value {
       overflow: hidden;
-    }"""
-)
+      text-overflow: ellipsis;
+      font-size: 21px;
+      font-weight: 950;
+      letter-spacing: -0.4px;
+    }
 
-html = html.replace(
-"""    .toolbar {
-      display: flex;""",
-"""    .toolbar {
-      width: 100%;
+    .stat.blueText .value { color: var(--blue); }
+    .stat.greenText .value { color: var(--green); }
+    .stat.redText .value { color: #dc2626; }
+
+    .visual-card {
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
       min-width: 0;
-      display: flex;"""
-)
+    }
 
-html = html.replace(
-"""    .canvas-wrap {
-      position: relative;""",
-"""    .canvas-wrap {
+    .toolbar .btn {
+      flex: 0 0 auto;
+      min-width: 46px;
+      padding: 11px 12px;
+      border-radius: 15px;
+    }
+
+    .status {
+      min-width: 0;
+      flex: 1;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .line-window {
       position: relative;
       width: 100%;
       max-width: 100%;
-      min-width: 0;
-      contain: layout paint;
-      isolation: isolate;"""
-)
-
-# 5) El canvas nunca define ancho extra.
-html = html.replace(
-"""    canvas {
-      width: 100%;""",
-"""    canvas {
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;"""
-)
-
-# 6) El ciclo de restos se desplaza internamente y no agranda la página.
-html = html.replace(
-"""    .cycle-row {
-      display: flex;
-      gap: 7px;
-      overflow-x: auto;""",
-"""    .cycle-row {
-      display: flex;
-      gap: 7px;
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
+      height: 500px;
       overflow-x: auto;
       overflow-y: hidden;
-      overscroll-behavior-x: contain;"""
-)
+      overscroll-behavior-x: contain;
+      border-radius: 21px;
+      border: 1px solid #cbd5e1;
+      background:
+        radial-gradient(circle at 16% 10%, rgba(219, 234, 254, 0.9), transparent 31%),
+        radial-gradient(circle at 85% 5%, rgba(220, 252, 231, 0.72), transparent 28%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      touch-action: pan-x;
+    }
 
-# 7) En pantallas grandes también dejamos seguro el ancho.
-html = html.replace(
-"""      .app {
-        width: min(900px, 100%);
-      }""",
-"""      .app {
-        width: 100%;
-        max-width: 900px;
-      }"""
-)
+    .line-inner {
+      position: relative;
+      height: 100%;
+      min-width: 100%;
+    }
 
-html = html.replace(
-"""      .content {
-        grid-template-columns: 320px 1fr;
-        align-items: start;
-      }""",
-"""      .content {
-        grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
-        align-items: start;
-      }"""
-)
+    .axis {
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      top: 245px;
+      height: 4px;
+      border-radius: 99px;
+      background: #94a3b8;
+    }
 
-# 8) Ajuste JS: el divisor puede ser mayor sin estirar visualmente, porque el paso horizontal queda acotado.
-html = html.replace(
-"""      const unit = W < 380 ? 58 : 64;""",
-"""      // Tamaño fijo por marca de la recta. Si hay muchos números, se arrastra.
-      // No se agranda la interfaz: solo aumenta la tira interna desplazable.
-      const unit = W < 380 ? 56 : 62;"""
-)
+    .axis::after {
+      content: "";
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      width: 0;
+      height: 0;
+      transform: translateY(-50%);
+      border-left: 15px solid #94a3b8;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+    }
 
-# 9) Si el usuario cambia divisor/número, centramos en el número inicial y no dejamos pan anterior raro.
-html = html.replace(
-"""    inputNumero.addEventListener("change", reiniciar);
-    inputDivisor.addEventListener("change", reiniciar);""",
-"""    inputNumero.addEventListener("change", reiniciar);
-    inputDivisor.addEventListener("change", reiniciar);
-    inputNumero.addEventListener("input", () => {
+    .top-panel {
+      position: sticky;
+      left: 14px;
+      top: 16px;
+      z-index: 10;
+      width: calc(100vw - 64px);
+      max-width: 360px;
+      border-radius: 18px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #dbeafe;
+      backdrop-filter: blur(10px);
+    }
+
+    .top-panel .small {
+      color: #475569;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .top-panel .big {
+      color: #0f172a;
+      margin-top: 2px;
+      font-size: 18px;
+      font-weight: 950;
+    }
+
+    .progress-base,
+    .progress-fill {
+      position: absolute;
+      top: 185px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .progress-base {
+      background: #dbeafe;
+    }
+
+    .progress-fill {
+      background: #22c55e;
+    }
+
+    .jump {
+      position: absolute;
+      top: 210px;
+      height: 42px;
+      border-top: 3px solid #16a34a;
+      border-radius: 50% 50% 0 0;
+    }
+
+    .tick {
+      position: absolute;
+      top: 229px;
+      width: 2px;
+      height: 34px;
+      background: #64748b;
+      border-radius: 99px;
+    }
+
+    .tick.multiple {
+      width: 4px;
+      height: 46px;
+      top: 223px;
+      background: #22c55e;
+    }
+
+    .tick.initial {
+      width: 5px;
+      height: 54px;
+      top: 219px;
+      background: #2563eb;
+    }
+
+    .tick.current {
+      width: 5px;
+      height: 62px;
+      top: 215px;
+      background: #ef4444;
+    }
+
+    .num-label {
+      position: absolute;
+      top: 285px;
+      transform: translateX(-50%);
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .rest-chip {
+      position: absolute;
+      top: 340px;
+      transform: translateX(-50%);
+      width: 38px;
+      height: 30px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: #475569;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .rest-chip.multiple {
+      color: #166534;
+      background: #dcfce7;
+      border-color: #86efac;
+    }
+
+    .rest-chip.initial {
+      color: #1d4ed8;
+      background: #dbeafe;
+      border-color: #60a5fa;
+    }
+
+    .rest-chip.current {
+      color: #991b1b;
+      background: #fee2e2;
+      border-color: #fca5a5;
+    }
+
+    .marker {
+      position: absolute;
+      top: 238px;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 99px;
+      border: 3px solid white;
+      box-shadow: 0 0 18px rgba(15, 23, 42, 0.18);
+      z-index: 5;
+    }
+
+    .marker.initial {
+      background: #2563eb;
+    }
+
+    .marker.target {
+      background: #22c55e;
+    }
+
+    .marker.current {
+      width: 30px;
+      height: 30px;
+      background: #ef4444;
+    }
+
+    .tag {
+      position: absolute;
+      transform: translateX(-50%);
+      padding: 8px 10px;
+      border-radius: 13px;
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+      z-index: 6;
+    }
+
+    .tag.initial {
+      top: 120px;
+      color: #1d4ed8;
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+    }
+
+    .tag.target {
+      top: 80px;
+      color: #166534;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+    }
+
+    .bottom-message {
+      position: sticky;
+      left: 14px;
+      bottom: 18px;
+      width: calc(100vw - 64px);
+      max-width: 360px;
+      z-index: 10;
+      margin-top: 408px;
+      padding: 14px 12px;
+      border-radius: 17px;
+      text-align: center;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-weight: 950;
+      font-size: 15px;
+    }
+
+    .hint {
+      position: sticky;
+      left: 50%;
+      bottom: 82px;
+      width: fit-content;
+      margin: 0 auto;
+      transform: translateX(-50%);
+      z-index: 11;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: #475569;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid #e2e8f0;
+      font-size: 11px;
+      font-weight: 900;
+      pointer-events: none;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .result {
+      margin-top: 10px;
+      border-radius: 20px;
+      background: #0f172a;
+      color: white;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .result-text {
+      color: #cbd5e1;
+      line-height: 1.42;
+      font-size: 13.5px;
+    }
+
+    .result-text b {
+      color: white;
+    }
+
+    .result-formula {
+      border-radius: 17px;
+      padding: 12px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+    }
+
+    .result-formula .top {
+      color: #93c5fd;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .result-formula .bottom {
+      color: #22c55e;
+      font-size: 28px;
+      font-weight: 950;
+    }
+
+    .cycle {
+      padding: 12px;
+    }
+
+    .cycle-title {
+      margin: 0 0 9px;
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .cycle-row {
+      display: flex;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      gap: 7px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      padding-bottom: 3px;
+      scrollbar-width: thin;
+    }
+
+    .chip {
+      flex: 0 0 43px;
+      width: 43px;
+      height: 50px;
+      border-radius: 15px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      display: grid;
+      place-items: center;
+      font-weight: 950;
+      color: var(--text);
+    }
+
+    .chip.zero {
+      background: var(--green-soft);
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .chip.selected {
+      background: var(--blue-soft);
+      border-color: #60a5fa;
+      color: #1d4ed8;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    @media (max-width: 370px) {
+      body {
+        padding: 6px;
+      }
+
+      .app {
+        border-radius: 22px;
+      }
+
+      .hero {
+        padding: 18px 14px 15px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .content {
+        padding: 9px;
+      }
+
+      .btn {
+        font-size: 13px;
+        padding: 12px 8px;
+      }
+
+      .line-window {
+        height: 480px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="badge"><span></span> Recta desplazable</div>
+      <h1>División mental con restos</h1>
+      <p>La interfaz queda fija. Si hay muchos números, deslizá la recta con el dedo.</p>
+    </section>
+
+    <section class="content">
+      <section class="card controls">
+        <div class="input-grid">
+          <div>
+            <label for="numero">Número</label>
+            <input id="numero" type="number" min="0" step="1" value="200" />
+          </div>
+
+          <div>
+            <label for="divisor">Divisor</label>
+            <input id="divisor" type="number" min="2" max="60" step="1" value="6" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button id="calcular" class="btn blue">Calcular</button>
+          <button id="reset" class="btn dark">Reiniciar</button>
+          <button id="prev" class="btn dark">Anterior</button>
+          <button id="next" class="btn green">Siguiente</button>
+          <button id="auto" class="btn blue">Animar</button>
+          <button id="finish" class="btn green">Resultado</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat blueText">
+            <div class="label">Resto</div>
+            <div id="statResto" class="value">2</div>
+          </div>
+
+          <div class="stat greenText">
+            <div class="label">Múltiplo</div>
+            <div id="statMultiplo" class="value">204</div>
+          </div>
+
+          <div class="stat redText">
+            <div class="label">Pasos</div>
+            <div id="statPasos" class="value">4</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card visual-card">
+        <div class="toolbar">
+          <button id="softPrev" class="btn dark">←</button>
+          <div id="status" class="status">Listo para iniciar</div>
+          <button id="softNext" class="btn green">→</button>
+          <button id="centerBtn" class="btn blue">⌖</button>
+        </div>
+
+        <div id="lineWindow" class="line-window">
+          <div id="lineInner" class="line-inner"></div>
+        </div>
+
+        <div class="result">
+          <div id="resultText" class="result-text"></div>
+
+          <div class="result-formula">
+            <div class="top">Conclusión</div>
+            <div id="resultFormula" class="bottom">r = 2</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card cycle">
+        <h2 class="cycle-title">Ciclo de restos</h2>
+        <div id="cycle" class="cycle-row"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const inputNumero = document.getElementById("numero");
+    const inputDivisor = document.getElementById("divisor");
+
+    const btnCalcular = document.getElementById("calcular");
+    const btnReset = document.getElementById("reset");
+    const btnPrev = document.getElementById("prev");
+    const btnNext = document.getElementById("next");
+    const btnAuto = document.getElementById("auto");
+    const btnFinish = document.getElementById("finish");
+    const btnSoftPrev = document.getElementById("softPrev");
+    const btnSoftNext = document.getElementById("softNext");
+    const btnCenter = document.getElementById("centerBtn");
+
+    const lineWindow = document.getElementById("lineWindow");
+    const lineInner = document.getElementById("lineInner");
+
+    const cycleBox = document.getElementById("cycle");
+    const statusBox = document.getElementById("status");
+    const resultText = document.getElementById("resultText");
+    const resultFormula = document.getElementById("resultFormula");
+
+    const statResto = document.getElementById("statResto");
+    const statMultiplo = document.getElementById("statMultiplo");
+    const statPasos = document.getElementById("statPasos");
+
+    let numero = 200;
+    let divisor = 6;
+    let resto = 2;
+    let pasos = 4;
+    let objetivo = 204;
+    let pasoActual = 0;
+    let autoTimer = null;
+
+    let inicio = 0;
+    let fin = 10;
+    let unit = 64;
+    let leftPad = 68;
+
+    function mod(a, b) {
+      return ((a % b) + b) % b;
+    }
+
+    function leer() {
+      numero = parseInt(inputNumero.value, 10);
+      divisor = parseInt(inputDivisor.value, 10);
+
+      if (Number.isNaN(numero) || numero < 0) numero = 0;
+      if (Number.isNaN(divisor) || divisor < 2) divisor = 2;
+      if (divisor > 60) divisor = 60;
+
+      inputNumero.value = numero;
+      inputDivisor.value = divisor;
+
+      resto = mod(numero, divisor);
+      pasos = resto === 0 ? 0 : divisor - resto;
+      objetivo = numero + pasos;
+
+      if (pasoActual > pasos) pasoActual = pasos;
+    }
+
+    function calcularRango() {
+      const anterior = numero - resto;
+
+      inicio = anterior - 2;
+      fin = objetivo + 2;
+
+      if (fin - inicio < 8) {
+        const centro = Math.round((inicio + fin) / 2);
+        inicio = centro - 4;
+        fin = centro + 4;
+      }
+
+      const w = lineWindow.clientWidth || 340;
+      unit = w < 380 ? 58 : 64;
+      leftPad = 68;
+    }
+
+    function xOf(n) {
+      return leftPad + (n - inicio) * unit;
+    }
+
+    function scrollToNumber(n, behavior = "smooth") {
+      const x = xOf(n);
+      const target = x - lineWindow.clientWidth / 2;
+      lineWindow.scrollTo({ left: Math.max(0, target), behavior });
+    }
+
+    function detenerAuto() {
+      if (autoTimer !== null) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+        btnAuto.textContent = "Animar";
+        btnAuto.className = "btn blue";
+      }
+    }
+
+    function reiniciar() {
       detenerAuto();
-    });
-    inputDivisor.addEventListener("input", () => {
-      detenerAuto();
-    });"""
-)
-
-# 10) Mejora extra: en resize no repetimos cadenas que puedan generar inconsistencias.
-html = html.replace(
-"""    window.addEventListener("resize", () => {
-      calcularGeo();
-      ensureVisible(numero + pasoActual);
-      resizeCanvas();
-      actualizar();
-    });""",
-"""    window.addEventListener("resize", () => {
       leer();
-      resizeCanvas();
-      calcularGeo();
-      ensureVisible(numero + pasoActual);
+      pasoActual = 0;
       actualizar();
-    });"""
-)
+      requestAnimationFrame(() => scrollToNumber(numero, "auto"));
+    }
 
-out = Path("/mnt/data/restos-celular-sin-desborde.html")
-out.write_text(html, encoding="utf-8")
-str(out), out.stat().st_size
+    function finalizar() {
+      detenerAuto();
+      leer();
+      pasoActual = pasos;
+      actualizar();
+      requestAnimationFrame(() => scrollToNumber(objetivo));
+    }
 
+    function avanzar() {
+      detenerAuto();
+      leer();
+
+      if (pasoActual < pasos) {
+        pasoActual++;
+      }
+
+      actualizar();
+      requestAnimationFrame(() => scrollToNumber(numero + pasoActual));
+    }
+
+    function retroceder() {
+      detenerAuto();
+      leer();
+
+      if (pasoActual > 0) {
+        pasoActual--;
+      }
+
+      actualizar();
+      requestAnimationFrame(() => scrollToNumber(numero + pasoActual));
+    }
+
+    function animar() {
+      leer();
+
+      if (autoTimer !== null) {
+        detenerAuto();
+        return;
+      }
+
+      pasoActual = 0;
+      actualizar();
+      requestAnimationFrame(() => scrollToNumber(numero, "auto"));
+
+      btnAuto.textContent = "Detener";
+      btnAuto.className = "btn red";
+
+      autoTimer = setInterval(() => {
+        leer();
+
+        if (pasoActual < pasos) {
+          pasoActual++;
+          actualizar();
+          requestAnimationFrame(() => scrollToNumber(numero + pasoActual));
+        } else {
+          detenerAuto();
+        }
+      }, 700);
+    }
+
+    function actualizarCiclo() {
+      let html = "";
+
+      for (let r = 0; r < divisor; r++) {
+        let cls = "chip";
+
+        if (r === 0) cls += " zero";
+        if (r === resto) cls += " selected";
+
+        html += `<div class="${cls}">${r}</div>`;
+      }
+
+      html += `<div class="chip zero">0</div>`;
+      cycleBox.innerHTML = html;
+    }
+
+    function actualizarPaneles() {
+      statResto.textContent = resto;
+      statMultiplo.textContent = objetivo;
+      statPasos.textContent = pasos;
+
+      const actual = numero + pasoActual;
+
+      if (pasos === 0) {
+        statusBox.textContent = `${numero} ya es múltiplo de ${divisor}`;
+        resultText.innerHTML = `
+          <b>${numero}</b> ya tiene resto 0 al dividirlo por <b>${divisor}</b>.
+        `;
+        resultFormula.textContent = "r = 0";
+        return;
+      }
+
+      if (pasoActual === 0) {
+        statusBox.textContent = `Inicio: ${numero}`;
+        resultText.innerHTML = `
+          Desde <b>${numero}</b>, avanzamos hasta encontrar el próximo múltiplo de <b>${divisor}</b>.
+        `;
+      }
+
+      else if (pasoActual < pasos) {
+        statusBox.textContent = `${pasoActual} de ${pasos} pasos`;
+        resultText.innerHTML = `
+          Posición actual: <b>${actual}</b>. La recta se puede deslizar sin agrandar la pantalla.
+        `;
+      }
+
+      else {
+        statusBox.textContent = `Llegada: ${objetivo}`;
+        resultText.innerHTML = `
+          Desde <b>${numero}</b> se avanzaron <b>${pasos}</b> lugares hasta <b>${objetivo}</b>.
+          Entonces: <b>${divisor} − ${pasos} = ${resto}</b>.
+        `;
+      }
+
+      resultFormula.textContent = `r = ${resto}`;
+    }
+
+    function dibujarRecta() {
+      calcularRango();
+
+      const actual = numero + pasoActual;
+      const contentWidth = leftPad * 2 + (fin - inicio) * unit;
+
+      lineInner.style.width = `${Math.max(contentWidth, lineWindow.clientWidth)}px`;
+      lineInner.innerHTML = "";
+
+      const axis = document.createElement("div");
+      axis.className = "axis";
+      lineInner.appendChild(axis);
+
+      const topPanel = document.createElement("div");
+      topPanel.className = "top-panel";
+      topPanel.innerHTML = `
+        <div class="small">Recorrido</div>
+        <div class="big">${numero} ÷ ${divisor}</div>
+      `;
+      lineInner.appendChild(topPanel);
+
+      if (pasos > 0) {
+        const xN = xOf(numero);
+        const xA = xOf(actual);
+        const xO = xOf(objetivo);
+
+        const base = document.createElement("div");
+        base.className = "progress-base";
+        base.style.left = `${xN}px`;
+        base.style.width = `${Math.max(0, xO - xN)}px`;
+        lineInner.appendChild(base);
+
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+        fill.style.left = `${xN}px`;
+        fill.style.width = `${Math.max(0, xA - xN)}px`;
+        lineInner.appendChild(fill);
+
+        for (let s = 0; s < pasoActual; s++) {
+          const x1 = xOf(numero + s);
+          const x2 = xOf(numero + s + 1);
+
+          const jump = document.createElement("div");
+          jump.className = "jump";
+          jump.style.left = `${x1}px`;
+          jump.style.width = `${Math.max(0, x2 - x1)}px`;
+          lineInner.appendChild(jump);
+        }
+      }
+
+      for (let n = inicio; n <= fin; n++) {
+        const x = xOf(n);
+        const r = mod(n, divisor);
+        const isInitial = n === numero;
+        const isTarget = n === objetivo;
+        const isCurrent = n === actual;
+        const isMultiple = r === 0;
+
+        const tick = document.createElement("div");
+        tick.className = "tick";
+        if (isMultiple) tick.classList.add("multiple");
+        if (isInitial) tick.classList.add("initial");
+        if (isCurrent) tick.classList.add("current");
+        tick.style.left = `${x}px`;
+        lineInner.appendChild(tick);
+
+        const num = document.createElement("div");
+        num.className = "num-label";
+        num.textContent = n;
+        num.style.left = `${x}px`;
+        lineInner.appendChild(num);
+
+        const chip = document.createElement("div");
+        chip.className = "rest-chip";
+        if (isMultiple) chip.classList.add("multiple");
+        if (isInitial) chip.classList.add("initial");
+        if (isCurrent) chip.classList.add("current");
+        chip.textContent = `r${r}`;
+        chip.style.left = `${x}px`;
+        lineInner.appendChild(chip);
+      }
+
+      const xN = xOf(numero);
+      const xO = xOf(objetivo);
+      const xA = xOf(actual);
+
+      const tagInitial = document.createElement("div");
+      tagInitial.className = "tag initial";
+      tagInitial.textContent = "inicio";
+      tagInitial.style.left = `${xN}px`;
+      lineInner.appendChild(tagInitial);
+
+      const markerInitial = document.createElement("div");
+      markerInitial.className = "marker initial";
+      markerInitial.style.left = `${xN}px`;
+      lineInner.appendChild(markerInitial);
+
+      const tagTarget = document.createElement("div");
+      tagTarget.className = "tag target";
+      tagTarget.textContent = "múltiplo";
+      tagTarget.style.left = `${xO}px`;
+      lineInner.appendChild(tagTarget);
+
+      const markerTarget = document.createElement("div");
+      markerTarget.className = "marker target";
+      markerTarget.style.left = `${xO}px`;
+      lineInner.appendChild(markerTarget);
+
+      const markerCurrent = document.createElement("div");
+      markerCurrent.className = "marker current";
+      markerCurrent.style.left = `${xA}px`;
+      lineInner.appendChild(markerCurrent);
+
+      const hint = document.createElement("div");
+      hint.className = "hint";
+      hint.textContent = "deslizá la recta ↔";
+      lineInner.appendChild(hint);
+
+      const msg = document.createElement("div");
+      msg.className = "bottom-message";
+
+      if (pasos === 0) {
+        msg.textContent = `${numero} ya es múltiplo de ${divisor}`;
+      } else if (pasoActual === 0) {
+        msg.textContent = `Partimos de ${numero}`;
+      } else if (pasoActual < pasos) {
+        msg.textContent = `${pasoActual} de ${pasos} pasos`;
+      } else {
+        msg.textContent = `${divisor} − ${pasos} = ${resto}`;
+      }
+
+      lineInner.appendChild(msg);
+    }
+
+    function actualizar() {
+      leer();
+      actualizarCiclo();
+      actualizarPaneles();
+      dibujarRecta();
+    }
+
+    btnCalcular.addEventListener("click", reiniciar);
+    btnReset.addEventListener("click", reiniciar);
+    btnPrev.addEventListener("click", retroceder);
+    btnNext.addEventListener("click", avanzar);
+    btnSoftPrev.addEventListener("click", retroceder);
+    btnSoftNext.addEventListener("click", avanzar);
+    btnAuto.addEventListener("click", animar);
+    btnFinish.addEventListener("click", finalizar);
+
+    btnCenter.addEventListener("click", () => {
+      leer();
+      calcularRango();
+      scrollToNumber(numero + pasoActual);
+    });
+
+    inputNumero.addEventListener("change", reiniciar);
+    inputDivisor.addEventListener("change", reiniciar);
+
+    window.addEventListener("resize", () => {
+      actualizar();
+      requestAnimationFrame(() => scrollToNumber(numero + pasoActual, "auto"));
+    });
+
+    function iniciar() {
+      reiniciar();
+      requestAnimationFrame(() => scrollToNumber(numero, "auto"));
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", iniciar);
+    } else {
+      iniciar();
+    }
+  </script>
+</body>
+</html>
+"""
+
+path = "/mnt/data/restos-celular-estable.html"
+Path(path).write_text(html, encoding="utf-8")
+path
