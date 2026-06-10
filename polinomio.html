@@ -1,1 +1,1462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de restos y división de polinomios</title>
+  <style>
+    :root {
+      --bg: #eef4ff;
+      --card: rgba(255,255,255,0.92);
+      --ink: #10172a;
+      --muted: #526179;
+      --line: #dce7ff;
+      --blue: #3657ff;
+      --blue-soft: #edf2ff;
+      --green: #0f9f6e;
+      --red: #dc2626;
+      --orange: #ff9f1c;
+      --purple: #7c3aed;
+      --shadow: 0 18px 40px rgba(60, 90, 160, 0.14);
+    }
 
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(54,87,255,.18), transparent 28%),
+        linear-gradient(135deg, #f8fbff, var(--bg));
+      padding: 18px;
+    }
+
+    .app {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: rgba(255,255,255,.7);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 46px);
+      letter-spacing: -0.055em;
+      line-height: 1.02;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 780px;
+      line-height: 1.45;
+      font-size: 15px;
+    }
+
+    .badge {
+      background: var(--ink);
+      color: white;
+      border-radius: 999px;
+      padding: 10px 15px;
+      font-weight: 900;
+      box-shadow: 0 12px 24px rgba(16,23,42,.2);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 10px;
+      margin-bottom: 8px;
+    }
+
+    .tab {
+      border: 0;
+      background: white;
+      color: #31405b;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: 0 7px 15px rgba(52,83,140,.08);
+      transition: .18s ease;
+      white-space: nowrap;
+    }
+
+    .tab:hover { transform: translateY(-1px); }
+    .tab.active { background: var(--blue); color: white; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 1fr) 390px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 980px) {
+      body { padding: 10px; }
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: 0 12px 28px rgba(52, 83, 140, .08);
+      backdrop-filter: blur(8px);
+    }
+
+    .graph-card {
+      min-height: 610px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      min-height: 560px;
+      flex: 1;
+      overflow: hidden;
+      border-radius: 20px;
+      background: white;
+      border: 1px solid var(--line);
+    }
+
+    @media (max-width: 600px) {
+      .graph-card { min-height: 500px; }
+      .canvas-wrap { min-height: 450px; }
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    canvas:active { cursor: grabbing; }
+
+    .floating {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+
+    .equation-box {
+      max-width: 100%;
+      background: rgba(16,23,42,.92);
+      color: white;
+      border-radius: 18px;
+      padding: 11px 14px;
+      box-shadow: 0 12px 25px rgba(16,23,42,.22);
+    }
+
+    .equation-box .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      opacity: .75;
+      font-weight: 900;
+    }
+
+    .equation-box .eq {
+      font-size: clamp(17px, 3vw, 25px);
+      font-weight: 950;
+      margin-top: 2px;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .mini-help {
+      background: rgba(255,255,255,.96);
+      color: #334155;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.35;
+      max-width: 270px;
+      box-shadow: 0 10px 22px rgba(52,83,140,.12);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .slider-block {
+      background: #f8faff;
+      border: 1px solid #e0e8ff;
+      border-radius: 18px;
+      padding: 11px;
+    }
+
+    .slider-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .slider-head strong { font-size: 14px; }
+
+    .pill {
+      background: var(--ink);
+      color: white;
+      border-radius: 999px;
+      padding: 4px 9px;
+      min-width: 46px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .note {
+      color: #66748c;
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 6px;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 15px;
+      padding: 10px 10px;
+      background: var(--blue-soft);
+      color: #20304f;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .18s ease;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .btn:hover { transform: translateY(-1px); background: #dfe9ff; }
+    .btn.primary { background: var(--blue); color: white; }
+    .btn.dark { background: var(--ink); color: white; }
+    .btn.good { background: var(--green); color: white; }
+    .btn.warn { background: #ffb020; color: #1f2937; }
+    .btn.danger { background: var(--red); color: white; }
+
+    .story {
+      background: var(--ink);
+      color: white;
+      border-radius: 20px;
+      padding: 14px;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .story strong { color: #dbe6ff; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 900px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .info-grid { grid-template-columns: 1fr; } }
+
+    .info {
+      background: #f8faff;
+      border: 1px solid #e0e8ff;
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .small {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 4px;
+    }
+
+    .large {
+      color: var(--ink);
+      font-weight: 950;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+    }
+
+    .desc {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) { .wide-grid { grid-template-columns: 1fr; } }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 660px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #edf3ff;
+      border-right: 1px solid #edf3ff;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--ink);
+      color: white;
+      font-weight: 950;
+    }
+
+    tr:last-child td, tr:last-child th { border-bottom: 0; }
+    td:last-child, th:last-child { border-right: 0; }
+
+    .q-cell { background: #eef6ff; font-weight: 900; }
+    .r-cell { background: #fff2c2; font-weight: 950; }
+    .coef-cell { background: #fff; font-weight: 800; }
+
+    .identity {
+      background: linear-gradient(135deg, #10172a, #253b7a);
+      color: white;
+      border-radius: 20px;
+      padding: 16px;
+      line-height: 1.45;
+      box-shadow: 0 14px 28px rgba(16,23,42,.15);
+    }
+
+    .identity .formula {
+      margin-top: 8px;
+      font-size: clamp(18px, 3vw, 25px);
+      font-weight: 950;
+      letter-spacing: -0.03em;
+      line-height: 1.3;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+    }
+
+    .step {
+      background: #f8faff;
+      border: 1px solid #e0e8ff;
+      border-radius: 18px;
+      padding: 12px;
+      line-height: 1.45;
+      color: #46556f;
+    }
+
+    .step b { color: var(--ink); }
+
+    .challenge {
+      background: linear-gradient(135deg, #10172a, #253b7a);
+      color: white;
+      border-radius: 22px;
+      padding: 18px;
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .challenge h2 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: -0.04em;
+    }
+
+    .challenge-text {
+      font-size: 18px;
+      line-height: 1.4;
+      font-weight: 850;
+      margin-top: 8px;
+    }
+
+    .feedback {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 16px;
+      padding: 10px;
+      min-height: 45px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .guide {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) { .guide { grid-template-columns: 1fr; } }
+
+    .guide h3 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .guide ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #46556f;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .mini-input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      color: #46556f;
+      font-size: 13px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 10px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-weight: 850;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <h1>Laboratorio de restos y división de polinomios</h1>
+        <p>
+          Explorá qué ocurre al dividir un polinomio <b>P(x)</b> por un divisor lineal <b>x − a</b>.
+          El programa conecta gráfico, valor numérico, Ruffini, resto, raíz y factorización.
+        </p>
+      </div>
+      <div class="badge">Listo para GitHub Pages</div>
+    </section>
+
+    <nav class="tabs" aria-label="Secciones">
+      <button class="tab active" data-tab="explorar">Explorar</button>
+      <button class="tab" data-tab="ruffini">Ruffini paso a paso</button>
+      <button class="tab" data-tab="factorizacion">Factorización</button>
+      <button class="tab" data-tab="desafios">Desafíos</button>
+      <button class="tab" data-tab="docente">Guía docente</button>
+    </nav>
+
+    <section class="panel active" id="panel-explorar">
+      <div class="layout">
+        <div class="card graph-card">
+          <div class="canvas-wrap">
+            <canvas id="graph"></canvas>
+            <div class="floating">
+              <div class="equation-box">
+                <div class="label">Polinomio actual</div>
+                <div class="eq" id="polyBox">P(x)=x²−4</div>
+              </div>
+              <div class="mini-help">
+                Arrastrá el plano para moverlo.<br>
+                Usá la rueda del mouse para acercar o alejar.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="card controls">
+          <div>
+            <h2 class="section-title">1. Divisor lineal</h2>
+            <div class="slider-block">
+              <div class="slider-head">
+                <strong>Valor de a</strong>
+                <span class="pill" id="aValue">2</span>
+              </div>
+              <input id="aSlider" type="range" min="-6" max="6" step="0.5" value="2">
+              <div class="note">
+                Si el divisor es <b>x − a</b>, el resto se calcula como <b>P(a)</b>.
+                Divisor actual: <b id="divisorNote">x − 2</b>.
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 class="section-title">2. Coeficientes de P(x)</h2>
+            <div class="slider-block">
+              <div class="slider-head"><strong>Coeficiente de x⁵</strong><span class="pill" id="coef0Val">0</span></div>
+              <input class="coef" data-i="0" type="range" min="-5" max="5" step="1" value="0">
+            </div>
+            <div class="slider-block">
+              <div class="slider-head"><strong>Coeficiente de x⁴</strong><span class="pill" id="coef1Val">0</span></div>
+              <input class="coef" data-i="1" type="range" min="-5" max="5" step="1" value="0">
+            </div>
+            <div class="slider-block">
+              <div class="slider-head"><strong>Coeficiente de x³</strong><span class="pill" id="coef2Val">0</span></div>
+              <input class="coef" data-i="2" type="range" min="-5" max="5" step="1" value="0">
+            </div>
+            <div class="slider-block">
+              <div class="slider-head"><strong>Coeficiente de x²</strong><span class="pill" id="coef3Val">1</span></div>
+              <input class="coef" data-i="3" type="range" min="-5" max="5" step="1" value="1">
+            </div>
+            <div class="slider-block">
+              <div class="slider-head"><strong>Coeficiente de x</strong><span class="pill" id="coef4Val">0</span></div>
+              <input class="coef" data-i="4" type="range" min="-5" max="5" step="1" value="0">
+            </div>
+            <div class="slider-block">
+              <div class="slider-head"><strong>Término independiente</strong><span class="pill" id="coef5Val">-4</span></div>
+              <input class="coef" data-i="5" type="range" min="-10" max="10" step="1" value="-4">
+            </div>
+          </div>
+
+          <div>
+            <h2 class="section-title">3. Ejemplos rápidos</h2>
+            <div class="btn-grid">
+              <button class="btn primary preset" data-coefs="0,0,0,1,0,-4" data-a="2">x² − 4</button>
+              <button class="btn preset" data-coefs="0,0,1,0,-1,-2" data-a="2">x³ − x − 2</button>
+              <button class="btn preset" data-coefs="0,0,0,2,-3,1" data-a="1">2x² − 3x + 1</button>
+              <button class="btn preset" data-coefs="0,1,0,-5,0,4" data-a="1">x⁴ − 5x² + 4</button>
+              <button class="btn preset" data-coefs="0,0,1,-3,-4,12" data-a="3">x³ − 3x² − 4x + 12</button>
+              <button class="btn dark" id="resetView">Centrar gráfico</button>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <label class="chip"><input type="checkbox" id="showRoots" checked> raíces</label>
+            <label class="chip"><input type="checkbox" id="showRemainder" checked> resto</label>
+            <label class="chip"><input type="checkbox" id="showRuffiniInGraph" checked> lectura visual</label>
+          </div>
+
+          <div class="story" id="story">
+            <strong>Lectura:</strong> el resto es la altura del gráfico cuando x vale a.
+          </div>
+        </aside>
+      </div>
+
+      <div class="info-grid">
+        <div class="info">
+          <div class="small">Divisor</div>
+          <div class="large" id="divisorInfo">x − 2</div>
+          <div class="desc">Estamos dividiendo por este divisor lineal.</div>
+        </div>
+        <div class="info">
+          <div class="small">Resto</div>
+          <div class="large" id="remainderInfo">0</div>
+          <div class="desc">Se obtiene calculando P(a).</div>
+        </div>
+        <div class="info">
+          <div class="small">Punto del gráfico</div>
+          <div class="large" id="pointInfo">(2, 0)</div>
+          <div class="desc">El resto es la coordenada y de este punto.</div>
+        </div>
+        <div class="info">
+          <div class="small">Conclusión</div>
+          <div class="large" id="factorInfo">Es factor</div>
+          <div class="desc">Si el resto es cero, aparece una factorización exacta.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-ruffini">
+      <div class="wide-grid">
+        <div class="card">
+          <h2 class="section-title">Ruffini paso a paso</h2>
+          <p class="desc" style="margin-bottom:12px;">
+            La tabla usa los coeficientes del polinomio y el valor de <b>a</b>. El último número de la fila inferior es el resto.
+          </p>
+          <div class="table-wrap">
+            <table id="ruffiniTable"></table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Lectura de la división</h2>
+          <div class="identity">
+            <div>Identidad fundamental:</div>
+            <div class="formula" id="divisionIdentity">P(x) = (x − 2)(x + 2) + 0</div>
+          </div>
+
+          <div class="info-grid" style="grid-template-columns: 1fr; margin-top:12px;">
+            <div class="info">
+              <div class="small">Cociente Q(x)</div>
+              <div class="large" id="quotientInfo">x + 2</div>
+              <div class="desc">Sale de la última fila de Ruffini, sin contar el resto.</div>
+            </div>
+            <div class="info">
+              <div class="small">Resto R</div>
+              <div class="large" id="remainderInfo2">0</div>
+              <div class="desc">Debe coincidir con P(a).</div>
+            </div>
+          </div>
+
+          <div class="story" style="margin-top:12px;" id="ruffiniStory">
+            <strong>Idea clave:</strong> Ruffini y el gráfico están mostrando el mismo resto.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-factorizacion">
+      <div class="wide-grid">
+        <div class="card">
+          <h2 class="section-title">Teorema del resto</h2>
+          <div class="steps">
+            <div class="step"><b>1.</b> Si dividimos P(x) por x − a, podemos escribir: <b>P(x) = (x − a)Q(x) + R</b>.</div>
+            <div class="step"><b>2.</b> Reemplazamos x por a: <b>P(a) = (a − a)Q(a) + R</b>.</div>
+            <div class="step"><b>3.</b> Como a − a = 0, queda: <b>P(a) = R</b>.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Factorización del caso actual</h2>
+          <div id="factorizationBox"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-desafios">
+      <div class="wide-grid">
+        <div class="challenge">
+          <div>
+            <h2>Desafío para el alumno</h2>
+            <div class="challenge-text" id="challengeText">Para P(x)=x²−4, mové a hasta que el resto sea 0.</div>
+          </div>
+          <div class="feedback" id="challengeFeedback">Modificá el valor de a y presioná “Comprobar”.</div>
+          <div class="btn-grid">
+            <button class="btn good" id="checkChallenge">Comprobar</button>
+            <button class="btn warn" id="showSolution">Mostrar solución</button>
+            <button class="btn" id="newChallenge">Nuevo desafío</button>
+            <button class="btn dark" id="loadChallenge">Cargar desafío</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Uso didáctico de los desafíos</h2>
+          <div class="guide" style="grid-template-columns:1fr;">
+            <div>
+              <h3>Antes de comprobar</h3>
+              <ul>
+                <li>Pedí que anticipen si el resto será cero o no.</li>
+                <li>Que expliquen qué divisor están probando.</li>
+                <li>Que miren si el punto marcado queda sobre el eje x.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Después de comprobar</h3>
+              <ul>
+                <li>Relacionar resto cero con raíz.</li>
+                <li>Relacionar raíz con factor.</li>
+                <li>Leer el cociente que aparece en Ruffini.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Pregunta fuerte</h3>
+              <ul>
+                <li>Si P(a) no da cero, ¿puede x − a ser factor?</li>
+                <li>¿Qué información da el gráfico que también aparece en Ruffini?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-docente">
+      <div class="card">
+        <h2 class="section-title">Guía docente sugerida</h2>
+        <div class="guide">
+          <div class="info">
+            <h3>1. Empezar por el gráfico</h3>
+            <ul>
+              <li>Usá P(x)=x²−4.</li>
+              <li>Mové a hasta 2.</li>
+              <li>El punto queda en el eje x porque P(2)=0.</li>
+            </ul>
+          </div>
+          <div class="info">
+            <h3>2. Nombrar el divisor</h3>
+            <ul>
+              <li>Si a=2, el divisor es x−2.</li>
+              <li>Si a=−3, el divisor es x+3.</li>
+              <li>Este cambio de signo suele ser el error más común.</li>
+            </ul>
+          </div>
+          <div class="info">
+            <h3>3. Pasar a Ruffini</h3>
+            <ul>
+              <li>Leer coeficientes de izquierda a derecha.</li>
+              <li>Multiplicar por a y sumar.</li>
+              <li>El último número es el resto.</li>
+            </ul>
+          </div>
+          <div class="info">
+            <h3>4. Cerrar con factorización</h3>
+            <ul>
+              <li>Si R=0, entonces x−a es factor.</li>
+              <li>Usar el cociente Q(x).</li>
+              <li>Escribir P(x)=(x−a)Q(x).</li>
+            </ul>
+          </div>
+          <div class="info">
+            <h3>5. Conectar registros</h3>
+            <ul>
+              <li>Gráfico: altura P(a).</li>
+              <li>Numérico: evaluación del polinomio.</li>
+              <li>Algebraico: división y factorización.</li>
+              <li>Tabular: Ruffini.</li>
+            </ul>
+          </div>
+          <div class="info">
+            <h3>6. Actividad de cierre</h3>
+            <ul>
+              <li>Dar un divisor y pedir crear un polinomio que lo tenga como factor.</li>
+              <li>Dar un polinomio y pedir encontrar un divisor exacto.</li>
+              <li>Pedir justificar con gráfico, Ruffini y teorema del resto.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      coeffs: [0, 0, 0, 1, 0, -4],
+      a: 2,
+      zoom: 46,
+      panX: 0,
+      panY: 0,
+      showRoots: true,
+      showRemainder: true,
+      showRuffiniInGraph: true
+    };
+
+    const canvas = document.getElementById("graph");
+    const ctx = canvas.getContext("2d");
+    let W = 800;
+    let H = 560;
+
+    const $ = (id) => document.getElementById(id);
+    const coefInputs = Array.from(document.querySelectorAll(".coef"));
+
+    function fmt(n) {
+      if (!Number.isFinite(n)) return "∞";
+      if (Math.abs(n) < 1e-10) n = 0;
+      const r = Math.round(n * 1000) / 1000;
+      if (Number.isInteger(r)) return String(r);
+      return String(r).replace(".", ",");
+    }
+
+    function fmtDot(n) {
+      if (Math.abs(n) < 1e-10) n = 0;
+      const r = Math.round(n * 1000) / 1000;
+      return String(r);
+    }
+
+    function close(a, b, eps = 0.06) {
+      return Math.abs(a - b) < eps;
+    }
+
+    function trimCoeffs(coeffs) {
+      const arr = coeffs.slice();
+      while (arr.length > 1 && Math.abs(arr[0]) < 1e-12) arr.shift();
+      return arr;
+    }
+
+    function evaluate(coeffs, x) {
+      const arr = trimCoeffs(coeffs);
+      let y = 0;
+      for (const c of arr) y = y * x + c;
+      return y;
+    }
+
+    function syntheticDivision(coeffs, a) {
+      const arr = trimCoeffs(coeffs);
+      if (arr.length === 1) {
+        return {
+          coeffs: arr,
+          products: [null],
+          bottom: [arr[0]],
+          quotient: [0],
+          remainder: arr[0]
+        };
+      }
+
+      const bottom = [arr[0]];
+      const products = [null];
+
+      for (let i = 1; i < arr.length; i++) {
+        const product = a * bottom[i - 1];
+        products.push(product);
+        bottom.push(arr[i] + product);
+      }
+
+      return {
+        coeffs: arr,
+        products,
+        bottom,
+        quotient: bottom.slice(0, -1),
+        remainder: bottom[bottom.length - 1]
+      };
+    }
+
+    function divisorText(a) {
+      if (close(a, 0)) return "x";
+      if (a > 0) return "x − " + fmt(Math.abs(a));
+      return "x + " + fmt(Math.abs(a));
+    }
+
+    function polyToHTML(coeffs) {
+      const arr = trimCoeffs(coeffs);
+      const deg = arr.length - 1;
+      const terms = [];
+
+      for (let i = 0; i < arr.length; i++) {
+        const c = arr[i];
+        if (Math.abs(c) < 1e-12) continue;
+        const p = deg - i;
+        const sign = c < 0 ? "−" : "+";
+        const absC = Math.abs(c);
+        let body = "";
+
+        if (p === 0) {
+          body = fmt(absC);
+        } else if (p === 1) {
+          body = close(absC, 1, 1e-12) ? "x" : fmt(absC) + "x";
+        } else {
+          body = close(absC, 1, 1e-12) ? "x<sup>" + p + "</sup>" : fmt(absC) + "x<sup>" + p + "</sup>";
+        }
+
+        terms.push({ sign, body });
+      }
+
+      if (terms.length === 0) return "0";
+
+      let html = "";
+      terms.forEach((t, idx) => {
+        if (idx === 0) html += t.sign === "−" ? "−" + t.body : t.body;
+        else html += " " + t.sign + " " + t.body;
+      });
+      return html;
+    }
+
+    function polyToPlain(coeffs) {
+      return polyToHTML(coeffs)
+        .replaceAll("<sup>", "^")
+        .replaceAll("</sup>", "")
+        .replaceAll("−", "-");
+    }
+
+    function toScreenX(x) {
+      return W / 2 + state.panX + x * state.zoom;
+    }
+
+    function toScreenY(y) {
+      return H / 2 + state.panY - y * state.zoom;
+    }
+
+    function toWorldX(px) {
+      return (px - W / 2 - state.panX) / state.zoom;
+    }
+
+    function toWorldY(py) {
+      return -(py - H / 2 - state.panY) / state.zoom;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      W = rect.width;
+      H = rect.height;
+      canvas.width = Math.max(1, rect.width * dpr);
+      canvas.height = Math.max(1, rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+
+      const xMin = Math.floor(toWorldX(0)) - 1;
+      const xMax = Math.ceil(toWorldX(W)) + 1;
+      const yMin = Math.floor(toWorldY(H)) - 1;
+      const yMax = Math.ceil(toWorldY(0)) + 1;
+
+      ctx.font = "11px system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      for (let x = xMin; x <= xMax; x++) {
+        const sx = toScreenX(x);
+        ctx.beginPath();
+        ctx.strokeStyle = x === 0 ? "#1f2937" : "#edf3ff";
+        ctx.lineWidth = x === 0 ? 2 : 1;
+        ctx.moveTo(sx, 0);
+        ctx.lineTo(sx, H);
+        ctx.stroke();
+
+        if (x !== 0 && state.zoom > 28) {
+          ctx.fillStyle = "#8a98b3";
+          ctx.fillText(String(x), sx, toScreenY(0) + 14);
+        }
+      }
+
+      for (let y = yMin; y <= yMax; y++) {
+        const sy = toScreenY(y);
+        ctx.beginPath();
+        ctx.strokeStyle = y === 0 ? "#1f2937" : "#edf3ff";
+        ctx.lineWidth = y === 0 ? 2 : 1;
+        ctx.moveTo(0, sy);
+        ctx.lineTo(W, sy);
+        ctx.stroke();
+
+        if (y !== 0 && state.zoom > 28) {
+          ctx.fillStyle = "#8a98b3";
+          ctx.textAlign = "right";
+          ctx.fillText(String(y), toScreenX(0) - 8, sy);
+          ctx.textAlign = "center";
+        }
+      }
+
+      ctx.fillStyle = "#1f2937";
+      ctx.font = "bold 13px system-ui";
+      ctx.fillText("x", W - 16, toScreenY(0) - 12);
+      ctx.fillText("y", toScreenX(0) + 14, 16);
+    }
+
+    function drawPolynomial() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#3657ff";
+
+      let started = false;
+      for (let px = 0; px <= W; px += 1.5) {
+        const x = toWorldX(px);
+        const y = evaluate(state.coeffs, x);
+        const py = toScreenY(y);
+
+        if (!Number.isFinite(py) || Math.abs(py) > 100000) {
+          started = false;
+          continue;
+        }
+
+        if (!started) {
+          ctx.moveTo(px, py);
+          started = true;
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPoint(x, y, color, label) {
+      const sx = toScreenX(x);
+      const sy = toScreenY(y);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 3;
+      ctx.arc(sx, sy, 7.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      if (label) {
+        ctx.fillStyle = color;
+        ctx.font = "bold 13px system-ui";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(label, sx + 10, sy - 8);
+      }
+      ctx.restore();
+    }
+
+    function findApproxRoots() {
+      const roots = [];
+      const minX = Math.max(-20, toWorldX(0));
+      const maxX = Math.min(20, toWorldX(W));
+      const step = Math.max(0.02, (maxX - minX) / 600);
+
+      let prevX = minX;
+      let prevY = evaluate(state.coeffs, prevX);
+
+      for (let x = minX + step; x <= maxX; x += step) {
+        const y = evaluate(state.coeffs, x);
+
+        if (Math.abs(y) < 0.015) {
+          if (roots.every(r => Math.abs(r - x) > 0.22)) roots.push(x);
+        }
+
+        if (Number.isFinite(prevY) && Number.isFinite(y) && prevY * y < 0) {
+          let lo = prevX;
+          let hi = x;
+          for (let i = 0; i < 24; i++) {
+            const mid = (lo + hi) / 2;
+            const ym = evaluate(state.coeffs, mid);
+            const ylo = evaluate(state.coeffs, lo);
+            if (ylo * ym <= 0) hi = mid;
+            else lo = mid;
+          }
+          const root = (lo + hi) / 2;
+          if (roots.every(r => Math.abs(r - root) > 0.22)) roots.push(root);
+        }
+
+        prevX = x;
+        prevY = y;
+      }
+
+      return roots.slice(0, 10);
+    }
+
+    function drawRemainderVisual() {
+      const a = state.a;
+      const r = evaluate(state.coeffs, a);
+      const sx = toScreenX(a);
+      const sy = toScreenY(r);
+
+      ctx.save();
+
+      if (state.showRemainder) {
+        ctx.strokeStyle = "#ff9f1c";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(sx, 0);
+        ctx.lineTo(sx, H);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#12a37f";
+        ctx.beginPath();
+        ctx.moveTo(0, sy);
+        ctx.lineTo(W, sy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      if (state.showRuffiniInGraph) {
+        ctx.fillStyle = "rgba(16,23,42,.88)";
+        ctx.strokeStyle = "rgba(255,255,255,.9)";
+        ctx.lineWidth = 1;
+        const boxW = 220;
+        const boxH = 58;
+        const bx = Math.min(Math.max(sx + 12, 12), W - boxW - 12);
+        const by = Math.min(Math.max(sy + 12, 72), H - boxH - 12);
+        ctx.beginPath();
+        roundRect(ctx, bx, by, boxW, boxH, 14);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "white";
+        ctx.font = "bold 13px system-ui";
+        ctx.textAlign = "left";
+        ctx.fillText("Resto = P(a)", bx + 12, by + 22);
+        ctx.font = "bold 18px system-ui";
+        ctx.fillText("P(" + fmt(a) + ") = " + fmt(r), bx + 12, by + 45);
+      }
+
+      ctx.restore();
+      drawPoint(a, r, "#ef4444", "(" + fmt(a) + ", " + fmt(r) + ")");
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function drawRoots() {
+      if (!state.showRoots) return;
+      const roots = findApproxRoots();
+      roots.forEach(root => drawPoint(root, 0, "#7c3aed", "raíz"));
+    }
+
+    function draw() {
+      if (!ctx || W <= 0 || H <= 0) return;
+      drawGrid();
+      drawPolynomial();
+      drawRoots();
+      drawRemainderVisual();
+    }
+
+    function updateUI() {
+      const a = state.a;
+      const syn = syntheticDivision(state.coeffs, a);
+      const r = syn.remainder;
+      const dText = divisorText(a);
+      const pHTML = polyToHTML(state.coeffs);
+      const qHTML = polyToHTML(syn.quotient);
+
+      $("polyBox").innerHTML = "P(x) = " + pHTML;
+      $("aValue").textContent = fmt(a);
+      $("divisorNote").innerHTML = dText;
+      $("divisorInfo").innerHTML = dText;
+      $("remainderInfo").textContent = fmt(r);
+      $("remainderInfo2").textContent = fmt(r);
+      $("pointInfo").textContent = "(" + fmt(a) + ", " + fmt(r) + ")";
+      $("quotientInfo").innerHTML = qHTML;
+      $("divisionIdentity").innerHTML = "P(x) = (" + dText + ") · (" + qHTML + ") + " + fmt(r);
+
+      state.coeffs.forEach((c, i) => {
+        $("coef" + i + "Val").textContent = fmt(c);
+        coefInputs[i].value = c;
+      });
+      $("aSlider").value = fmtDot(a);
+
+      if (close(r, 0, 1e-8)) {
+        $("factorInfo").textContent = "Es factor";
+        $("story").innerHTML = "<strong>Lectura:</strong> como P(" + fmt(a) + ") = 0, el punto marcado está sobre el eje x. Entonces <strong>" + dText + "</strong> es factor de P(x).";
+        $("ruffiniStory").innerHTML = "<strong>Idea clave:</strong> el último número de Ruffini es 0. Eso confirma que el divisor es exacto.";
+      } else {
+        $("factorInfo").textContent = "No es factor";
+        $("story").innerHTML = "<strong>Lectura:</strong> el resto es P(" + fmt(a) + ") = " + fmt(r) + ". Como no da 0, <strong>" + dText + "</strong> no es factor de P(x).";
+        $("ruffiniStory").innerHTML = "<strong>Idea clave:</strong> el último número de Ruffini coincide con la altura del gráfico en x = " + fmt(a) + ".";
+      }
+
+      updateRuffiniTable(syn);
+      updateFactorization(syn);
+      draw();
+    }
+
+    function updateRuffiniTable(syn) {
+      const arr = syn.coeffs;
+      const deg = arr.length - 1;
+
+      let powers = "";
+      for (let i = 0; i < arr.length; i++) {
+        const p = deg - i;
+        let label = "";
+        if (p === 0) label = "cte.";
+        else if (p === 1) label = "x";
+        else label = "x<sup>" + p + "</sup>";
+        powers += "<th>" + label + "</th>";
+      }
+
+      const coefs = arr.map(c => "<td class='coef-cell'>" + fmt(c) + "</td>").join("");
+      const products = syn.products.map((p, i) => i === 0 ? "<td>—</td>" : "<td>" + fmt(p) + "</td>").join("");
+      const bottom = syn.bottom.map((b, i) => {
+        const cls = i === syn.bottom.length - 1 ? "r-cell" : "q-cell";
+        return "<td class='" + cls + "'>" + fmt(b) + "</td>";
+      }).join("");
+
+      $("ruffiniTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>a = ${fmt(state.a)}</th>
+            ${powers}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Coeficientes</th>
+            ${coefs}
+          </tr>
+          <tr>
+            <th>Multiplico por a</th>
+            ${products}
+          </tr>
+          <tr>
+            <th>Sumo</th>
+            ${bottom}
+          </tr>
+        </tbody>
+      `;
+    }
+
+    function updateFactorization(syn) {
+      const r = syn.remainder;
+      const dText = divisorText(state.a);
+      const pHTML = polyToHTML(state.coeffs);
+      const qHTML = polyToHTML(syn.quotient);
+
+      if (close(r, 0, 1e-8)) {
+        $("factorizationBox").innerHTML = `
+          <div class="identity" style="background:linear-gradient(135deg,#0f766e,#155e75);">
+            <div>Como el resto es cero, la división es exacta:</div>
+            <div class="formula">${pHTML} = (${dText}) · (${qHTML})</div>
+          </div>
+          <div class="step" style="margin-top:12px;">
+            <b>Conclusión:</b> ${dText} es factor de P(x), y a = ${fmt(state.a)} es raíz del polinomio.
+          </div>
+        `;
+      } else {
+        $("factorizationBox").innerHTML = `
+          <div class="identity" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);">
+            <div>Como el resto no es cero, no hay factorización exacta con este divisor:</div>
+            <div class="formula">${pHTML} = (${dText}) · (${qHTML}) + ${fmt(r)}</div>
+          </div>
+          <div class="step" style="margin-top:12px;">
+            <b>Conclusión:</b> ${dText} no es factor de P(x), porque P(${fmt(state.a)}) = ${fmt(r)}.
+          </div>
+        `;
+      }
+    }
+
+    function setState(coeffs, a, resetGraph = false) {
+      state.coeffs = coeffs.slice();
+      state.a = Number(a);
+      if (resetGraph) {
+        state.zoom = 46;
+        state.panX = 0;
+        state.panY = 0;
+      }
+      updateUI();
+    }
+
+    function setupControls() {
+      $("aSlider").addEventListener("input", (e) => {
+        state.a = Number(e.target.value);
+        updateUI();
+      });
+
+      coefInputs.forEach(input => {
+        input.addEventListener("input", (e) => {
+          const i = Number(e.target.dataset.i);
+          state.coeffs[i] = Number(e.target.value);
+          updateUI();
+        });
+      });
+
+      document.querySelectorAll(".preset").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const coeffs = btn.dataset.coefs.split(",").map(Number);
+          const a = Number(btn.dataset.a);
+          setState(coeffs, a, true);
+        });
+      });
+
+      $("showRoots").addEventListener("change", e => {
+        state.showRoots = e.target.checked;
+        draw();
+      });
+
+      $("showRemainder").addEventListener("change", e => {
+        state.showRemainder = e.target.checked;
+        draw();
+      });
+
+      $("showRuffiniInGraph").addEventListener("change", e => {
+        state.showRuffiniInGraph = e.target.checked;
+        draw();
+      });
+
+      $("resetView").addEventListener("click", () => {
+        state.zoom = 46;
+        state.panX = 0;
+        state.panY = 0;
+        draw();
+      });
+    }
+
+    function setupTabs() {
+      document.querySelectorAll(".tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+          btn.classList.add("active");
+          $("panel-" + btn.dataset.tab).classList.add("active");
+          setTimeout(resizeCanvas, 60);
+        });
+      });
+    }
+
+    function setupDragging() {
+      let dragging = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      canvas.addEventListener("pointerdown", e => {
+        dragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+      });
+
+      canvas.addEventListener("pointermove", e => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        state.panX += dx;
+        state.panY += dy;
+        draw();
+      });
+
+      canvas.addEventListener("pointerup", () => dragging = false);
+      canvas.addEventListener("pointercancel", () => dragging = false);
+
+      canvas.addEventListener("wheel", e => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.08 : 0.92;
+        state.zoom = Math.max(18, Math.min(95, state.zoom * factor));
+        draw();
+      }, { passive: false });
+    }
+
+    const challenges = [
+      {
+        text: "Para P(x)=x²−4, mové a hasta que el resto sea 0.",
+        coeffs: [0,0,0,1,0,-4],
+        startA: 0,
+        solutions: [2, -2],
+        hint: "Buscá dónde el gráfico corta al eje x."
+      },
+      {
+        text: "Para P(x)=x³−x−2, encontrá un valor de a que haga resto 0.",
+        coeffs: [0,0,1,0,-1,-2],
+        startA: 0,
+        solutions: [2],
+        hint: "Probá valores enteros cercanos."
+      },
+      {
+        text: "Para P(x)=2x²−3x+1, encontrá un valor de a que haga resto 0.",
+        coeffs: [0,0,0,2,-3,1],
+        startA: 0,
+        solutions: [1, 0.5],
+        hint: "Tiene una raíz entera y otra fraccionaria."
+      },
+      {
+        text: "Para P(x)=x⁴−5x²+4, encontrá un divisor lineal que sea factor.",
+        coeffs: [0,1,0,-5,0,4],
+        startA: 0,
+        solutions: [1, -1, 2, -2],
+        hint: "Tiene varias raíces enteras."
+      },
+      {
+        text: "Para P(x)=x³−3x²−4x+12, buscá un a con resto 0.",
+        coeffs: [0,0,1,-3,-4,12],
+        startA: 0,
+        solutions: [2, 3, -2],
+        hint: "Hay más de una respuesta correcta."
+      }
+    ];
+
+    let challengeIndex = 0;
+
+    function renderChallenge(resetFeedback = true) {
+      const ch = challenges[challengeIndex];
+      $("challengeText").textContent = ch.text;
+      if (resetFeedback) $("challengeFeedback").textContent = "Modificá el valor de a y presioná “Comprobar”.";
+    }
+
+    function setupChallenges() {
+      renderChallenge();
+
+      $("newChallenge").addEventListener("click", () => {
+        challengeIndex = (challengeIndex + 1) % challenges.length;
+        renderChallenge(true);
+      });
+
+      $("loadChallenge").addEventListener("click", () => {
+        const ch = challenges[challengeIndex];
+        setState(ch.coeffs, ch.startA, true);
+        renderChallenge(true);
+        document.querySelector('[data-tab="explorar"]').click();
+      });
+
+      $("showSolution").addEventListener("click", () => {
+        const ch = challenges[challengeIndex];
+        setState(ch.coeffs, ch.solutions[0], true);
+        $("challengeFeedback").textContent = "Una solución es a = " + fmt(ch.solutions[0]) + ". El divisor correspondiente es " + divisorText(ch.solutions[0]) + ".";
+      });
+
+      $("checkChallenge").addEventListener("click", () => {
+        const r = evaluate(state.coeffs, state.a);
+        if (close(r, 0, 1e-8)) {
+          $("challengeFeedback").textContent = "¡Muy bien! El resto es 0. Entonces " + divisorText(state.a) + " es factor de P(x).";
+        } else {
+          $("challengeFeedback").textContent = "Todavía no. El resto actual es " + fmt(r) + ". Pista: " + challenges[challengeIndex].hint;
+        }
+      });
+    }
+
+    setupControls();
+    setupTabs();
+    setupDragging();
+    setupChallenges();
+    updateUI();
+    resizeCanvas();
+
+    window.addEventListener("resize", resizeCanvas);
+  </script>
+</body>
+</html>
