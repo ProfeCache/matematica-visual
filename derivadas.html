@@ -1,0 +1,96 @@
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funciones y derivadas interactivas</title>
+<style>
+:root{--bg:#edf4ff;--ink:#0f172a;--muted:#64748b;--card:#fff;--line:#dbe4f0;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--dark:#020617;--shadow:0 24px 70px rgba(15,23,42,.16)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;padding:14px;font-family:Inter,system-ui,"Segoe UI",Arial,sans-serif;background:radial-gradient(circle at 10% 5%,rgba(37,99,235,.16),transparent 28%),radial-gradient(circle at 90% 5%,rgba(22,163,74,.13),transparent 25%),linear-gradient(180deg,#f8fbff 0%,var(--bg) 55%,#e2e8f0 100%);color:var(--ink)}
+.app{width:min(1280px,100%);margin:auto;background:#f8fafc;border:1px solid rgba(148,163,184,.35);border-radius:30px;overflow:hidden;box-shadow:var(--shadow)}
+.hero{padding:28px 30px;color:#fff;background:radial-gradient(circle at 15% 20%,rgba(56,189,248,.28),transparent 30%),radial-gradient(circle at 85% 5%,rgba(99,102,241,.28),transparent 30%),linear-gradient(135deg,#020617 0%,#0f172a 60%,#111827 100%)}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;color:#bfdbfe;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);font-size:12px;font-weight:900;letter-spacing:.45px;text-transform:uppercase}.badge span{width:9px;height:9px;border-radius:50%;background:#38bdf8;box-shadow:0 0 16px rgba(56,189,248,.95)}
+h1{margin:16px 0 8px;font-size:clamp(31px,5vw,54px);line-height:1.02;letter-spacing:-1.4px}.hero p{margin:0;max-width:860px;color:#cbd5e1;line-height:1.55;font-size:15.5px}
+.content{padding:18px;display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;align-items:start}.card{background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:0 12px 34px rgba(15,23,42,.07);overflow:hidden}.panel{padding:16px;display:grid;gap:14px}
+h2{margin:0;color:#1e293b;font-size:17px;font-weight:950}.field{display:grid;gap:6px}label{color:#475569;font-size:12px;font-weight:900;letter-spacing:.45px;text-transform:uppercase}
+select,input[type=range]{width:100%;accent-color:var(--blue)}select{border:1px solid #cbd5e1;background:#f8fafc;color:var(--ink);border-radius:15px;padding:11px 12px;outline:0;font-size:15px;font-weight:850}.slider-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.value{padding:5px 9px;border-radius:999px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:12px;font-weight:900}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:15px;padding:11px 12px;color:white;font-weight:900;cursor:pointer}.blue{background:linear-gradient(135deg,#2563eb,#4f46e5)}.dark{background:linear-gradient(135deg,#334155,#0f172a)}.red{background:linear-gradient(135deg,#dc2626,#991b1b)}
+.info{border-radius:20px;background:#0f172a;color:white;padding:15px;display:grid;gap:10px}.info .mini{color:#93c5fd;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.45px}.formula{font-size:18px;font-weight:950;line-height:1.35}.explain{color:#cbd5e1;font-size:13.5px;line-height:1.45}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{border-radius:18px;background:#f8fafc;border:1px solid #e2e8f0;padding:12px}.metric .k{font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px}.metric .v{font-size:20px;font-weight:950;color:#0f172a}.mblue .v{color:#2563eb}.mgreen .v{color:#16a34a}.mred .v{color:#ef4444}
+.graphs{display:grid;gap:14px;min-width:0}.graph-card{padding:14px}.graph-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.title{display:flex;align-items:center;gap:9px;color:#1e293b;font-size:16px;font-weight:950}.dot{width:13px;height:13px;border-radius:50%;box-shadow:0 0 0 5px rgba(37,99,235,.12)}.dblue{background:#2563eb}.dgreen{background:#16a34a;box-shadow:0 0 0 5px rgba(22,163,74,.13)}.tag{padding:8px 11px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;font-size:12px;font-weight:900}
+canvas{width:100%;height:340px;display:block;border-radius:22px;border:1px solid #cbd5e1;background:radial-gradient(circle at 12% 10%,rgba(219,234,254,.75),transparent 30%),radial-gradient(circle at 88% 8%,rgba(220,252,231,.62),transparent 28%),linear-gradient(180deg,#fff 0%,#f8fafc 100%);touch-action:none;cursor:crosshair}.note{text-align:center;color:#64748b;font-size:12px;line-height:1.4}
+@media(max-width:980px){body{padding:8px}.app{border-radius:24px}.hero{padding:22px 18px}.content{grid-template-columns:1fr;padding:12px}canvas{height:320px}}@media(max-width:520px){.btns,.metrics{grid-template-columns:1fr}canvas{height:280px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="hero">
+<div class="badge"><span></span> visualizador interactivo</div>
+<h1>Funciones y derivadas</h1>
+<p>Mové el punto sobre la función y observá cómo ese mismo valor de x se refleja en el gráfico de la derivada. La pendiente de la tangente se transforma en altura en el segundo gráfico.</p>
+</header>
+<section class="content">
+<aside class="card panel">
+<h2>Controles</h2>
+<div class="field"><label>Función</label><select id="type">
+<option value="linear">Lineal: f(x)=a·x+b</option>
+<option value="quadratic" selected>Cuadrática: f(x)=a·(x-h)²+k</option>
+<option value="cubic">Cúbica: f(x)=a·(x-h)³+k</option>
+<option value="sin">Senoidal: f(x)=A·sen(Bx+C)+D</option>
+<option value="cos">Cosenoidal: f(x)=A·cos(Bx+C)+D</option>
+<option value="exp">Exponencial: f(x)=a·e^(b·x)+k</option>
+<option value="log">Logarítmica: f(x)=a·ln(x-h)+k</option>
+<option value="abs">Valor absoluto: f(x)=a·|x-h|+k</option>
+</select></div>
+<div class="field"><div class="slider-top"><label id="la">a</label><span id="va" class="value">1.00</span></div><input id="a" type="range" min="-4" max="4" step="0.01" value="1"></div>
+<div class="field"><div class="slider-top"><label id="lb">h</label><span id="vb" class="value">0.00</span></div><input id="b" type="range" min="-5" max="5" step="0.01" value="0"></div>
+<div class="field"><div class="slider-top"><label id="lc">k</label><span id="vc" class="value">0.00</span></div><input id="c" type="range" min="-5" max="5" step="0.01" value="0"></div>
+<div class="field"><div class="slider-top"><label id="ld">d</label><span id="vd" class="value">0.00</span></div><input id="d" type="range" min="-5" max="5" step="0.01" value="0"></div>
+<div class="field"><div class="slider-top"><label>x</label><span id="vx" class="value">1.00</span></div><input id="x" type="range" min="-6" max="6" step="0.01" value="1"></div>
+<div class="field"><div class="slider-top"><label>zoom</label><span id="vz" class="value">1.00</span></div><input id="zoom" type="range" min="0.5" max="2.5" step="0.01" value="1"></div>
+<div class="btns"><button id="anim" class="btn blue">Animar x</button><button id="reset" class="btn dark">Reiniciar</button></div>
+<div class="info"><div class="mini">Función actual</div><div id="formula" class="formula"></div><div id="explain" class="explain"></div></div>
+<div class="metrics">
+<div class="metric mblue"><div class="k">f(x)</div><div id="fx" class="v">0</div></div>
+<div class="metric mgreen"><div class="k">f'(x)</div><div id="dfx" class="v">0</div></div>
+<div class="metric mred"><div class="k">pendiente</div><div id="slope" class="v">0</div></div>
+<div class="metric"><div class="k">x</div><div id="xbox" class="v">0</div></div>
+</div>
+</aside>
+<section class="graphs">
+<section class="card graph-card"><div class="graph-head"><div class="title"><span class="dot dblue"></span>Gráfico de la función</div><div class="tag">punto + tangente</div></div><canvas id="c1"></canvas></section>
+<section class="card graph-card"><div class="graph-head"><div class="title"><span class="dot dgreen"></span>Gráfico de la derivada</div><div class="tag">mismo valor de x</div></div><canvas id="c2"></canvas></section>
+<div class="note">Arrastrá sobre cualquiera de los gráficos para mover el mismo valor de x en ambos.</div>
+</section>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const c1=$("c1"), c2=$("c2");
+const ids=["a","b","c","d","x","zoom"];
+const presets={
+linear:{labs:["a","b","—","—"],vals:[1,0,0,0],f:"f(x)=a·x+b",e:"En una función lineal, la derivada es constante: la pendiente no cambia."},
+quadratic:{labs:["a","h","k","—"],vals:[1,0,0,0],f:"f(x)=a·(x-h)²+k",e:"En la cuadrática, la derivada es lineal: la pendiente cambia de manera constante."},
+cubic:{labs:["a","h","k","—"],vals:[.2,0,0,0],f:"f(x)=a·(x-h)³+k",e:"En la cúbica, la derivada es cuadrática: las pendientes forman una parábola."},
+sin:{labs:["A","B","C","D"],vals:[2,1,0,0],f:"f(x)=A·sen(Bx+C)+D",e:"La derivada de una función seno se relaciona con una función coseno."},
+cos:{labs:["A","B","C","D"],vals:[2,1,0,0],f:"f(x)=A·cos(Bx+C)+D",e:"La derivada de una función coseno se relaciona con una función seno negativa."},
+exp:{labs:["a","b","k","—"],vals:[1,.5,0,0],f:"f(x)=a·e^(b·x)+k",e:"En la exponencial, la derivada crece o decrece de manera proporcional a la función."},
+log:{labs:["a","h","k","—"],vals:[1,-5,0,0],f:"f(x)=a·ln(x-h)+k",e:"La función logarítmica solo existe cuando x-h>0. Cerca del borde, la pendiente cambia mucho."},
+abs:{labs:["a","h","k","—"],vals:[1,0,0,0],f:"f(x)=a·|x-h|+k",e:"En el valor absoluto hay una punta: en ese punto la derivada no está definida."}
+};
+let timer=null, dir=1;
+function n(id){return Number($(id).value)}
+function p(){return{t:$("type").value,a:n("a"),b:n("b"),c:n("c"),d:n("d"),x:n("x"),z:n("zoom")}}
+function f(x,p){let {t,a,b,c,d}=p;if(t==="linear")return a*x+b;if(t==="quadratic")return a*(x-b)**2+c;if(t==="cubic")return a*(x-b)**3+c;if(t==="sin")return a*Math.sin(b*x+c)+d;if(t==="cos")return a*Math.cos(b*x+c)+d;if(t==="exp")return a*Math.exp(b*x)+c;if(t==="log"){let u=x-b;return u>0?a*Math.log(u)+c:NaN}if(t==="abs")return a*Math.abs(x-b)+c}
+function df(x,p){let {t,a,b,c}=p;if(t==="linear")return a;if(t==="quadratic")return 2*a*(x-b);if(t==="cubic")return 3*a*(x-b)**2;if(t==="sin")return a*b*Math.cos(b*x+c);if(t==="cos")return -a*b*Math.sin(b*x+c);if(t==="exp")return a*b*Math.exp(b*x);if(t==="log"){let u=x-b;return u>0?a/u:NaN}if(t==="abs"){if(Math.abs(x-b)<.025)return NaN;return x>b?a:-a}}
+function fmt(v){return Number.isFinite(v)?(Math.abs(v)>999?v.toExponential(2):v.toFixed(3)):"no definida"}
+function world(p){let m=6/p.z;return{xmin:-m,xmax:m,ymin:-m,ymax:m}}
+function size(cv){let r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;let ctx=cv.getContext("2d");ctx.setTransform(d,0,0,d,0,0);return{ctx,W:r.width,H:r.height}}
+function sx(x,W,w){return (x-w.xmin)/(w.xmax-w.xmin)*W} function sy(y,H,w){return H-(y-w.ymin)/(w.ymax-w.ymin)*H}
+function xp(px,W,w){return w.xmin+px/W*(w.xmax-w.xmin)}
+function grid(ctx,W,H,w){ctx.clearRect(0,0,W,H);ctx.strokeStyle="#e2e8f0";ctx.lineWidth=1;for(let x=Math.ceil(w.xmin);x<=Math.floor(w.xmax);x++){let X=sx(x,W,w);ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke()}for(let y=Math.ceil(w.ymin);y<=Math.floor(w.ymax);y++){let Y=sy(y,H,w);ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);ctx.stroke()}ctx.strokeStyle="#94a3b8";ctx.lineWidth=2;let X0=sx(0,W,w),Y0=sy(0,H,w);ctx.beginPath();ctx.moveTo(0,Y0);ctx.lineTo(W,Y0);ctx.stroke();ctx.beginPath();ctx.moveTo(X0,0);ctx.lineTo(X0,H);ctx.stroke()}
+function curve(ctx,W,H,w,p,der){ctx.beginPath();ctx.strokeStyle=der?"#16a34a":"#2563eb";ctx.lineWidth=3;let started=false;for(let px=0;px<=W;px++){let x=xp(px,W,w),y=der?df(x,p):f(x,p);if(!Number.isFinite(y)||y<w.ymin-10||y>w.ymax+10){started=false;continue}let py=sy(y,H,w);if(!started){ctx.moveTo(px,py);started=true}else ctx.lineTo(px,py)}ctx.stroke()}
+function linkedFunction(ctx,W,H,w,p){let x=p.x,y=f(x,p),m=df(x,p),X=sx(x,W,w);ctx.save();ctx.setLineDash([7,6]);ctx.strokeStyle="rgba(239,68,68,.55)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke();ctx.setLineDash([]);if(Number.isFinite(y)){let Y=sy(y,H,w);if(Number.is
