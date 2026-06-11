@@ -1,96 +1,945 @@
-from pathlib import Path
-
-html = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Funciones y derivadas interactivas</title>
-<style>
-:root{--bg:#edf4ff;--ink:#0f172a;--muted:#64748b;--card:#fff;--line:#dbe4f0;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--dark:#020617;--shadow:0 24px 70px rgba(15,23,42,.16)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;padding:14px;font-family:Inter,system-ui,"Segoe UI",Arial,sans-serif;background:radial-gradient(circle at 10% 5%,rgba(37,99,235,.16),transparent 28%),radial-gradient(circle at 90% 5%,rgba(22,163,74,.13),transparent 25%),linear-gradient(180deg,#f8fbff 0%,var(--bg) 55%,#e2e8f0 100%);color:var(--ink)}
-.app{width:min(1280px,100%);margin:auto;background:#f8fafc;border:1px solid rgba(148,163,184,.35);border-radius:30px;overflow:hidden;box-shadow:var(--shadow)}
-.hero{padding:28px 30px;color:#fff;background:radial-gradient(circle at 15% 20%,rgba(56,189,248,.28),transparent 30%),radial-gradient(circle at 85% 5%,rgba(99,102,241,.28),transparent 30%),linear-gradient(135deg,#020617 0%,#0f172a 60%,#111827 100%)}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;color:#bfdbfe;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);font-size:12px;font-weight:900;letter-spacing:.45px;text-transform:uppercase}.badge span{width:9px;height:9px;border-radius:50%;background:#38bdf8;box-shadow:0 0 16px rgba(56,189,248,.95)}
-h1{margin:16px 0 8px;font-size:clamp(31px,5vw,54px);line-height:1.02;letter-spacing:-1.4px}.hero p{margin:0;max-width:860px;color:#cbd5e1;line-height:1.55;font-size:15.5px}
-.content{padding:18px;display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;align-items:start}.card{background:var(--card);border:1px solid var(--line);border-radius:26px;box-shadow:0 12px 34px rgba(15,23,42,.07);overflow:hidden}.panel{padding:16px;display:grid;gap:14px}
-h2{margin:0;color:#1e293b;font-size:17px;font-weight:950}.field{display:grid;gap:6px}label{color:#475569;font-size:12px;font-weight:900;letter-spacing:.45px;text-transform:uppercase}
-select,input[type=range]{width:100%;accent-color:var(--blue)}select{border:1px solid #cbd5e1;background:#f8fafc;color:var(--ink);border-radius:15px;padding:11px 12px;outline:0;font-size:15px;font-weight:850}.slider-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.value{padding:5px 9px;border-radius:999px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:12px;font-weight:900}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:15px;padding:11px 12px;color:white;font-weight:900;cursor:pointer}.blue{background:linear-gradient(135deg,#2563eb,#4f46e5)}.dark{background:linear-gradient(135deg,#334155,#0f172a)}.red{background:linear-gradient(135deg,#dc2626,#991b1b)}
-.info{border-radius:20px;background:#0f172a;color:white;padding:15px;display:grid;gap:10px}.info .mini{color:#93c5fd;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.45px}.formula{font-size:18px;font-weight:950;line-height:1.35}.explain{color:#cbd5e1;font-size:13.5px;line-height:1.45}
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{border-radius:18px;background:#f8fafc;border:1px solid #e2e8f0;padding:12px}.metric .k{font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px}.metric .v{font-size:20px;font-weight:950;color:#0f172a}.mblue .v{color:#2563eb}.mgreen .v{color:#16a34a}.mred .v{color:#ef4444}
-.graphs{display:grid;gap:14px;min-width:0}.graph-card{padding:14px}.graph-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.title{display:flex;align-items:center;gap:9px;color:#1e293b;font-size:16px;font-weight:950}.dot{width:13px;height:13px;border-radius:50%;box-shadow:0 0 0 5px rgba(37,99,235,.12)}.dblue{background:#2563eb}.dgreen{background:#16a34a;box-shadow:0 0 0 5px rgba(22,163,74,.13)}.tag{padding:8px 11px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;font-size:12px;font-weight:900}
-canvas{width:100%;height:340px;display:block;border-radius:22px;border:1px solid #cbd5e1;background:radial-gradient(circle at 12% 10%,rgba(219,234,254,.75),transparent 30%),radial-gradient(circle at 88% 8%,rgba(220,252,231,.62),transparent 28%),linear-gradient(180deg,#fff 0%,#f8fafc 100%);touch-action:none;cursor:crosshair}.note{text-align:center;color:#64748b;font-size:12px;line-height:1.4}
-@media(max-width:980px){body{padding:8px}.app{border-radius:24px}.hero{padding:22px 18px}.content{grid-template-columns:1fr;padding:12px}canvas{height:320px}}@media(max-width:520px){.btns,.metrics{grid-template-columns:1fr}canvas{height:280px}}
-</style>
-</head>
-<body>
-<main class="app">
-<header class="hero">
-<div class="badge"><span></span> visualizador interactivo</div>
-<h1>Funciones y derivadas</h1>
-<p>Mové el punto sobre la función y observá cómo ese mismo valor de x se refleja en el gráfico de la derivada. La pendiente de la tangente se transforma en altura en el segundo gráfico.</p>
-</header>
-<section class="content">
-<aside class="card panel">
-<h2>Controles</h2>
-<div class="field"><label>Función</label><select id="type">
-<option value="linear">Lineal: f(x)=a·x+b</option>
-<option value="quadratic" selected>Cuadrática: f(x)=a·(x-h)²+k</option>
-<option value="cubic">Cúbica: f(x)=a·(x-h)³+k</option>
-<option value="sin">Senoidal: f(x)=A·sen(Bx+C)+D</option>
-<option value="cos">Cosenoidal: f(x)=A·cos(Bx+C)+D</option>
-<option value="exp">Exponencial: f(x)=a·e^(b·x)+k</option>
-<option value="log">Logarítmica: f(x)=a·ln(x-h)+k</option>
-<option value="abs">Valor absoluto: f(x)=a·|x-h|+k</option>
-</select></div>
-<div class="field"><div class="slider-top"><label id="la">a</label><span id="va" class="value">1.00</span></div><input id="a" type="range" min="-4" max="4" step="0.01" value="1"></div>
-<div class="field"><div class="slider-top"><label id="lb">h</label><span id="vb" class="value">0.00</span></div><input id="b" type="range" min="-5" max="5" step="0.01" value="0"></div>
-<div class="field"><div class="slider-top"><label id="lc">k</label><span id="vc" class="value">0.00</span></div><input id="c" type="range" min="-5" max="5" step="0.01" value="0"></div>
-<div class="field"><div class="slider-top"><label id="ld">d</label><span id="vd" class="value">0.00</span></div><input id="d" type="range" min="-5" max="5" step="0.01" value="0"></div>
-<div class="field"><div class="slider-top"><label>x</label><span id="vx" class="value">1.00</span></div><input id="x" type="range" min="-6" max="6" step="0.01" value="1"></div>
-<div class="field"><div class="slider-top"><label>zoom</label><span id="vz" class="value">1.00</span></div><input id="zoom" type="range" min="0.5" max="2.5" step="0.01" value="1"></div>
-<div class="btns"><button id="anim" class="btn blue">Animar x</button><button id="reset" class="btn dark">Reiniciar</button></div>
-<div class="info"><div class="mini">Función actual</div><div id="formula" class="formula"></div><div id="explain" class="explain"></div></div>
-<div class="metrics">
-<div class="metric mblue"><div class="k">f(x)</div><div id="fx" class="v">0</div></div>
-<div class="metric mgreen"><div class="k">f'(x)</div><div id="dfx" class="v">0</div></div>
-<div class="metric mred"><div class="k">pendiente</div><div id="slope" class="v">0</div></div>
-<div class="metric"><div class="k">x</div><div id="xbox" class="v">0</div></div>
-</div>
-</aside>
-<section class="graphs">
-<section class="card graph-card"><div class="graph-head"><div class="title"><span class="dot dblue"></span>Gráfico de la función</div><div class="tag">punto + tangente</div></div><canvas id="c1"></canvas></section>
-<section class="card graph-card"><div class="graph-head"><div class="title"><span class="dot dgreen"></span>Gráfico de la derivada</div><div class="tag">mismo valor de x</div></div><canvas id="c2"></canvas></section>
-<div class="note">Arrastrá sobre cualquiera de los gráficos para mover el mismo valor de x en ambos.</div>
-</section>
-</section>
-</main>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funciones y derivadas interactivas</title>
 
-<script>
-const $=id=>document.getElementById(id);
-const c1=$("c1"), c2=$("c2");
-const ids=["a","b","c","d","x","zoom"];
-const presets={
-linear:{labs:["a","b","—","—"],vals:[1,0,0,0],f:"f(x)=a·x+b",e:"En una función lineal, la derivada es constante: la pendiente no cambia."},
-quadratic:{labs:["a","h","k","—"],vals:[1,0,0,0],f:"f(x)=a·(x-h)²+k",e:"En la cuadrática, la derivada es lineal: la pendiente cambia de manera constante."},
-cubic:{labs:["a","h","k","—"],vals:[.2,0,0,0],f:"f(x)=a·(x-h)³+k",e:"En la cúbica, la derivada es cuadrática: las pendientes forman una parábola."},
-sin:{labs:["A","B","C","D"],vals:[2,1,0,0],f:"f(x)=A·sen(Bx+C)+D",e:"La derivada de una función seno se relaciona con una función coseno."},
-cos:{labs:["A","B","C","D"],vals:[2,1,0,0],f:"f(x)=A·cos(Bx+C)+D",e:"La derivada de una función coseno se relaciona con una función seno negativa."},
-exp:{labs:["a","b","k","—"],vals:[1,.5,0,0],f:"f(x)=a·e^(b·x)+k",e:"En la exponencial, la derivada crece o decrece de manera proporcional a la función."},
-log:{labs:["a","h","k","—"],vals:[1,-5,0,0],f:"f(x)=a·ln(x-h)+k",e:"La función logarítmica solo existe cuando x-h>0. Cerca del borde, la pendiente cambia mucho."},
-abs:{labs:["a","h","k","—"],vals:[1,0,0,0],f:"f(x)=a·|x-h|+k",e:"En el valor absoluto hay una punta: en ese punto la derivada no está definida."}
-};
-let timer=null, dir=1;
-function n(id){return Number($(id).value)}
-function p(){return{t:$("type").value,a:n("a"),b:n("b"),c:n("c"),d:n("d"),x:n("x"),z:n("zoom")}}
-function f(x,p){let {t,a,b,c,d}=p;if(t==="linear")return a*x+b;if(t==="quadratic")return a*(x-b)**2+c;if(t==="cubic")return a*(x-b)**3+c;if(t==="sin")return a*Math.sin(b*x+c)+d;if(t==="cos")return a*Math.cos(b*x+c)+d;if(t==="exp")return a*Math.exp(b*x)+c;if(t==="log"){let u=x-b;return u>0?a*Math.log(u)+c:NaN}if(t==="abs")return a*Math.abs(x-b)+c}
-function df(x,p){let {t,a,b,c}=p;if(t==="linear")return a;if(t==="quadratic")return 2*a*(x-b);if(t==="cubic")return 3*a*(x-b)**2;if(t==="sin")return a*b*Math.cos(b*x+c);if(t==="cos")return -a*b*Math.sin(b*x+c);if(t==="exp")return a*b*Math.exp(b*x);if(t==="log"){let u=x-b;return u>0?a/u:NaN}if(t==="abs"){if(Math.abs(x-b)<.025)return NaN;return x>b?a:-a}}
-function fmt(v){return Number.isFinite(v)?(Math.abs(v)>999?v.toExponential(2):v.toFixed(3)):"no definida"}
-function world(p){let m=6/p.z;return{xmin:-m,xmax:m,ymin:-m,ymax:m}}
-function size(cv){let r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;let ctx=cv.getContext("2d");ctx.setTransform(d,0,0,d,0,0);return{ctx,W:r.width,H:r.height}}
-function sx(x,W,w){return (x-w.xmin)/(w.xmax-w.xmin)*W} function sy(y,H,w){return H-(y-w.ymin)/(w.ymax-w.ymin)*H}
-function xp(px,W,w){return w.xmin+px/W*(w.xmax-w.xmin)}
-function grid(ctx,W,H,w){ctx.clearRect(0,0,W,H);ctx.strokeStyle="#e2e8f0";ctx.lineWidth=1;for(let x=Math.ceil(w.xmin);x<=Math.floor(w.xmax);x++){let X=sx(x,W,w);ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke()}for(let y=Math.ceil(w.ymin);y<=Math.floor(w.ymax);y++){let Y=sy(y,H,w);ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);ctx.stroke()}ctx.strokeStyle="#94a3b8";ctx.lineWidth=2;let X0=sx(0,W,w),Y0=sy(0,H,w);ctx.beginPath();ctx.moveTo(0,Y0);ctx.lineTo(W,Y0);ctx.stroke();ctx.beginPath();ctx.moveTo(X0,0);ctx.lineTo(X0,H);ctx.stroke()}
-function curve(ctx,W,H,w,p,der){ctx.beginPath();ctx.strokeStyle=der?"#16a34a":"#2563eb";ctx.lineWidth=3;let started=false;for(let px=0;px<=W;px++){let x=xp(px,W,w),y=der?df(x,p):f(x,p);if(!Number.isFinite(y)||y<w.ymin-10||y>w.ymax+10){started=false;continue}let py=sy(y,H,w);if(!started){ctx.moveTo(px,py);started=true}else ctx.lineTo(px,py)}ctx.stroke()}
-function linkedFunction(ctx,W,H,w,p){let x=p.x,y=f(x,p),m=df(x,p),X=sx(x,W,w);ctx.save();ctx.setLineDash([7,6]);ctx.strokeStyle="rgba(239,68,68,.55)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(X,0);ctx.lineTo(X,H);ctx.stroke();ctx.setLineDash([]);if(Number.isFinite(y)){let Y=sy(y,H,w);if(Number.is
+  <style>
+    :root {
+      --bg: #eef4ff;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #dbe4f0;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --red: #ef4444;
+      --dark: #020617;
+      --shadow: 0 24px 70px rgba(15,23,42,.16);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      padding: 14px;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 5%, rgba(37,99,235,.16), transparent 28%),
+        radial-gradient(circle at 90% 5%, rgba(22,163,74,.13), transparent 25%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 55%, #e2e8f0 100%);
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      background: #f8fafc;
+      border: 1px solid rgba(148,163,184,.35);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px 30px;
+      color: white;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(56,189,248,.28), transparent 30%),
+        radial-gradient(circle at 85% 5%, rgba(99,102,241,.28), transparent 30%),
+        linear-gradient(135deg, #020617 0%, #0f172a 60%, #111827 100%);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      color: #bfdbfe;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+    }
+
+    .badge span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 16px rgba(56,189,248,.95);
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(31px, 5vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -1.3px;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 850px;
+      color: #cbd5e1;
+      line-height: 1.55;
+      font-size: 15.5px;
+    }
+
+    .content {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      box-shadow: 0 12px 34px rgba(15,23,42,.07);
+      overflow: hidden;
+    }
+
+    .panel {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 17px;
+      font-weight: 950;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    label {
+      color: #475569;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+    }
+
+    .value {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: var(--ink);
+      border-radius: 15px;
+      padding: 11px 12px;
+      outline: none;
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 15px;
+      padding: 11px 12px;
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .blue { background: linear-gradient(135deg,#2563eb,#4f46e5); }
+    .dark { background: linear-gradient(135deg,#334155,#0f172a); }
+    .red { background: linear-gradient(135deg,#dc2626,#991b1b); }
+
+    .info {
+      border-radius: 20px;
+      background: #0f172a;
+      color: white;
+      padding: 15px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info .mini {
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+    }
+
+    .formula {
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+
+    .explain {
+      color: #cbd5e1;
+      font-size: 13.5px;
+      line-height: 1.45;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .metric {
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+    }
+
+    .metric .k {
+      font-size: 11px;
+      font-weight: 900;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      margin-bottom: 4px;
+    }
+
+    .metric .v {
+      font-size: 20px;
+      font-weight: 950;
+      color: #0f172a;
+    }
+
+    .mblue .v { color: #2563eb; }
+    .mgreen .v { color: #16a34a; }
+    .mred .v { color: #ef4444; }
+
+    .graphs {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .graph-card {
+      padding: 14px;
+    }
+
+    .graph-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #1e293b;
+      font-size: 16px;
+      font-weight: 950;
+    }
+
+    .dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 5px rgba(37,99,235,.12);
+    }
+
+    .dblue { background: #2563eb; }
+    .dgreen {
+      background: #16a34a;
+      box-shadow: 0 0 0 5px rgba(22,163,74,.13);
+    }
+
+    .tag {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .svg-wrap {
+      width: 100%;
+      border-radius: 22px;
+      border: 1px solid #cbd5e1;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(219,234,254,.75), transparent 30%),
+        radial-gradient(circle at 88% 8%, rgba(220,252,231,.62), transparent 28%),
+        linear-gradient(180deg,#fff 0%,#f8fafc 100%);
+    }
+
+    svg {
+      width: 100%;
+      height: 340px;
+      display: block;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .grid-line {
+      stroke: #e2e8f0;
+      stroke-width: 1;
+    }
+
+    .axis {
+      stroke: #94a3b8;
+      stroke-width: 2;
+    }
+
+    .curve-function {
+      fill: none;
+      stroke: #2563eb;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .curve-derivative {
+      fill: none;
+      stroke: #16a34a;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .linked-line {
+      stroke: rgba(239,68,68,.58);
+      stroke-width: 2;
+      stroke-dasharray: 7 6;
+    }
+
+    .tangent {
+      stroke: #ef4444;
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .height-line {
+      stroke: rgba(22,163,74,.38);
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .point-function {
+      fill: #ef4444;
+      stroke: #fff;
+      stroke-width: 3;
+    }
+
+    .point-derivative {
+      fill: #16a34a;
+      stroke: #fff;
+      stroke-width: 3;
+    }
+
+    .small-text {
+      fill: #0f172a;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: Arial, sans-serif;
+    }
+
+    .note {
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 980px) {
+      body { padding: 8px; }
+      .app { border-radius: 24px; }
+      .hero { padding: 22px 18px; }
+      .content {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
+      svg { height: 320px; }
+    }
+
+    @media (max-width: 520px) {
+      .buttons,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      svg {
+        height: 280px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="hero">
+      <div class="badge"><span></span> visualizador interactivo</div>
+      <h1>Funciones y derivadas</h1>
+      <p>
+        Mové el punto sobre la función y observá cómo ese mismo valor de x aparece en el gráfico de la derivada.
+        La pendiente de la tangente se transforma en altura en el segundo gráfico.
+      </p>
+    </header>
+
+    <section class="content">
+      <aside class="card panel">
+        <h2>Controles</h2>
+
+        <div class="field">
+          <label>Función</label>
+          <select id="type">
+            <option value="linear">Lineal: f(x)=a·x+b</option>
+            <option value="quadratic" selected>Cuadrática: f(x)=a·(x-h)²+k</option>
+            <option value="cubic">Cúbica: f(x)=a·(x-h)³+k</option>
+            <option value="sin">Senoidal: f(x)=A·sen(Bx+C)+D</option>
+            <option value="cos">Cosenoidal: f(x)=A·cos(Bx+C)+D</option>
+            <option value="exp">Exponencial: f(x)=a·e^(b·x)+k</option>
+            <option value="log">Logarítmica: f(x)=a·ln(x-h)+k</option>
+            <option value="abs">Valor absoluto: f(x)=a·|x-h|+k</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="slider-top"><label id="la">a</label><span id="va" class="value">1.00</span></div>
+          <input id="a" type="range" min="-4" max="4" step="0.01" value="1">
+        </div>
+
+        <div class="field">
+          <div class="slider-top"><label id="lb">h</label><span id="vb" class="value">0.00</span></div>
+          <input id="b" type="range" min="-5" max="5" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <div class="slider-top"><label id="lc">k</label><span id="vc" class="value">0.00</span></div>
+          <input id="c" type="range" min="-5" max="5" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <div class="slider-top"><label id="ld">d</label><span id="vd" class="value">0.00</span></div>
+          <input id="d" type="range" min="-5" max="5" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <div class="slider-top"><label>x</label><span id="vx" class="value">1.00</span></div>
+          <input id="x" type="range" min="-6" max="6" step="0.01" value="1">
+        </div>
+
+        <div class="field">
+          <div class="slider-top"><label>zoom</label><span id="vz" class="value">1.00</span></div>
+          <input id="zoom" type="range" min="0.5" max="2.5" step="0.01" value="1">
+        </div>
+
+        <div class="buttons">
+          <button id="anim" class="btn blue">Animar x</button>
+          <button id="reset" class="btn dark">Reiniciar</button>
+        </div>
+
+        <div class="info">
+          <div class="mini">Función actual</div>
+          <div id="formula" class="formula"></div>
+          <div id="explain" class="explain"></div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric mblue"><div class="k">f(x)</div><div id="fx" class="v">0</div></div>
+          <div class="metric mgreen"><div class="k">f'(x)</div><div id="dfx" class="v">0</div></div>
+          <div class="metric mred"><div class="k">pendiente</div><div id="slope" class="v">0</div></div>
+          <div class="metric"><div class="k">x</div><div id="xbox" class="v">0</div></div>
+        </div>
+      </aside>
+
+      <section class="graphs">
+        <section class="card graph-card">
+          <div class="graph-head">
+            <div class="title"><span class="dot dblue"></span>Gráfico de la función</div>
+            <div class="tag">punto + recta tangente</div>
+          </div>
+          <div class="svg-wrap">
+            <svg id="svgFunction" viewBox="0 0 900 360" preserveAspectRatio="none"></svg>
+          </div>
+        </section>
+
+        <section class="card graph-card">
+          <div class="graph-head">
+            <div class="title"><span class="dot dgreen"></span>Gráfico de la derivada</div>
+            <div class="tag">mismo valor de x</div>
+          </div>
+          <div class="svg-wrap">
+            <svg id="svgDerivative" viewBox="0 0 900 360" preserveAspectRatio="none"></svg>
+          </div>
+        </section>
+
+        <div class="note">Arrastrá sobre cualquiera de los gráficos para mover el mismo valor de x en ambos.</div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const svgFunction = $("svgFunction");
+    const svgDerivative = $("svgDerivative");
+
+    const presets = {
+      linear: {
+        labels: ["a", "b", "—", "—"],
+        values: [1, 0, 0, 0],
+        formula: "f(x)=a·x+b",
+        explain: "En una función lineal, la derivada es constante: la pendiente no cambia."
+      },
+      quadratic: {
+        labels: ["a", "h", "k", "—"],
+        values: [1, 0, 0, 0],
+        formula: "f(x)=a·(x-h)²+k",
+        explain: "En la cuadrática, la derivada es lineal: la pendiente cambia de manera constante."
+      },
+      cubic: {
+        labels: ["a", "h", "k", "—"],
+        values: [0.2, 0, 0, 0],
+        formula: "f(x)=a·(x-h)³+k",
+        explain: "En la cúbica, la derivada es cuadrática: las pendientes forman una parábola."
+      },
+      sin: {
+        labels: ["A", "B", "C", "D"],
+        values: [2, 1, 0, 0],
+        formula: "f(x)=A·sen(Bx+C)+D",
+        explain: "La derivada de una función seno se relaciona con una función coseno."
+      },
+      cos: {
+        labels: ["A", "B", "C", "D"],
+        values: [2, 1, 0, 0],
+        formula: "f(x)=A·cos(Bx+C)+D",
+        explain: "La derivada de una función coseno se relaciona con una función seno negativa."
+      },
+      exp: {
+        labels: ["a", "b", "k", "—"],
+        values: [1, 0.5, 0, 0],
+        formula: "f(x)=a·e^(b·x)+k",
+        explain: "En la exponencial, la derivada crece o decrece de manera proporcional a la función."
+      },
+      log: {
+        labels: ["a", "h", "k", "—"],
+        values: [1, -5, 0, 0],
+        formula: "f(x)=a·ln(x-h)+k",
+        explain: "La función logarítmica solo existe cuando x-h>0. Cerca del borde, la pendiente cambia mucho."
+      },
+      abs: {
+        labels: ["a", "h", "k", "—"],
+        values: [1, 0, 0, 0],
+        formula: "f(x)=a·|x-h|+k",
+        explain: "En el valor absoluto hay una punta: en ese punto la derivada no está definida."
+      }
+    };
+
+    let timer = null;
+    let direction = 1;
+
+    function num(id) {
+      return Number($(id).value);
+    }
+
+    function params() {
+      return {
+        type: $("type").value,
+        a: num("a"),
+        b: num("b"),
+        c: num("c"),
+        d: num("d"),
+        x: num("x"),
+        zoom: num("zoom")
+      };
+    }
+
+    function f(x, p) {
+      if (p.type === "linear") return p.a * x + p.b;
+      if (p.type === "quadratic") return p.a * Math.pow(x - p.b, 2) + p.c;
+      if (p.type === "cubic") return p.a * Math.pow(x - p.b, 3) + p.c;
+      if (p.type === "sin") return p.a * Math.sin(p.b * x + p.c) + p.d;
+      if (p.type === "cos") return p.a * Math.cos(p.b * x + p.c) + p.d;
+      if (p.type === "exp") return p.a * Math.exp(p.b * x) + p.c;
+      if (p.type === "log") {
+        const inside = x - p.b;
+        return inside > 0 ? p.a * Math.log(inside) + p.c : NaN;
+      }
+      if (p.type === "abs") return p.a * Math.abs(x - p.b) + p.c;
+      return NaN;
+    }
+
+    function df(x, p) {
+      if (p.type === "linear") return p.a;
+      if (p.type === "quadratic") return 2 * p.a * (x - p.b);
+      if (p.type === "cubic") return 3 * p.a * Math.pow(x - p.b, 2);
+      if (p.type === "sin") return p.a * p.b * Math.cos(p.b * x + p.c);
+      if (p.type === "cos") return -p.a * p.b * Math.sin(p.b * x + p.c);
+      if (p.type === "exp") return p.a * p.b * Math.exp(p.b * x);
+      if (p.type === "log") {
+        const inside = x - p.b;
+        return inside > 0 ? p.a / inside : NaN;
+      }
+      if (p.type === "abs") {
+        if (Math.abs(x - p.b) < 0.025) return NaN;
+        return x > p.b ? p.a : -p.a;
+      }
+      return NaN;
+    }
+
+    function fmt(v) {
+      if (!Number.isFinite(v)) return "no definida";
+      if (Math.abs(v) > 999) return v.toExponential(2);
+      return v.toFixed(3);
+    }
+
+    function world(p) {
+      const m = 6 / p.zoom;
+      return {
+        xmin: -m,
+        xmax: m,
+        ymin: -m,
+        ymax: m
+      };
+    }
+
+    function sx(x, w) {
+      return ((x - w.xmin) / (w.xmax - w.xmin)) * 900;
+    }
+
+    function sy(y, w) {
+      return 360 - ((y - w.ymin) / (w.ymax - w.ymin)) * 360;
+    }
+
+    function xFromSvgEvent(event, svg, w) {
+      const rect = svg.getBoundingClientRect();
+      const px = event.clientX - rect.left;
+      return w.xmin + (px / rect.width) * (w.xmax - w.xmin);
+    }
+
+    function create(tag, attrs = {}, parent) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const key in attrs) {
+        el.setAttribute(key, attrs[key]);
+      }
+      parent.appendChild(el);
+      return el;
+    }
+
+    function clear(svg) {
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+    }
+
+    function drawGrid(svg, w) {
+      for (let x = Math.ceil(w.xmin); x <= Math.floor(w.xmax); x++) {
+        const X = sx(x, w);
+        create("line", { x1: X, y1: 0, x2: X, y2: 360, class: "grid-line" }, svg);
+      }
+
+      for (let y = Math.ceil(w.ymin); y <= Math.floor(w.ymax); y++) {
+        const Y = sy(y, w);
+        create("line", { x1: 0, y1: Y, x2: 900, y2: Y, class: "grid-line" }, svg);
+      }
+
+      create("line", { x1: 0, y1: sy(0, w), x2: 900, y2: sy(0, w), class: "axis" }, svg);
+      create("line", { x1: sx(0, w), y1: 0, x2: sx(0, w), y2: 360, class: "axis" }, svg);
+    }
+
+    function curvePath(p, w, derivative = false) {
+      let d = "";
+      let started = false;
+
+      for (let px = 0; px <= 900; px += 2) {
+        const x = w.xmin + (px / 900) * (w.xmax - w.xmin);
+        const y = derivative ? df(x, p) : f(x, p);
+
+        if (!Number.isFinite(y) || y < w.ymin - 20 || y > w.ymax + 20) {
+          started = false;
+          continue;
+        }
+
+        const py = sy(y, w);
+
+        if (!started) {
+          d += `M ${px} ${py} `;
+          started = true;
+        } else {
+          d += `L ${px} ${py} `;
+        }
+      }
+
+      return d;
+    }
+
+    function drawFunctionGraph(svg, p, w) {
+      clear(svg);
+      drawGrid(svg, w);
+
+      create("path", { d: curvePath(p, w, false), class: "curve-function" }, svg);
+
+      const x = p.x;
+      const y = f(x, p);
+      const m = df(x, p);
+      const X = sx(x, w);
+
+      create("line", { x1: X, y1: 0, x2: X, y2: 360, class: "linked-line" }, svg);
+
+      if (Number.isFinite(y)) {
+        const Y = sy(y, w);
+
+        if (Number.isFinite(m)) {
+          const L = (w.xmax - w.xmin) * 0.18;
+          const x1 = x - L;
+          const x2 = x + L;
+          const y1 = y + m * (x1 - x);
+          const y2 = y + m * (x2 - x);
+
+          create("line", {
+            x1: sx(x1, w),
+            y1: sy(y1, w),
+            x2: sx(x2, w),
+            y2: sy(y2, w),
+            class: "tangent"
+          }, svg);
+        }
+
+        create("circle", { cx: X, cy: Y, r: 8, class: "point-function" }, svg);
+
+        const label = create("text", {
+          x: Math.min(X + 12, 780),
+          y: Math.max(Y - 12, 18),
+          class: "small-text"
+        }, svg);
+        label.textContent = `x=${fmt(x)}`;
+      }
+    }
+
+    function drawDerivativeGraph(svg, p, w) {
+      clear(svg);
+      drawGrid(svg, w);
+
+      create("path", { d: curvePath(p, w, true), class: "curve-derivative" }, svg);
+
+      const x = p.x;
+      const y = df(x, p);
+      const X = sx(x, w);
+
+      create("line", { x1: X, y1: 0, x2: X, y2: 360, class: "linked-line" }, svg);
+
+      if (Number.isFinite(y)) {
+        const Y = sy(y, w);
+
+        create("line", { x1: X, y1: sy(0, w), x2: X, y2: Y, class: "height-line" }, svg);
+        create("circle", { cx: X, cy: Y, r: 8, class: "point-derivative" }, svg);
+
+        const label = create("text", {
+          x: Math.min(X + 12, 740),
+          y: Math.max(Y - 12, 18),
+          class: "small-text"
+        }, svg);
+        label.textContent = `f'(x)=${fmt(y)}`;
+      } else {
+        const label = create("text", {
+          x: Math.min(X + 12, 730),
+          y: 24,
+          class: "small-text",
+          fill: "#ef4444"
+        }, svg);
+        label.textContent = "derivada no definida";
+      }
+    }
+
+    function updateLabels() {
+      const p = params();
+
+      $("va").textContent = p.a.toFixed(2);
+      $("vb").textContent = p.b.toFixed(2);
+      $("vc").textContent = p.c.toFixed(2);
+      $("vd").textContent = p.d.toFixed(2);
+      $("vx").textContent = p.x.toFixed(2);
+      $("vz").textContent = p.zoom.toFixed(2);
+
+      $("formula").textContent = presets[p.type].formula;
+      $("explain").textContent = presets[p.type].explain;
+
+      const y = f(p.x, p);
+      const dy = df(p.x, p);
+
+      $("fx").textContent = fmt(y);
+      $("dfx").textContent = fmt(dy);
+      $("slope").textContent = fmt(dy);
+      $("xbox").textContent = p.x.toFixed(3);
+    }
+
+    function draw() {
+      const p = params();
+      const w = world(p);
+
+      drawFunctionGraph(svgFunction, p, w);
+      drawDerivativeGraph(svgDerivative, p, w);
+      updateLabels();
+    }
+
+    function applyPreset() {
+      const preset = presets[$("type").value];
+
+      $("a").value = preset.values[0];
+      $("b").value = preset.values[1];
+      $("c").value = preset.values[2];
+      $("d").value = preset.values[3];
+
+      $("la").textContent = preset.labels[0];
+      $("lb").textContent = preset.labels[1];
+      $("lc").textContent = preset.labels[2];
+      $("ld").textContent = preset.labels[3];
+
+      draw();
+    }
+
+    function reset() {
+      stopAnimation();
+      $("type").value = "quadratic";
+      $("x").value = 1;
+      $("zoom").value = 1;
+      applyPreset();
+    }
+
+    function stopAnimation() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+        $("anim").textContent = "Animar x";
+        $("anim").className = "btn blue";
+      }
+    }
+
+    function animate() {
+      if (timer) {
+        stopAnimation();
+        return;
+      }
+
+      $("anim").textContent = "Detener";
+      $("anim").className = "btn red";
+
+      timer = setInterval(() => {
+        let x = Number($("x").value);
+        x += 0.06 * direction;
+
+        if (x >= 6) {
+          x = 6;
+          direction = -1;
+        }
+
+        if (x <= -6) {
+          x = -6;
+          direction = 1;
+        }
+
+        $("x").value = x;
+        draw();
+      }, 30);
+    }
+
+    function setXFromPointer(event, svg) {
+      const p = params();
+      const w = world(p);
+      const x = xFromSvgEvent(event, svg, w);
+      const limited = Math.max(-6, Math.min(6, x));
+      $("x").value = limited;
+      draw();
+    }
+
+    function addDrag(svg) {
+      let dragging = false;
+
+      svg.addEventListener("pointerdown", event => {
+        dragging = true;
+        svg.setPointerCapture(event.pointerId);
+        setXFromPointer(event, svg);
+      });
+
+      svg.addEventListener("pointermove", event => {
+        if (!dragging) return;
+        setXFromPointer(event, svg);
+      });
+
+      svg.addEventListener("pointerup", event => {
+        dragging = false;
+        try {
+          svg.releasePointerCapture(event.pointerId);
+        } catch (e) {}
+      });
+
+      svg.addEventListener("pointercancel", () => {
+        dragging = false;
+      });
+    }
+
+    ["a", "b", "c", "d", "x", "zoom"].forEach(id => {
+      $(id).addEventListener("input", draw);
+    });
+
+    $("type").addEventListener("change", applyPreset);
+    $("reset").addEventListener("click", reset);
+    $("anim").addEventListener("click", animate);
+
+    addDrag(svgFunction);
+    addDrag(svgDerivative);
+
+    applyPreset();
+  </script>
+</body>
+</html>
