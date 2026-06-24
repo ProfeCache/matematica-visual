@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Área del triángulo | PROFE CACHE</title>
+
+  <style>
+    :root {
+      --azul-profundo: #071b3a;
+      --azul-medio: #0b4d91;
+      --azul-electrico: #1e88ff;
+      --celeste: #7dd3fc;
+      --celeste-suave: #d9f3ff;
+      --blanco: #ffffff;
+      --texto: #eaf6ff;
+      --gris-azulado: #8fb7d9;
+      --fondo-tarjeta: rgba(255, 255, 255, 0.08);
+      --borde: rgba(255, 255, 255, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(30, 136, 255, 0.35), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.25), transparent 30%),
+        linear-gradient(135deg, #071b3a, #0a2d5c 55%, #0b4d91);
+      color: var(--texto);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .app {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    header {
+      grid-column: 1 / -1;
+      padding: 18px;
+      border: 1px solid var(--borde);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    .marca {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(125, 211, 252, 0.15);
+      border: 1px solid rgba(125, 211, 252, 0.35);
+      color: var(--celeste-suave);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+      margin-bottom: 12px;
+    }
+
+    .marca span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--celeste);
+      box-shadow: 0 0 16px var(--celeste);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 5vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .subtitulo {
+      margin: 12px 0 0;
+      max-width: 850px;
+      color: var(--celeste-suave);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .panel {
+      border: 1px solid var(--borde);
+      border-radius: 24px;
+      background: var(--fondo-tarjeta);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+
+    .visual {
+      padding: 14px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 20px;
+      background:
+        linear-gradient(rgba(125, 211, 252, 0.09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(125, 211, 252, 0.09) 1px, transparent 1px),
+        radial-gradient(circle at top, rgba(30, 136, 255, 0.25), transparent 40%),
+        rgba(255, 255, 255, 0.04);
+      background-size: 36px 36px, 36px 36px, auto, auto;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .controles {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .grupo-control {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .fila {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    label {
+      font-weight: 700;
+      color: var(--blanco);
+    }
+
+    .valor {
+      color: var(--celeste);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--celeste);
+    }
+
+    .botones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      padding: 13px 14px;
+      border-radius: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--blanco);
+      background: linear-gradient(135deg, var(--azul-electrico), var(--azul-medio));
+      box-shadow: 0 10px 25px rgba(30, 136, 255, 0.28);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    button.secundario {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: none;
+    }
+
+    .paso-card {
+      padding: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .paso-numero {
+      color: var(--celeste);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .paso-titulo {
+      font-size: 1.35rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--blanco);
+    }
+
+    .paso-texto {
+      color: var(--celeste-suave);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .formula {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(7, 27, 58, 0.55);
+      border: 1px solid rgba(125, 211, 252, 0.28);
+    }
+
+    .formula-linea {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 1rem;
+    }
+
+    .formula-linea:last-child {
+      border-bottom: none;
+    }
+
+    .formula-linea strong {
+      color: var(--blanco);
+    }
+
+    .formula-linea span {
+      color: var(--celeste);
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .preguntas {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .preguntas h2 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .pregunta {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(125, 211, 252, 0.11);
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      color: var(--celeste-suave);
+      line-height: 1.45;
+    }
+
+    .nota-docente {
+      padding: 18px;
+      color: var(--celeste-suave);
+      line-height: 1.5;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nota-docente strong {
+      color: var(--blanco);
+    }
+
+    .triangle-a {
+      fill: rgba(30, 136, 255, 0.55);
+      stroke: rgba(217, 243, 255, 0.9);
+      stroke-width: 4;
+    }
+
+    .triangle-b {
+      fill: rgba(125, 211, 252, 0.35);
+      stroke: rgba(217, 243, 255, 0.85);
+      stroke-width: 4;
+    }
+
+    .rect-outline {
+      fill: rgba(30, 136, 255, 0.22);
+      stroke: rgba(217, 243, 255, 0.9);
+      stroke-width: 5;
+    }
+
+    .diagonal {
+      stroke: #ffffff;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 12 10;
+      filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.8));
+    }
+
+    .medida {
+      stroke: rgba(217, 243, 255, 0.85);
+      stroke-width: 3;
+      marker-start: url(#flecha);
+      marker-end: url(#flecha);
+    }
+
+    .linea-guia {
+      stroke: rgba(125, 211, 252, 0.45);
+      stroke-width: 2;
+      stroke-dasharray: 8 8;
+    }
+
+    .texto-svg {
+      fill: #eaf6ff;
+      font-weight: 800;
+      font-size: 24px;
+    }
+
+    .texto-svg-small {
+      fill: #d9f3ff;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .fade {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    @media (max-width: 850px) {
+      body {
+        padding: 10px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      .panel {
+        border-radius: 20px;
+      }
+
+      .botones {
+        grid-template-columns: 1fr;
+      }
+
+      .formula-linea {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .formula-linea span {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div class="marca"><span></span> PROFE CACHE</div>
+      <h1>¿De dónde sale el área del triángulo?</h1>
+      <p class="subtitulo">
+        Una exploración visual: construimos un rectángulo, lo cortamos con una diagonal
+        y descubrimos por qué el área del triángulo es la mitad de base por altura.
+      </p>
+    </header>
+
+    <section class="panel visual">
+      <svg id="svg" viewBox="0 0 900 560" aria-label="Representación visual del área del triángulo">
+        <defs>
+          <marker id="flecha" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d9f3ff"></path>
+          </marker>
+
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Fondo decorativo -->
+        <circle cx="760" cy="90" r="80" fill="rgba(125,211,252,0.08)"></circle>
+        <circle cx="110" cy="460" r="100" fill="rgba(30,136,255,0.10)"></circle>
+
+        <!-- Guías -->
+        <line id="guideBase" class="linea-guia fade" />
+        <line id="guideAltura" class="linea-guia fade" />
+
+        <!-- Figura -->
+        <rect id="rectangulo" class="rect-outline fade" />
+
+        <polygon id="trianguloA" class="triangle-a fade" />
+        <polygon id="trianguloB" class="triangle-b fade" />
+
+        <line id="diagonal" class="diagonal fade" />
+
+        <!-- Medidas -->
+        <line id="medidaBase" class="medida fade" />
+        <line id="medidaAltura" class="medida fade" />
+
+        <text id="labelBase" class="texto-svg fade" text-anchor="middle">base</text>
+        <text id="labelAltura" class="texto-svg fade" text-anchor="middle">altura</text>
+
+        <!-- Textos internos -->
+        <text id="textoTri1" class="texto-svg-small fade" text-anchor="middle">Triángulo 1</text>
+        <text id="textoTri2" class="texto-svg-small fade" text-anchor="middle">Triángulo 2</text>
+
+        <text id="textoCentral" class="texto-svg fade" text-anchor="middle" filter="url(#glow)">
+          Dos triángulos iguales forman un rectángulo
+        </text>
+      </svg>
+    </section>
+
+    <aside class="panel">
+      <div class="controles">
+        <div class="grupo-control">
+          <div class="fila">
+            <label for="base">Base del rectángulo</label>
+            <span class="valor"><span id="baseValor">8</span> u</span>
+          </div>
+          <input id="base" type="range" min="3" max="12" step="0.5" value="8" />
+        </div>
+
+        <div class="grupo-control">
+          <div class="fila">
+            <label for="altura">Altura del rectángulo</label>
+            <span class="valor"><span id="alturaValor">5</span> u</span>
+          </div>
+          <input id="altura" type="range" min="2" max="9" step="0.5" value="5" />
+        </div>
+
+        <div class="botones">
+          <button id="anterior" class="secundario">← Anterior</button>
+          <button id="siguiente">Siguiente →</button>
+          <button id="reiniciar" class="secundario">Reiniciar</button>
+          <button id="animar">Animar idea</button>
+        </div>
+      </div>
+
+      <div class="paso-card">
+        <div class="paso-numero" id="pasoNumero">Paso 1 de 4</div>
+        <div class="paso-titulo" id="pasoTitulo">Partimos de un rectángulo</div>
+        <p class="paso-texto" id="pasoTexto">
+          Observamos un rectángulo de base b y altura h. Su área se calcula multiplicando base por altura.
+        </p>
+
+        <div class="formula">
+          <div class="formula-linea">
+            <strong>Área del rectángulo</strong>
+            <span id="areaRectangulo">b · h = 40 u²</span>
+          </div>
+          <div class="formula-linea">
+            <strong>Área de cada triángulo</strong>
+            <span id="areaTriangulo">b · h / 2 = 20 u²</span>
+          </div>
+          <div class="formula-linea">
+            <strong>Conclusión</strong>
+            <span>A = (b · h) / 2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="preguntas">
+        <h2>Preguntas para explorar</h2>
+        <div class="pregunta">¿Qué cambia si modificamos la base pero dejamos fija la altura?</div>
+        <div class="pregunta">¿Qué cambia si modificamos la altura pero dejamos fija la base?</div>
+        <div class="pregunta">¿Por qué cada triángulo representa exactamente la mitad del rectángulo?</div>
+      </div>
+
+      <div class="nota-docente">
+        <strong>Uso docente:</strong> primero dejá que el estudiante observe la figura sin fórmula.
+        Después pedile que anticipe qué relación hay entre el rectángulo y uno de los triángulos.
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const baseSlider = document.getElementById("base");
+    const alturaSlider = document.getElementById("altura");
+
+    const baseValor = document.getElementById("baseValor");
+    const alturaValor = document.getElementById("alturaValor");
+
+    const rectangulo = document.getElementById("rectangulo");
+    const trianguloA = document.getElementById("trianguloA");
+    const trianguloB = document.getElementById("trianguloB");
+    const diagonal = document.getElementById("diagonal");
+
+    const medidaBase = document.getElementById("medidaBase");
+    const medidaAltura = document.getElementById("medidaAltura");
+    const guideBase = document.getElementById("guideBase");
+    const guideAltura = document.getElementById("guideAltura");
+
+    const labelBase = document.getElementById("labelBase");
+    const labelAltura = document.getElementById("labelAltura");
+    const textoTri1 = document.getElementById("textoTri1");
+    const textoTri2 = document.getElementById("textoTri2");
+    const textoCentral = document.getElementById("textoCentral");
+
+    const pasoNumero = document.getElementById("pasoNumero");
+    const pasoTitulo = document.getElementById("pasoTitulo");
+    const pasoTexto = document.getElementById("pasoTexto");
+
+    const areaRectangulo = document.getElementById("areaRectangulo");
+    const areaTriangulo = document.getElementById("areaTriangulo");
+
+    const btnAnterior = document.getElementById("anterior");
+    const btnSiguiente = document.getElementById("siguiente");
+    const btnReiniciar = document.getElementById("reiniciar");
+    const btnAnimar = document.getElementById("animar");
+
+    let paso = 1;
+
+    const pasos = [
+      {
+        titulo: "Partimos de un rectángulo",
+        texto: "Observamos un rectángulo de base b y altura h. Su área se calcula multiplicando base por altura."
+      },
+      {
+        titulo: "Trazamos una diagonal",
+        texto: "La diagonal corta el rectángulo desde un vértice hasta el opuesto. Esa línea divide la figura en dos partes."
+      },
+      {
+        titulo: "Aparecen dos triángulos iguales",
+        texto: "La diagonal separa el rectángulo en dos triángulos congruentes: tienen la misma forma y el mismo tamaño."
+      },
+      {
+        titulo: "Cada triángulo es la mitad",
+        texto: "Como los dos triángulos forman todo el rectángulo, el área de uno solo es la mitad del área rectangular."
+      }
+    ];
+
+    function punto(x, y) {
+      return `${x},${y}`;
+    }
+
+    function setOpacity(element, value) {
+      element.style.opacity = value;
+    }
+
+    function actualizar() {
+      const b = Number(baseSlider.value);
+      const h = Number(alturaSlider.value);
+
+      baseValor.textContent = b;
+      alturaValor.textContent = h;
+
+      const areaR = b * h;
+      const areaT = areaR / 2;
+
+      areaRectangulo.textContent = `${b} · ${h} = ${areaR.toFixed(2)} u²`;
+      areaTriangulo.textContent = `(${b} · ${h}) / 2 = ${areaT.toFixed(2)} u²`;
+
+      /*
+        Escalado automático:
+        La figura se adapta al tamaño del SVG sin deformarse demasiado.
+      */
+      const maxW = 560;
+      const maxH = 330;
+      const scale = Math.min(maxW / b, maxH / h);
+
+      const w = b * scale;
+      const alto = h * scale;
+
+      const x = 170;
+      const y = 100 + (330 - alto) / 2;
+
+      const A = { x: x, y: y };
+      const B = { x: x + w, y: y };
+      const C = { x: x + w, y: y + alto };
+      const D = { x: x, y: y + alto };
+
+      rectangulo.setAttribute("x", x);
+      rectangulo.setAttribute("y", y);
+      rectangulo.setAttribute("width", w);
+      rectangulo.setAttribute("height", alto);
+      rectangulo.setAttribute("rx", 8);
+
+      trianguloA.setAttribute("points", `${punto(D.x, D.y)} ${punto(A.x, A.y)} ${punto(B.x, B.y)}`);
+      trianguloB.setAttribute("points", `${punto(D.x, D.y)} ${punto(B.x, B.y)} ${punto(C.x, C.y)}`);
+
+      diagonal.setAttribute("x1", D.x);
+      diagonal.setAttribute("y1", D.y);
+      diagonal.setAttribute("x2", B.x);
+      diagonal.setAttribute("y2", B.y);
+
+      medidaBase.setAttribute("x1", D.x);
+      medidaBase.setAttribute("y1", D.y + 45);
+      medidaBase.setAttribute("x2", C.x);
+      medidaBase.setAttribute("y2", C.y + 45);
+
+      medidaAltura.setAttribute("x1", C.x + 45);
+      medidaAltura.setAttribute("y1", B.y);
+      medidaAltura.setAttribute("x2", C.x + 45);
+      medidaAltura.setAttribute("y2", C.y);
+
+      guideBase.setAttribute("x1", D.x);
+      guideBase.setAttribute("y1", D.y);
+      guideBase.setAttribute("x2", D.x);
+      guideBase.setAttribute("y2", D.y + 55);
+
+      guideAltura.setAttribute("x1", C.x);
+      guideAltura.setAttribute("y1", C.y);
+      guideAltura.setAttribute("x2", C.x + 55);
+      guideAltura.setAttribute("y2", C.y);
+
+      labelBase.setAttribute("x", x + w / 2);
+      labelBase.setAttribute("y", D.y + 82);
+      labelBase.textContent = `base = ${b} u`;
+
+      labelAltura.setAttribute("x", C.x + 88);
+      labelAltura.setAttribute("y", y + alto / 2 + 8);
+      labelAltura.textContent = `altura = ${h} u`;
+      labelAltura.setAttribute("transform", `rotate(90 ${C.x + 88} ${y + alto / 2 + 8})`);
+
+      textoTri1.setAttribute("x", x + w * 0.43);
+      textoTri1.setAttribute("y", y + alto * 0.28);
+
+      textoTri2.setAttribute("x", x + w * 0.64);
+      textoTri2.setAttribute("y", y + alto * 0.72);
+
+      textoCentral.setAttribute("x", 450);
+      textoCentral.setAttribute("y", 510);
+
+      actualizarPaso();
+    }
+
+    function actualizarPaso() {
+      pasoNumero.textContent = `Paso ${paso} de 4`;
+      pasoTitulo.textContent = pasos[paso - 1].titulo;
+      pasoTexto.textContent = pasos[paso - 1].texto;
+
+      if (paso === 1) {
+        setOpacity(rectangulo, 1);
+        setOpacity(trianguloA, 0);
+        setOpacity(trianguloB, 0);
+        setOpacity(diagonal, 0);
+        setOpacity(medidaBase, 1);
+        setOpacity(medidaAltura, 1);
+        setOpacity(labelBase, 1);
+        setOpacity(labelAltura, 1);
+        setOpacity(textoTri1, 0);
+        setOpacity(textoTri2, 0);
+        setOpacity(textoCentral, 0);
+      }
+
+      if (paso === 2) {
+        setOpacity(rectangulo, 1);
+        setOpacity(trianguloA, 0);
+        setOpacity(trianguloB, 0);
+        setOpacity(diagonal, 1);
+        setOpacity(medidaBase, 1);
+        setOpacity(medidaAltura, 1);
+        setOpacity(labelBase, 1);
+        setOpacity(labelAltura, 1);
+        setOpacity(textoTri1, 0);
+        setOpacity(textoTri2, 0);
+        setOpacity(textoCentral, 0);
+      }
+
+      if (paso === 3) {
+        setOpacity(rectangulo, 0.25);
+        setOpacity(trianguloA, 1);
+        setOpacity(trianguloB, 1);
+        setOpacity(diagonal, 1);
+        setOpacity(medidaBase, 1);
+        setOpacity(medidaAltura, 1);
+        setOpacity(labelBase, 1);
+        setOpacity(labelAltura, 1);
+        setOpacity(textoTri1, 1);
+        setOpacity(textoTri2, 1);
+        setOpacity(textoCentral, 0);
+      }
+
+      if (paso === 4) {
+        setOpacity(rectangulo, 0.2);
+        setOpacity(trianguloA, 1);
+        setOpacity(trianguloB, 1);
+        setOpacity(diagonal, 1);
+        setOpacity(medidaBase, 1);
+        setOpacity(medidaAltura, 1);
+        setOpacity(labelBase, 1);
+        setOpacity(labelAltura, 1);
+        setOpacity(textoTri1, 1);
+        setOpacity(textoTri2, 1);
+        setOpacity(textoCentral, 1);
+      }
+    }
+
+    function animarIdea() {
+      paso = 1;
+      actualizarPaso();
+
+      setTimeout(() => {
+        paso = 2;
+        actualizarPaso();
+      }, 900);
+
+      setTimeout(() => {
+        paso = 3;
+        actualizarPaso();
+      }, 1800);
+
+      setTimeout(() => {
+        paso = 4;
+        actualizarPaso();
+      }, 2700);
+    }
+
+    baseSlider.addEventListener("input", actualizar);
+    alturaSlider.addEventListener("input", actualizar);
+
+    btnSiguiente.addEventListener("click", () => {
+      paso = Math.min(4, paso + 1);
+      actualizarPaso();
+    });
+
+    btnAnterior.addEventListener("click", () => {
+      paso = Math.max(1, paso - 1);
+      actualizarPaso();
+    });
+
+    btnReiniciar.addEventListener("click", () => {
+      paso = 1;
+      baseSlider.value = 8;
+      alturaSlider.value = 5;
+      actualizar();
+    });
+
+    btnAnimar.addEventListener("click", animarIdea);
+
+    actualizar();
+  </script>
+</body>
+</html>
