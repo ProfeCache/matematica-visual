@@ -3,742 +3,737 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Área del triángulo | PROFE CACHE</title>
+  <title>Animación área del triángulo | PROFE CACHE</title>
 
   <style>
-    :root {
-      --azul-profundo: #071b3a;
-      --azul-medio: #0b4d91;
-      --azul-electrico: #1e88ff;
-      --celeste: #7dd3fc;
-      --celeste-suave: #d9f3ff;
-      --blanco: #ffffff;
-      --texto: #eaf6ff;
-      --gris-azulado: #8fb7d9;
-      --fondo-tarjeta: rgba(255, 255, 255, 0.08);
-      --borde: rgba(255, 255, 255, 0.18);
+    :root{
+      --azul-profundo:#06224a;
+      --azul:#0d61d8;
+      --azul-electrico:#1e88ff;
+      --celeste:#7dd3fc;
+      --celeste-claro:#d9f3ff;
+      --blanco:#ffffff;
+      --tinta:#09203f;
+      --gris:#55708f;
+      --panel:#f4fbff;
+      --linea:#0b376d;
+      --sombra:0 24px 70px rgba(6,34,74,.22);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    *{box-sizing:border-box;}
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(30, 136, 255, 0.35), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.25), transparent 30%),
-        linear-gradient(135deg, #071b3a, #0a2d5c 55%, #0b4d91);
-      color: var(--texto);
-      min-height: 100vh;
-      padding: 16px;
+        radial-gradient(circle at top left, rgba(30,136,255,.28), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(125,211,252,.33), transparent 32%),
+        linear-gradient(135deg, #eaf8ff, #d8efff 42%, #b8ddff);
+      color:var(--tinta);
+      display:grid;
+      place-items:center;
+      padding:18px;
     }
 
-    .app {
-      width: min(1100px, 100%);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
-      align-items: start;
+    .layout{
+      width:min(1200px,100%);
+      display:grid;
+      grid-template-columns:minmax(310px, 460px) 1fr;
+      gap:22px;
+      align-items:center;
     }
 
-    header {
-      grid-column: 1 / -1;
-      padding: 18px;
-      border: 1px solid var(--borde);
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-    }
-
-    .marca {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(125, 211, 252, 0.15);
-      border: 1px solid rgba(125, 211, 252, 0.35);
-      color: var(--celeste-suave);
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      font-size: 0.78rem;
-      margin-bottom: 12px;
-    }
-
-    .marca span {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--celeste);
-      box-shadow: 0 0 16px var(--celeste);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(1.7rem, 5vw, 3rem);
-      line-height: 1.05;
-    }
-
-    .subtitulo {
-      margin: 12px 0 0;
-      max-width: 850px;
-      color: var(--celeste-suave);
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-
-    .panel {
-      border: 1px solid var(--borde);
-      border-radius: 24px;
-      background: var(--fondo-tarjeta);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
-      overflow: hidden;
-    }
-
-    .visual {
-      padding: 14px;
-    }
-
-    svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 20px;
+    .reel{
+      width:min(430px, 100%);
+      aspect-ratio:9/16;
+      margin:auto;
+      border-radius:34px;
+      overflow:hidden;
       background:
-        linear-gradient(rgba(125, 211, 252, 0.09) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(125, 211, 252, 0.09) 1px, transparent 1px),
-        radial-gradient(circle at top, rgba(30, 136, 255, 0.25), transparent 40%),
-        rgba(255, 255, 255, 0.04);
-      background-size: 36px 36px, 36px 36px, auto, auto;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+        radial-gradient(circle at 25% 10%, rgba(125,211,252,.55), transparent 22%),
+        linear-gradient(180deg, #ffffff 0%, #eef9ff 45%, #d8efff 100%);
+      box-shadow:var(--sombra);
+      border:1px solid rgba(255,255,255,.8);
+      position:relative;
     }
 
-    .controles {
-      padding: 18px;
-      display: grid;
-      gap: 16px;
+    .reel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(13,97,216,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(13,97,216,.06) 1px, transparent 1px);
+      background-size:34px 34px;
+      mask-image:linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
+      pointer-events:none;
     }
 
-    .grupo-control {
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 18px;
-      padding: 14px;
+    .topbar{
+      position:absolute;
+      z-index:4;
+      top:20px;
+      left:20px;
+      right:20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
     }
 
-    .fila {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: center;
+    .brand{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:.75rem;
+      letter-spacing:.08em;
+      color:var(--azul-profundo);
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(13,97,216,.15);
+      backdrop-filter:blur(10px);
     }
 
-    label {
-      font-weight: 700;
-      color: var(--blanco);
+    .brand-dot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:var(--azul-electrico);
+      box-shadow:0 0 14px rgba(30,136,255,.8);
     }
 
-    .valor {
-      color: var(--celeste);
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
+    .badge{
+      padding:8px 11px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:.72rem;
+      color:white;
+      background:linear-gradient(135deg, var(--azul-electrico), var(--azul-profundo));
+      box-shadow:0 10px 20px rgba(13,97,216,.20);
     }
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--celeste);
+    .title{
+      position:absolute;
+      z-index:4;
+      top:80px;
+      left:26px;
+      right:26px;
+      text-align:center;
     }
 
-    .botones {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    .eyebrow{
+      margin:0 0 8px;
+      color:var(--azul);
+      font-weight:900;
+      letter-spacing:.08em;
+      font-size:.8rem;
+      text-transform:uppercase;
     }
 
-    button {
-      border: none;
-      padding: 13px 14px;
-      border-radius: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      color: var(--blanco);
-      background: linear-gradient(135deg, var(--azul-electrico), var(--azul-medio));
-      box-shadow: 0 10px 25px rgba(30, 136, 255, 0.28);
-      transition: transform 0.15s ease, filter 0.15s ease;
+    h1{
+      margin:0;
+      font-size:clamp(1.85rem, 7vw, 2.55rem);
+      line-height:.98;
+      letter-spacing:-.06em;
+      color:var(--azul-profundo);
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
+    .subtitle{
+      margin:10px auto 0;
+      max-width:310px;
+      color:#476987;
+      font-weight:650;
+      font-size:.96rem;
+      line-height:1.28;
     }
 
-    button.secundario {
-      background: rgba(255, 255, 255, 0.10);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: none;
+    .stage{
+      position:absolute;
+      z-index:2;
+      left:0;
+      right:0;
+      top:205px;
+      height:430px;
     }
 
-    .paso-card {
-      padding: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.05);
+    svg{
+      width:100%;
+      height:100%;
+      overflow:visible;
     }
 
-    .paso-numero {
-      color: var(--celeste);
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      margin-bottom: 8px;
+    .shape-shadow{filter:drop-shadow(0 22px 24px rgba(6,34,74,.16));}
+
+    .rect-fill{
+      fill:rgba(30,136,255,.13);
+      stroke:rgba(6,34,74,.85);
+      stroke-width:4;
+      vector-effect:non-scaling-stroke;
     }
 
-    .paso-titulo {
-      font-size: 1.35rem;
-      font-weight: 900;
-      margin-bottom: 8px;
-      color: var(--blanco);
+    .tri-a{
+      fill:rgba(30,136,255,.72);
+      stroke:#06224a;
+      stroke-width:3;
+      vector-effect:non-scaling-stroke;
     }
 
-    .paso-texto {
-      color: var(--celeste-suave);
-      line-height: 1.5;
-      margin: 0;
+    .tri-b{
+      fill:rgba(125,211,252,.68);
+      stroke:#06224a;
+      stroke-width:3;
+      vector-effect:non-scaling-stroke;
     }
 
-    .formula {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(7, 27, 58, 0.55);
-      border: 1px solid rgba(125, 211, 252, 0.28);
+    .diag{
+      stroke:#ffffff;
+      stroke-width:6;
+      stroke-linecap:round;
+      filter:drop-shadow(0 0 8px rgba(13,97,216,.75));
+      stroke-dasharray:1;
+      stroke-dashoffset:1;
+      vector-effect:non-scaling-stroke;
     }
 
-    .formula-linea {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-      font-size: 1rem;
+    .measure{
+      stroke:#0b376d;
+      stroke-width:3;
+      stroke-linecap:round;
+      vector-effect:non-scaling-stroke;
     }
 
-    .formula-linea:last-child {
-      border-bottom: none;
+    .measure-light{
+      stroke:rgba(11,55,109,.42);
+      stroke-width:2;
+      stroke-dasharray:6 7;
+      vector-effect:non-scaling-stroke;
     }
 
-    .formula-linea strong {
-      color: var(--blanco);
+    .svg-text{
+      fill:#0a2d5c;
+      font-weight:900;
+      font-size:20px;
+      letter-spacing:-.03em;
     }
 
-    .formula-linea span {
-      color: var(--celeste);
-      font-weight: 800;
-      text-align: right;
+    .tiny-text{
+      fill:#385c7e;
+      font-weight:850;
+      font-size:15px;
     }
 
-    .preguntas {
-      padding: 18px;
-      display: grid;
-      gap: 12px;
+    .formula-card{
+      position:absolute;
+      z-index:5;
+      left:24px;
+      right:24px;
+      bottom:94px;
+      padding:18px 18px 16px;
+      border-radius:24px;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(13,97,216,.13);
+      box-shadow:0 20px 45px rgba(6,34,74,.16);
+      backdrop-filter:blur(14px);
+      transform:translateY(28px);
+      opacity:0;
     }
 
-    .preguntas h2 {
-      margin: 0;
-      font-size: 1.15rem;
+    .formula-title{
+      margin:0 0 10px;
+      text-align:center;
+      color:#476987;
+      font-size:.88rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.07em;
     }
 
-    .pregunta {
-      padding: 12px;
-      border-radius: 16px;
-      background: rgba(125, 211, 252, 0.11);
-      border: 1px solid rgba(125, 211, 252, 0.22);
-      color: var(--celeste-suave);
-      line-height: 1.45;
+    .formula-main{
+      margin:0;
+      text-align:center;
+      font-size:2rem;
+      line-height:1;
+      color:var(--azul-profundo);
+      font-weight:950;
+      letter-spacing:-.06em;
     }
 
-    .nota-docente {
-      padding: 18px;
-      color: var(--celeste-suave);
-      line-height: 1.5;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
+    .formula-main span{
+      color:var(--azul-electrico);
     }
 
-    .nota-docente strong {
-      color: var(--blanco);
+    .formula-sub{
+      margin:11px 0 0;
+      text-align:center;
+      color:#476987;
+      font-weight:750;
+      font-size:.94rem;
+      line-height:1.25;
     }
 
-    .triangle-a {
-      fill: rgba(30, 136, 255, 0.55);
-      stroke: rgba(217, 243, 255, 0.9);
-      stroke-width: 4;
+    .caption{
+      position:absolute;
+      z-index:5;
+      left:24px;
+      right:24px;
+      bottom:28px;
+      text-align:center;
+      font-weight:900;
+      color:var(--azul-profundo);
+      font-size:1rem;
+      opacity:.92;
     }
 
-    .triangle-b {
-      fill: rgba(125, 211, 252, 0.35);
-      stroke: rgba(217, 243, 255, 0.85);
-      stroke-width: 4;
+    .pulse{
+      position:absolute;
+      z-index:1;
+      width:190px;
+      height:190px;
+      border-radius:50%;
+      background:rgba(30,136,255,.10);
+      left:50%;
+      top:390px;
+      transform:translate(-50%,-50%) scale(.8);
+      opacity:0;
     }
 
-    .rect-outline {
-      fill: rgba(30, 136, 255, 0.22);
-      stroke: rgba(217, 243, 255, 0.9);
-      stroke-width: 5;
+    .controls-panel{
+      border-radius:32px;
+      padding:24px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(255,255,255,.8);
+      box-shadow:var(--sombra);
+      backdrop-filter:blur(14px);
     }
 
-    .diagonal {
-      stroke: #ffffff;
-      stroke-width: 5;
-      stroke-linecap: round;
-      stroke-dasharray: 12 10;
-      filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.8));
+    .controls-panel h2{
+      margin:0 0 8px;
+      font-size:2rem;
+      line-height:1;
+      letter-spacing:-.05em;
+      color:var(--azul-profundo);
     }
 
-    .medida {
-      stroke: rgba(217, 243, 255, 0.85);
-      stroke-width: 3;
-      marker-start: url(#flecha);
-      marker-end: url(#flecha);
+    .controls-panel p{
+      color:#486985;
+      line-height:1.48;
+      margin:0 0 18px;
+      font-weight:650;
     }
 
-    .linea-guia {
-      stroke: rgba(125, 211, 252, 0.45);
-      stroke-width: 2;
-      stroke-dasharray: 8 8;
+    .buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:18px;
     }
 
-    .texto-svg {
-      fill: #eaf6ff;
-      font-weight: 800;
-      font-size: 24px;
+    button{
+      border:0;
+      cursor:pointer;
+      padding:13px 16px;
+      border-radius:16px;
+      font-weight:950;
+      color:white;
+      background:linear-gradient(135deg,var(--azul-electrico),var(--azul-profundo));
+      box-shadow:0 14px 26px rgba(13,97,216,.22);
+      transition:transform .15s ease, filter .15s ease;
     }
 
-    .texto-svg-small {
-      fill: #d9f3ff;
-      font-weight: 700;
-      font-size: 18px;
+    button:hover{transform:translateY(-1px);filter:brightness(1.05);}
+    button.secondary{
+      color:var(--azul-profundo);
+      background:#e7f5ff;
+      box-shadow:none;
+      border:1px solid rgba(13,97,216,.12);
     }
 
-    .fade {
-      transition: opacity 0.35s ease, transform 0.35s ease;
+    .sliders{
+      display:grid;
+      gap:14px;
+      margin-top:8px;
     }
 
-    @media (max-width: 850px) {
-      body {
-        padding: 10px;
-      }
+    .slider-card{
+      border:1px solid rgba(13,97,216,.12);
+      background:#f4fbff;
+      border-radius:20px;
+      padding:14px;
+    }
 
-      .app {
-        grid-template-columns: 1fr;
-      }
+    .slider-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:9px;
+      color:var(--azul-profundo);
+      font-weight:900;
+    }
 
-      header,
-      .panel {
-        border-radius: 20px;
-      }
+    .value{color:var(--azul);font-variant-numeric:tabular-nums;}
+    input[type="range"]{width:100%; accent-color:var(--azul-electrico);}
 
-      .botones {
-        grid-template-columns: 1fr;
-      }
+    .tips{
+      margin-top:18px;
+      display:grid;
+      gap:10px;
+    }
 
-      .formula-linea {
-        flex-direction: column;
-        gap: 4px;
-      }
+    .tip{
+      border-radius:18px;
+      background:#eef8ff;
+      border:1px solid rgba(13,97,216,.11);
+      padding:13px 14px;
+      color:#3f6383;
+      font-weight:700;
+      line-height:1.42;
+    }
 
-      .formula-linea span {
-        text-align: left;
-      }
+    .progress{
+      height:9px;
+      background:#d8efff;
+      border-radius:999px;
+      overflow:hidden;
+      margin:16px 0 20px;
+    }
+
+    .bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--azul-electrico),var(--celeste));
+      border-radius:999px;
+    }
+
+    /* Estados iniciales */
+    #rectGroup, #measuresGroup, #triA, #triB, #textMitad, #textRect, #caption1, #caption2{
+      opacity:0;
+    }
+
+    @media(max-width:900px){
+      body{padding:10px;}
+      .layout{grid-template-columns:1fr;}
+      .controls-panel{order:2;}
+      .reel{order:1;}
     }
   </style>
 </head>
-
 <body>
-  <main class="app">
-    <header>
-      <div class="marca"><span></span> PROFE CACHE</div>
-      <h1>¿De dónde sale el área del triángulo?</h1>
-      <p class="subtitulo">
-        Una exploración visual: construimos un rectángulo, lo cortamos con una diagonal
-        y descubrimos por qué el área del triángulo es la mitad de base por altura.
-      </p>
-    </header>
+  <div class="layout">
+    <section class="reel" aria-label="Animación visual del área del triángulo">
+      <div class="topbar">
+        <div class="brand"><span class="brand-dot"></span>PROFE CACHE</div>
+        <div class="badge">GEOMETRÍA</div>
+      </div>
 
-    <section class="panel visual">
-      <svg id="svg" viewBox="0 0 900 560" aria-label="Representación visual del área del triángulo">
-        <defs>
-          <marker id="flecha" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d9f3ff"></path>
-          </marker>
+      <div class="title">
+        <p class="eyebrow">Idea visual</p>
+        <h1>El triángulo es medio rectángulo</h1>
+        <p class="subtitle">Una fórmula se entiende mejor cuando primero se ve.</p>
+      </div>
 
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
+      <div class="pulse" id="pulse"></div>
 
-        <!-- Fondo decorativo -->
-        <circle cx="760" cy="90" r="80" fill="rgba(125,211,252,0.08)"></circle>
-        <circle cx="110" cy="460" r="100" fill="rgba(30,136,255,0.10)"></circle>
+      <div class="stage">
+        <svg id="svg" viewBox="0 0 430 430" role="img">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#0b376d"></path>
+            </marker>
+          </defs>
 
-        <!-- Guías -->
-        <line id="guideBase" class="linea-guia fade" />
-        <line id="guideAltura" class="linea-guia fade" />
+          <g id="rectGroup" class="shape-shadow">
+            <rect id="rect" class="rect-fill" x="75" y="95" width="280" height="185" rx="10"></rect>
+          </g>
 
-        <!-- Figura -->
-        <rect id="rectangulo" class="rect-outline fade" />
+          <g id="trianglesGroup" class="shape-shadow">
+            <polygon id="triA" class="tri-a" points="75,280 75,95 355,95"></polygon>
+            <polygon id="triB" class="tri-b" points="75,280 355,95 355,280"></polygon>
+          </g>
 
-        <polygon id="trianguloA" class="triangle-a fade" />
-        <polygon id="trianguloB" class="triangle-b fade" />
+          <line id="diag" class="diag" x1="75" y1="280" x2="355" y2="95" pathLength="1"></line>
 
-        <line id="diagonal" class="diagonal fade" />
+          <g id="measuresGroup">
+            <line id="baseGuide1" class="measure-light" x1="75" y1="280" x2="75" y2="318"></line>
+            <line id="baseGuide2" class="measure-light" x1="355" y1="280" x2="355" y2="318"></line>
+            <line id="baseLine" class="measure" x1="75" y1="318" x2="355" y2="318" marker-start="url(#arrow)" marker-end="url(#arrow)"></line>
+            <text id="baseText" class="svg-text" x="215" y="348" text-anchor="middle">base</text>
 
-        <!-- Medidas -->
-        <line id="medidaBase" class="medida fade" />
-        <line id="medidaAltura" class="medida fade" />
+            <line id="heightGuide1" class="measure-light" x1="355" y1="95" x2="389" y2="95"></line>
+            <line id="heightGuide2" class="measure-light" x1="355" y1="280" x2="389" y2="280"></line>
+            <line id="heightLine" class="measure" x1="389" y1="95" x2="389" y2="280" marker-start="url(#arrow)" marker-end="url(#arrow)"></line>
+            <text id="heightText" class="svg-text" x="405" y="194" text-anchor="middle" transform="rotate(90 405 194)">altura</text>
+          </g>
 
-        <text id="labelBase" class="texto-svg fade" text-anchor="middle">base</text>
-        <text id="labelAltura" class="texto-svg fade" text-anchor="middle">altura</text>
+          <text id="textRect" class="tiny-text" x="215" y="77" text-anchor="middle">Área del rectángulo = base · altura</text>
+          <text id="textMitad" class="tiny-text" x="215" y="383" text-anchor="middle">La diagonal lo divide en 2 partes iguales</text>
+        </svg>
+      </div>
 
-        <!-- Textos internos -->
-        <text id="textoTri1" class="texto-svg-small fade" text-anchor="middle">Triángulo 1</text>
-        <text id="textoTri2" class="texto-svg-small fade" text-anchor="middle">Triángulo 2</text>
+      <div class="formula-card" id="formulaCard">
+        <p class="formula-title">Entonces</p>
+        <p class="formula-main">A = <span>b · h</span> / 2</p>
+        <p class="formula-sub" id="formulaSub">Porque un triángulo ocupa la mitad del rectángulo.</p>
+      </div>
 
-        <text id="textoCentral" class="texto-svg fade" text-anchor="middle" filter="url(#glow)">
-          Dos triángulos iguales forman un rectángulo
-        </text>
-      </svg>
+      <div class="caption" id="caption">No memorices primero. Mirá la estructura.</div>
     </section>
 
-    <aside class="panel">
-      <div class="controles">
-        <div class="grupo-control">
-          <div class="fila">
-            <label for="base">Base del rectángulo</label>
-            <span class="valor"><span id="baseValor">8</span> u</span>
+    <aside class="controls-panel">
+      <h2>Animación tipo reel</h2>
+      <p>
+        Pensada para grabar pantalla en formato vertical. Tiene una estética limpia, movimiento suave,
+        texto breve y una explicación visual del área del triángulo.
+      </p>
+
+      <div class="progress"><div class="bar" id="bar"></div></div>
+
+      <div class="buttons">
+        <button id="playBtn">Reproducir</button>
+        <button id="pauseBtn" class="secondary">Pausar</button>
+        <button id="restartBtn" class="secondary">Reiniciar</button>
+      </div>
+
+      <div class="sliders">
+        <div class="slider-card">
+          <div class="slider-row">
+            <span>Base</span>
+            <span class="value"><span id="baseValue">8</span> u</span>
           </div>
-          <input id="base" type="range" min="3" max="12" step="0.5" value="8" />
+          <input id="baseSlider" type="range" min="4" max="12" step="0.5" value="8">
         </div>
 
-        <div class="grupo-control">
-          <div class="fila">
-            <label for="altura">Altura del rectángulo</label>
-            <span class="valor"><span id="alturaValor">5</span> u</span>
+        <div class="slider-card">
+          <div class="slider-row">
+            <span>Altura</span>
+            <span class="value"><span id="heightValue">5</span> u</span>
           </div>
-          <input id="altura" type="range" min="2" max="9" step="0.5" value="5" />
-        </div>
-
-        <div class="botones">
-          <button id="anterior" class="secundario">← Anterior</button>
-          <button id="siguiente">Siguiente →</button>
-          <button id="reiniciar" class="secundario">Reiniciar</button>
-          <button id="animar">Animar idea</button>
+          <input id="heightSlider" type="range" min="3" max="9" step="0.5" value="5">
         </div>
       </div>
 
-      <div class="paso-card">
-        <div class="paso-numero" id="pasoNumero">Paso 1 de 4</div>
-        <div class="paso-titulo" id="pasoTitulo">Partimos de un rectángulo</div>
-        <p class="paso-texto" id="pasoTexto">
-          Observamos un rectángulo de base b y altura h. Su área se calcula multiplicando base por altura.
-        </p>
-
-        <div class="formula">
-          <div class="formula-linea">
-            <strong>Área del rectángulo</strong>
-            <span id="areaRectangulo">b · h = 40 u²</span>
-          </div>
-          <div class="formula-linea">
-            <strong>Área de cada triángulo</strong>
-            <span id="areaTriangulo">b · h / 2 = 20 u²</span>
-          </div>
-          <div class="formula-linea">
-            <strong>Conclusión</strong>
-            <span>A = (b · h) / 2</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="preguntas">
-        <h2>Preguntas para explorar</h2>
-        <div class="pregunta">¿Qué cambia si modificamos la base pero dejamos fija la altura?</div>
-        <div class="pregunta">¿Qué cambia si modificamos la altura pero dejamos fija la base?</div>
-        <div class="pregunta">¿Por qué cada triángulo representa exactamente la mitad del rectángulo?</div>
-      </div>
-
-      <div class="nota-docente">
-        <strong>Uso docente:</strong> primero dejá que el estudiante observe la figura sin fórmula.
-        Después pedile que anticipe qué relación hay entre el rectángulo y uno de los triángulos.
+      <div class="tips">
+        <div class="tip">Para Instagram: abrilo en pantalla completa y grabá la pantalla mientras tocás “Reproducir”.</div>
+        <div class="tip">Para clase: pausá justo después de la diagonal y preguntá: “¿qué parte del rectángulo ocupa cada triángulo?”.</div>
+        <div class="tip">Para PROFE CACHE: mantené esta línea visual azul y agregá una voz en off breve.</div>
       </div>
     </aside>
-  </main>
+  </div>
 
   <script>
-    const baseSlider = document.getElementById("base");
-    const alturaSlider = document.getElementById("altura");
+    const rectGroup = document.getElementById('rectGroup');
+    const rect = document.getElementById('rect');
+    const triA = document.getElementById('triA');
+    const triB = document.getElementById('triB');
+    const diag = document.getElementById('diag');
+    const measuresGroup = document.getElementById('measuresGroup');
+    const textRect = document.getElementById('textRect');
+    const textMitad = document.getElementById('textMitad');
+    const formulaCard = document.getElementById('formulaCard');
+    const caption = document.getElementById('caption');
+    const pulse = document.getElementById('pulse');
+    const bar = document.getElementById('bar');
 
-    const baseValor = document.getElementById("baseValor");
-    const alturaValor = document.getElementById("alturaValor");
+    const baseSlider = document.getElementById('baseSlider');
+    const heightSlider = document.getElementById('heightSlider');
+    const baseValue = document.getElementById('baseValue');
+    const heightValue = document.getElementById('heightValue');
+    const baseText = document.getElementById('baseText');
+    const heightText = document.getElementById('heightText');
 
-    const rectangulo = document.getElementById("rectangulo");
-    const trianguloA = document.getElementById("trianguloA");
-    const trianguloB = document.getElementById("trianguloB");
-    const diagonal = document.getElementById("diagonal");
+    const baseGuide1 = document.getElementById('baseGuide1');
+    const baseGuide2 = document.getElementById('baseGuide2');
+    const baseLine = document.getElementById('baseLine');
+    const heightGuide1 = document.getElementById('heightGuide1');
+    const heightGuide2 = document.getElementById('heightGuide2');
+    const heightLine = document.getElementById('heightLine');
 
-    const medidaBase = document.getElementById("medidaBase");
-    const medidaAltura = document.getElementById("medidaAltura");
-    const guideBase = document.getElementById("guideBase");
-    const guideAltura = document.getElementById("guideAltura");
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const restartBtn = document.getElementById('restartBtn');
 
-    const labelBase = document.getElementById("labelBase");
-    const labelAltura = document.getElementById("labelAltura");
-    const textoTri1 = document.getElementById("textoTri1");
-    const textoTri2 = document.getElementById("textoTri2");
-    const textoCentral = document.getElementById("textoCentral");
+    let startTime = null;
+    let pausedAt = 0;
+    let running = false;
+    let raf = null;
+    const DURATION = 9000;
 
-    const pasoNumero = document.getElementById("pasoNumero");
-    const pasoTitulo = document.getElementById("pasoTitulo");
-    const pasoTexto = document.getElementById("pasoTexto");
+    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function easeOutCubic(t){ return 1 - Math.pow(1-t, 3); }
+    function easeInOut(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+    function interval(p, a, b){ return clamp((p-a)/(b-a), 0, 1); }
+    function smooth(p,a,b){ return easeInOut(interval(p,a,b)); }
 
-    const areaRectangulo = document.getElementById("areaRectangulo");
-    const areaTriangulo = document.getElementById("areaTriangulo");
+    function setStyles(el, styles){ Object.assign(el.style, styles); }
 
-    const btnAnterior = document.getElementById("anterior");
-    const btnSiguiente = document.getElementById("siguiente");
-    const btnReiniciar = document.getElementById("reiniciar");
-    const btnAnimar = document.getElementById("animar");
-
-    let paso = 1;
-
-    const pasos = [
-      {
-        titulo: "Partimos de un rectángulo",
-        texto: "Observamos un rectángulo de base b y altura h. Su área se calcula multiplicando base por altura."
-      },
-      {
-        titulo: "Trazamos una diagonal",
-        texto: "La diagonal corta el rectángulo desde un vértice hasta el opuesto. Esa línea divide la figura en dos partes."
-      },
-      {
-        titulo: "Aparecen dos triángulos iguales",
-        texto: "La diagonal separa el rectángulo en dos triángulos congruentes: tienen la misma forma y el mismo tamaño."
-      },
-      {
-        titulo: "Cada triángulo es la mitad",
-        texto: "Como los dos triángulos forman todo el rectángulo, el área de uno solo es la mitad del área rectangular."
-      }
-    ];
-
-    function punto(x, y) {
-      return `${x},${y}`;
-    }
-
-    function setOpacity(element, value) {
-      element.style.opacity = value;
-    }
-
-    function actualizar() {
+    function updateGeometry(){
       const b = Number(baseSlider.value);
-      const h = Number(alturaSlider.value);
+      const h = Number(heightSlider.value);
+      baseValue.textContent = b;
+      heightValue.textContent = h;
 
-      baseValor.textContent = b;
-      alturaValor.textContent = h;
-
-      const areaR = b * h;
-      const areaT = areaR / 2;
-
-      areaRectangulo.textContent = `${b} · ${h} = ${areaR.toFixed(2)} u²`;
-      areaTriangulo.textContent = `(${b} · ${h}) / 2 = ${areaT.toFixed(2)} u²`;
-
-      /*
-        Escalado automático:
-        La figura se adapta al tamaño del SVG sin deformarse demasiado.
-      */
-      const maxW = 560;
-      const maxH = 330;
+      const maxW = 280;
+      const maxH = 195;
       const scale = Math.min(maxW / b, maxH / h);
-
       const w = b * scale;
-      const alto = h * scale;
+      const hh = h * scale;
+      const x = 215 - w / 2;
+      const y = 190 - hh / 2;
+      const A = {x:x, y:y};
+      const B = {x:x+w, y:y};
+      const C = {x:x+w, y:y+hh};
+      const D = {x:x, y:y+hh};
 
-      const x = 170;
-      const y = 100 + (330 - alto) / 2;
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', w);
+      rect.setAttribute('height', hh);
 
-      const A = { x: x, y: y };
-      const B = { x: x + w, y: y };
-      const C = { x: x + w, y: y + alto };
-      const D = { x: x, y: y + alto };
+      triA.setAttribute('points', `${D.x},${D.y} ${A.x},${A.y} ${B.x},${B.y}`);
+      triB.setAttribute('points', `${D.x},${D.y} ${B.x},${B.y} ${C.x},${C.y}`);
 
-      rectangulo.setAttribute("x", x);
-      rectangulo.setAttribute("y", y);
-      rectangulo.setAttribute("width", w);
-      rectangulo.setAttribute("height", alto);
-      rectangulo.setAttribute("rx", 8);
+      diag.setAttribute('x1', D.x);
+      diag.setAttribute('y1', D.y);
+      diag.setAttribute('x2', B.x);
+      diag.setAttribute('y2', B.y);
 
-      trianguloA.setAttribute("points", `${punto(D.x, D.y)} ${punto(A.x, A.y)} ${punto(B.x, B.y)}`);
-      trianguloB.setAttribute("points", `${punto(D.x, D.y)} ${punto(B.x, B.y)} ${punto(C.x, C.y)}`);
+      baseGuide1.setAttribute('x1', D.x); baseGuide1.setAttribute('y1', D.y);
+      baseGuide1.setAttribute('x2', D.x); baseGuide1.setAttribute('y2', D.y+38);
+      baseGuide2.setAttribute('x1', C.x); baseGuide2.setAttribute('y1', C.y);
+      baseGuide2.setAttribute('x2', C.x); baseGuide2.setAttribute('y2', C.y+38);
+      baseLine.setAttribute('x1', D.x); baseLine.setAttribute('y1', D.y+38);
+      baseLine.setAttribute('x2', C.x); baseLine.setAttribute('y2', C.y+38);
+      baseText.setAttribute('x', 215); baseText.setAttribute('y', D.y+68);
+      baseText.textContent = `base = ${b} u`;
 
-      diagonal.setAttribute("x1", D.x);
-      diagonal.setAttribute("y1", D.y);
-      diagonal.setAttribute("x2", B.x);
-      diagonal.setAttribute("y2", B.y);
-
-      medidaBase.setAttribute("x1", D.x);
-      medidaBase.setAttribute("y1", D.y + 45);
-      medidaBase.setAttribute("x2", C.x);
-      medidaBase.setAttribute("y2", C.y + 45);
-
-      medidaAltura.setAttribute("x1", C.x + 45);
-      medidaAltura.setAttribute("y1", B.y);
-      medidaAltura.setAttribute("x2", C.x + 45);
-      medidaAltura.setAttribute("y2", C.y);
-
-      guideBase.setAttribute("x1", D.x);
-      guideBase.setAttribute("y1", D.y);
-      guideBase.setAttribute("x2", D.x);
-      guideBase.setAttribute("y2", D.y + 55);
-
-      guideAltura.setAttribute("x1", C.x);
-      guideAltura.setAttribute("y1", C.y);
-      guideAltura.setAttribute("x2", C.x + 55);
-      guideAltura.setAttribute("y2", C.y);
-
-      labelBase.setAttribute("x", x + w / 2);
-      labelBase.setAttribute("y", D.y + 82);
-      labelBase.textContent = `base = ${b} u`;
-
-      labelAltura.setAttribute("x", C.x + 88);
-      labelAltura.setAttribute("y", y + alto / 2 + 8);
-      labelAltura.textContent = `altura = ${h} u`;
-      labelAltura.setAttribute("transform", `rotate(90 ${C.x + 88} ${y + alto / 2 + 8})`);
-
-      textoTri1.setAttribute("x", x + w * 0.43);
-      textoTri1.setAttribute("y", y + alto * 0.28);
-
-      textoTri2.setAttribute("x", x + w * 0.64);
-      textoTri2.setAttribute("y", y + alto * 0.72);
-
-      textoCentral.setAttribute("x", 450);
-      textoCentral.setAttribute("y", 510);
-
-      actualizarPaso();
+      heightGuide1.setAttribute('x1', B.x); heightGuide1.setAttribute('y1', B.y);
+      heightGuide1.setAttribute('x2', B.x+34); heightGuide1.setAttribute('y2', B.y);
+      heightGuide2.setAttribute('x1', C.x); heightGuide2.setAttribute('y1', C.y);
+      heightGuide2.setAttribute('x2', C.x+34); heightGuide2.setAttribute('y2', C.y);
+      heightLine.setAttribute('x1', C.x+34); heightLine.setAttribute('y1', B.y);
+      heightLine.setAttribute('x2', C.x+34); heightLine.setAttribute('y2', C.y);
+      heightText.setAttribute('x', C.x+51); heightText.setAttribute('y', y + hh/2 + 6);
+      heightText.setAttribute('transform', `rotate(90 ${C.x+51} ${y + hh/2 + 6})`);
+      heightText.textContent = `altura = ${h} u`;
     }
 
-    function actualizarPaso() {
-      pasoNumero.textContent = `Paso ${paso} de 4`;
-      pasoTitulo.textContent = pasos[paso - 1].titulo;
-      pasoTexto.textContent = pasos[paso - 1].texto;
+    function resetVisual(){
+      cancelAnimationFrame(raf);
+      running = false;
+      startTime = null;
+      pausedAt = 0;
+      bar.style.width = '0%';
+      updateGeometry();
+      render(0);
+    }
 
-      if (paso === 1) {
-        setOpacity(rectangulo, 1);
-        setOpacity(trianguloA, 0);
-        setOpacity(trianguloB, 0);
-        setOpacity(diagonal, 0);
-        setOpacity(medidaBase, 1);
-        setOpacity(medidaAltura, 1);
-        setOpacity(labelBase, 1);
-        setOpacity(labelAltura, 1);
-        setOpacity(textoTri1, 0);
-        setOpacity(textoTri2, 0);
-        setOpacity(textoCentral, 0);
+    function render(progress){
+      const p = clamp(progress,0,1);
+      bar.style.width = `${p*100}%`;
+
+      const intro = smooth(p, .00, .12);
+      const rectIn = smooth(p, .10, .24);
+      const measureIn = smooth(p, .22, .34);
+      const diagIn = smooth(p, .34, .48);
+      const triIn = smooth(p, .47, .60);
+      const split = smooth(p, .58, .72);
+      const formula = smooth(p, .72, .86);
+      const finalPulse = smooth(p, .84, .98);
+
+      // Rectángulo: aparece desde el centro
+      rectGroup.style.opacity = rectIn;
+      rectGroup.style.transformOrigin = '215px 190px';
+      rectGroup.style.transform = `scale(${lerp(.82,1,easeOutCubic(rectIn))})`;
+
+      // Medidas
+      measuresGroup.style.opacity = measureIn;
+      measuresGroup.style.transformOrigin = '215px 215px';
+      measuresGroup.style.transform = `translateY(${lerp(10,0,measureIn)}px)`;
+
+      // Diagonal dibujándose
+      diag.style.opacity = diagIn;
+      diag.style.strokeDashoffset = 1 - diagIn;
+
+      // Triángulos aparecen luego de la diagonal
+      triA.style.opacity = triIn;
+      triB.style.opacity = triIn;
+
+      // Separación leve de piezas: ayuda a ver “dos mitades”
+      triA.style.transformOrigin = '215px 190px';
+      triB.style.transformOrigin = '215px 190px';
+      triA.style.transform = `translate(${-16*split}px, ${-11*split}px)`;
+      triB.style.transform = `translate(${16*split}px, ${11*split}px)`;
+
+      // Texto de rectángulo y mitad
+      textRect.style.opacity = smooth(p, .23, .35) * (1 - interval(p, .58, .70));
+      textRect.style.transform = `translateY(${lerp(8,0,smooth(p,.23,.35))}px)`;
+      textMitad.style.opacity = smooth(p, .60, .75);
+      textMitad.style.transform = `translateY(${lerp(10,0,smooth(p,.60,.75))}px)`;
+
+      // Fórmula final
+      formulaCard.style.opacity = formula;
+      formulaCard.style.transform = `translateY(${lerp(28,0,easeOutCubic(formula))}px) scale(${lerp(.96,1,formula)})`;
+
+      // Pulso suave detrás
+      pulse.style.opacity = .65 * finalPulse * (1 - interval(p,.97,1));
+      pulse.style.transform = `translate(-50%,-50%) scale(${lerp(.45,1.75,finalPulse)})`;
+
+      // Caption final
+      if(p < .35){
+        caption.textContent = 'Primero miramos la figura.';
+      } else if(p < .58){
+        caption.textContent = 'Una diagonal divide el rectángulo.';
+      } else if(p < .78){
+        caption.textContent = 'Quedan dos triángulos iguales.';
+      } else {
+        caption.textContent = 'No memorices primero. Mirá la estructura.';
       }
 
-      if (paso === 2) {
-        setOpacity(rectangulo, 1);
-        setOpacity(trianguloA, 0);
-        setOpacity(trianguloB, 0);
-        setOpacity(diagonal, 1);
-        setOpacity(medidaBase, 1);
-        setOpacity(medidaAltura, 1);
-        setOpacity(labelBase, 1);
-        setOpacity(labelAltura, 1);
-        setOpacity(textoTri1, 0);
-        setOpacity(textoTri2, 0);
-        setOpacity(textoCentral, 0);
-      }
+      caption.style.opacity = lerp(.70,1, intro);
+    }
 
-      if (paso === 3) {
-        setOpacity(rectangulo, 0.25);
-        setOpacity(trianguloA, 1);
-        setOpacity(trianguloB, 1);
-        setOpacity(diagonal, 1);
-        setOpacity(medidaBase, 1);
-        setOpacity(medidaAltura, 1);
-        setOpacity(labelBase, 1);
-        setOpacity(labelAltura, 1);
-        setOpacity(textoTri1, 1);
-        setOpacity(textoTri2, 1);
-        setOpacity(textoCentral, 0);
-      }
-
-      if (paso === 4) {
-        setOpacity(rectangulo, 0.2);
-        setOpacity(trianguloA, 1);
-        setOpacity(trianguloB, 1);
-        setOpacity(diagonal, 1);
-        setOpacity(medidaBase, 1);
-        setOpacity(medidaAltura, 1);
-        setOpacity(labelBase, 1);
-        setOpacity(labelAltura, 1);
-        setOpacity(textoTri1, 1);
-        setOpacity(textoTri2, 1);
-        setOpacity(textoCentral, 1);
+    function tick(timestamp){
+      if(!startTime) startTime = timestamp - pausedAt;
+      const elapsed = timestamp - startTime;
+      const p = elapsed / DURATION;
+      render(p);
+      if(p < 1 && running){
+        raf = requestAnimationFrame(tick);
+      }else{
+        running = false;
+        pausedAt = DURATION;
       }
     }
 
-    function animarIdea() {
-      paso = 1;
-      actualizarPaso();
-
-      setTimeout(() => {
-        paso = 2;
-        actualizarPaso();
-      }, 900);
-
-      setTimeout(() => {
-        paso = 3;
-        actualizarPaso();
-      }, 1800);
-
-      setTimeout(() => {
-        paso = 4;
-        actualizarPaso();
-      }, 2700);
+    function play(){
+      if(running) return;
+      if(pausedAt >= DURATION) pausedAt = 0;
+      running = true;
+      startTime = null;
+      raf = requestAnimationFrame(tick);
     }
 
-    baseSlider.addEventListener("input", actualizar);
-    alturaSlider.addEventListener("input", actualizar);
+    function pause(){
+      if(!running) return;
+      running = false;
+      cancelAnimationFrame(raf);
+      const currentWidth = parseFloat(bar.style.width) || 0;
+      pausedAt = (currentWidth / 100) * DURATION;
+    }
 
-    btnSiguiente.addEventListener("click", () => {
-      paso = Math.min(4, paso + 1);
-      actualizarPaso();
-    });
+    playBtn.addEventListener('click', play);
+    pauseBtn.addEventListener('click', pause);
+    restartBtn.addEventListener('click', () => { resetVisual(); play(); });
 
-    btnAnterior.addEventListener("click", () => {
-      paso = Math.max(1, paso - 1);
-      actualizarPaso();
-    });
+    baseSlider.addEventListener('input', () => { updateGeometry(); if(!running) render(pausedAt / DURATION); });
+    heightSlider.addEventListener('input', () => { updateGeometry(); if(!running) render(pausedAt / DURATION); });
 
-    btnReiniciar.addEventListener("click", () => {
-      paso = 1;
-      baseSlider.value = 8;
-      alturaSlider.value = 5;
-      actualizar();
-    });
-
-    btnAnimar.addEventListener("click", animarIdea);
-
-    actualizar();
+    resetVisual();
+    setTimeout(play, 400);
   </script>
 </body>
 </html>
