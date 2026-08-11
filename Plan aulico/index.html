@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2f2463">
+  <title>Logaria · La aventura de los logaritmos</title>
+  <meta name="description" content="Mapa interactivo de seis semanas para aprender funciones logarítmicas mediante niveles, misiones y desafíos.">
+  <style>
+    :root {
+      --ink: #251f3f;
+      --muted: #69637c;
+      --paper: #fffdf8;
+      --violet: #5b42b8;
+      --violet-dark: #35256f;
+      --yellow: #ffd65a;
+      --pink: #ff6d9f;
+      --mint: #56d7b3;
+      --sky: #64b9ff;
+      --orange: #ff9c53;
+      --line: rgba(53, 37, 111, .17);
+      --shadow: 0 16px 45px rgba(53, 37, 111, .16);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, ui-rounded, "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(255, 214, 90, .27), transparent 22rem),
+        radial-gradient(circle at 92% 12%, rgba(100, 185, 255, .22), transparent 25rem),
+        #f5f1ff;
+    }
+    button { font: inherit; }
+    button:focus-visible, a:focus-visible { outline: 4px solid rgba(255, 214, 90, .9); outline-offset: 3px; }
+
+    .topbar {
+      position: sticky;
+      z-index: 20;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .8rem clamp(1rem, 4vw, 4rem);
+      color: white;
+      background: rgba(47, 36, 99, .94);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 6px 22px rgba(31, 22, 72, .18);
+    }
+    .brand { display: flex; align-items: center; gap: .7rem; font-weight: 900; letter-spacing: .02em; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 2.1rem;
+      height: 2.1rem;
+      color: var(--violet-dark);
+      background: var(--yellow);
+      border-radius: 50% 46% 55% 45%;
+      transform: rotate(-8deg);
+    }
+    .progress-wrap { display: flex; align-items: center; gap: .75rem; min-width: min(48vw, 25rem); }
+    .progress-track { flex: 1; height: .7rem; overflow: hidden; background: rgba(255,255,255,.18); border-radius: 99px; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--yellow), var(--orange)); transition: width .55s ease; }
+    .progress-text { min-width: 4.7rem; font-size: .82rem; font-weight: 800; text-align: right; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(4rem, 9vw, 8rem) clamp(1.2rem, 7vw, 7rem) clamp(4rem, 8vw, 7rem);
+      color: white;
+      background: linear-gradient(145deg, #33236c 0%, #5c43b7 58%, #7b5fda 100%);
+      isolation: isolate;
+    }
+    .hero::before, .hero::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      border: 2px solid rgba(255,255,255,.15);
+      border-radius: 50%;
+    }
+    .hero::before { width: 22rem; height: 22rem; right: -5rem; top: -8rem; box-shadow: 0 0 0 3rem rgba(255,255,255,.035), 0 0 0 7rem rgba(255,255,255,.025); }
+    .hero::after { width: 12rem; height: 12rem; left: -5rem; bottom: -6rem; }
+    .eyebrow { margin: 0 0 1rem; color: var(--yellow); font-weight: 900; text-transform: uppercase; letter-spacing: .13em; font-size: .78rem; }
+    h1 { max-width: 880px; margin: 0; font-size: clamp(2.7rem, 8vw, 6.4rem); line-height: .91; letter-spacing: -.055em; }
+    .hero p { max-width: 690px; margin: 1.6rem 0 0; color: #eeeaff; font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.6; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2rem; }
+    .primary, .ghost, .modal-action, .reset-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: .85rem 1.25rem;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .primary { color: var(--violet-dark); background: var(--yellow); box-shadow: 0 8px 0 #d7a92d; }
+    .ghost { color: white; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.28); }
+    .primary:hover, .ghost:hover, .modal-action:hover, .reset-btn:hover { transform: translateY(-2px); }
+    .stats { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 2.2rem; }
+    .stat { padding: .65rem .85rem; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.1); border-radius: 14px; font-size: .88rem; }
+
+    main { padding: 2.3rem clamp(1rem, 5vw, 4rem) 4rem; }
+    .guide {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 1050px;
+      margin: -4rem auto 3.3rem;
+      position: relative;
+      z-index: 4;
+      background: var(--paper);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .guide-item { padding: 1.3rem; border-right: 1px solid var(--line); }
+    .guide-item:last-child { border: 0; }
+    .guide-number { display: inline-grid; place-items: center; width: 2rem; height: 2rem; margin-bottom: .65rem; color: white; background: var(--violet); border-radius: 50%; font-weight: 900; }
+    .guide-item strong { display: block; margin-bottom: .25rem; }
+    .guide-item span { color: var(--muted); font-size: .88rem; line-height: 1.45; }
+
+    .map-heading { max-width: 1100px; margin: 0 auto 1.3rem; }
+    .map-heading h2 { margin: 0 0 .4rem; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.035em; }
+    .map-heading p { margin: 0; color: var(--muted); }
+    .world-map { max-width: 1100px; margin: 0 auto; display: grid; gap: 1.35rem; }
+
+    .world {
+      --world: var(--sky);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(13rem, .8fr) 2fr;
+      min-height: 260px;
+      background: var(--paper);
+      border: 1px solid rgba(53, 37, 111, .09);
+      border-radius: 27px;
+      box-shadow: 0 12px 35px rgba(53, 37, 111, .09);
+    }
+    .world:nth-child(2) { --world: var(--mint); }
+    .world:nth-child(3) { --world: var(--orange); }
+    .world:nth-child(4) { --world: var(--pink); }
+    .world:nth-child(5) { --world: #9f82ee; }
+    .world:nth-child(6) { --world: var(--yellow); }
+    .world-info { position: relative; padding: 1.65rem; background: color-mix(in srgb, var(--world) 22%, white); }
+    .world-info::after { content: ""; position: absolute; width: 7rem; height: 7rem; right: -2rem; bottom: -2rem; border-radius: 42% 58% 56% 44%; background: color-mix(in srgb, var(--world) 55%, white); opacity: .5; }
+    .world-kicker { margin: 0 0 .45rem; font-size: .76rem; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
+    .world h3 { margin: 0; font-size: 1.65rem; line-height: 1.05; letter-spacing: -.03em; }
+    .world-info p { position: relative; z-index: 1; margin: .75rem 0 0; color: #514b64; font-size: .9rem; line-height: 1.5; }
+    .world-badge { display: inline-flex; margin-top: 1.1rem; padding: .38rem .65rem; border-radius: 999px; background: rgba(255,255,255,.72); font-size: .76rem; font-weight: 800; }
+
+    .path { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; gap: clamp(.4rem, 2vw, 1.4rem); padding: 2rem clamp(1rem, 3vw, 2.3rem); }
+    .path::before { content: ""; position: absolute; left: 12%; right: 12%; top: 50%; height: 8px; background: repeating-linear-gradient(90deg, var(--line) 0 14px, transparent 14px 23px); transform: translateY(-50%); }
+    .stage-wrap { position: relative; z-index: 2; display: grid; justify-items: center; gap: .65rem; }
+    .stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: clamp(4.7rem, 9vw, 6.2rem);
+      aspect-ratio: 1;
+      border: 6px solid white;
+      border-radius: 45% 55% 50% 50%;
+      color: var(--violet-dark);
+      background: var(--world);
+      box-shadow: 0 7px 0 color-mix(in srgb, var(--world) 68%, #33236c), 0 12px 20px rgba(53,37,111,.18);
+      font-size: 1.45rem;
+      font-weight: 950;
+      cursor: pointer;
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .stage:hover:not(:disabled) { transform: translateY(-5px) rotate(-2deg); }
+    .stage.completed::after { content: "✓"; position: absolute; right: -.35rem; top: -.4rem; display: grid; place-items: center; width: 1.65rem; height: 1.65rem; color: white; background: #269c79; border: 3px solid white; border-radius: 50%; font-size: .8rem; }
+    .stage:disabled { color: #7d788c; background: #dcd9e4; box-shadow: 0 7px 0 #aaa5b6; cursor: not-allowed; filter: grayscale(1); }
+    .stage-label { max-width: 11rem; min-height: 2.3rem; text-align: center; font-size: .82rem; font-weight: 800; line-height: 1.3; }
+    .side-mission { border: 1px solid var(--line); border-radius: 999px; padding: .4rem .65rem; color: var(--violet-dark); background: white; font-size: .72rem; font-weight: 800; cursor: pointer; }
+    .side-mission:disabled { opacity: .42; cursor: not-allowed; }
+    .side-mission.done { color: #176d55; background: #ddf8ef; border-color: #81d6bd; }
+
+    .teacher-note { max-width: 1100px; margin: 1.5rem auto 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.15rem 1.25rem; background: #ebe4ff; border-radius: 18px; }
+    .teacher-note p { margin: 0; font-size: .88rem; line-height: 1.5; }
+    .reset-btn { flex: 0 0 auto; padding: .65rem .9rem; color: #5d2840; background: #ffe4ed; }
+
+    dialog { width: min(92vw, 620px); max-height: 88vh; border: 0; border-radius: 25px; padding: 0; color: var(--ink); background: var(--paper); box-shadow: 0 30px 90px rgba(25,16,61,.35); }
+    dialog::backdrop { background: rgba(28, 20, 62, .7); backdrop-filter: blur(5px); }
+    .modal-head { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4rem 1.4rem 1.1rem; color: white; background: var(--violet-dark); }
+    .modal-head small { display: block; margin-bottom: .3rem; color: #dcd3ff; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+    .modal-head h2 { margin: 0; font-size: 1.55rem; line-height: 1.1; }
+    .close { align-self: flex-start; width: 2.2rem; height: 2.2rem; border: 1px solid rgba(255,255,255,.3); border-radius: 50%; color: white; background: rgba(255,255,255,.08); cursor: pointer; font-size: 1.2rem; }
+    .modal-body { padding: 1.4rem; }
+    .mission-copy { margin: 0 0 1.1rem; color: var(--muted); line-height: 1.55; }
+    .formula { margin: 1rem 0; padding: 1rem; text-align: center; background: #f0ebff; border-radius: 15px; font-family: Georgia, serif; font-size: 1.16rem; }
+    .question { margin: 1.1rem 0 .75rem; font-weight: 850; line-height: 1.45; }
+    .answers { display: grid; gap: .55rem; }
+    .answer { display: flex; align-items: flex-start; gap: .65rem; padding: .85rem; border: 2px solid #e5e0ee; border-radius: 13px; background: white; cursor: pointer; text-align: left; }
+    .answer:hover { border-color: #aa98e8; }
+    .answer.selected { border-color: var(--violet); background: #f0ebff; }
+    .answer.correct { border-color: #31a981; background: #e3f8f1; }
+    .answer.wrong { border-color: #e4678e; background: #fff0f4; }
+    .answer-letter { display: grid; place-items: center; flex: 0 0 auto; width: 1.55rem; height: 1.55rem; border-radius: 50%; background: #eee9f8; font-size: .74rem; font-weight: 900; }
+    .feedback { min-height: 1.4rem; margin: .8rem 0; color: var(--muted); font-size: .88rem; font-weight: 700; }
+    .feedback.ok { color: #177056; }
+    .feedback.no { color: #a33456; }
+    .modal-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-top: 1.1rem; }
+    .hint-btn { border: 0; padding: .6rem 0; color: var(--violet); background: transparent; font-weight: 800; cursor: pointer; }
+    .modal-action { color: white; background: var(--violet); }
+    .modal-action:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .side-card { padding: 1.15rem; background: #fff5cf; border: 1px solid #f2d46c; border-radius: 16px; line-height: 1.55; }
+    .side-card strong { display: block; margin-bottom: .4rem; }
+    .toast { position: fixed; z-index: 50; left: 50%; bottom: 1.5rem; transform: translate(-50%, 120px); padding: .85rem 1rem; color: white; background: #24203a; border-radius: 999px; box-shadow: var(--shadow); font-weight: 800; opacity: 0; transition: .28s ease; }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    footer { padding: 2rem 1rem 3rem; color: var(--muted); text-align: center; font-size: .84rem; }
+
+    @media (max-width: 760px) {
+      .topbar { align-items: flex-start; }
+      .brand span:last-child { display: none; }
+      .progress-wrap { min-width: 65vw; }
+      .hero { padding-top: 4rem; }
+      .guide { grid-template-columns: 1fr; margin-top: -2.2rem; }
+      .guide-item { border-right: 0; border-bottom: 1px solid var(--line); }
+      .world { grid-template-columns: 1fr; }
+      .world-info { padding: 1.25rem; }
+      .path { min-height: 235px; padding: 1.5rem .65rem; gap: .25rem; }
+      .stage-label { font-size: .7rem; }
+      .side-mission { font-size: .64rem; padding: .35rem .45rem; }
+      .teacher-note { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">L</span><span>LOGARIA</span></div>
+    <div class="progress-wrap" aria-label="Progreso de la aventura">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">0 / 18</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">Residencia matemática · 6 semanas</p>
+    <h1>La aventura de los logaritmos</h1>
+    <p>Recorré seis mundos, superá los retos matemáticos y reuní las llaves necesarias para entrar a la Fortaleza Final.</p>
+    <div class="hero-actions">
+      <button class="primary" id="startButton">Comenzar aventura</button>
+      <button class="ghost" id="continueButton">Ir al nivel disponible</button>
+    </div>
+    <div class="stats">
+      <span class="stat">🗺️ 6 mundos</span>
+      <span class="stat">🔮 18 niveles</span>
+      <span class="stat">⭐ Misiones secundarias</span>
+      <span class="stat">🏰 1 desafío final</span>
+    </div>
+  </section>
+
+  <main id="map">
+    <section class="guide" aria-label="Cómo jugar">
+      <div class="guide-item"><span class="guide-number">1</span><strong>Explorá</strong><span>Abrí el nivel disponible y revisá su misión.</span></div>
+      <div class="guide-item"><span class="guide-number">2</span><strong>Resolvé</strong><span>Superá el reto de desbloqueo. Podés pedir una pista.</span></div>
+      <div class="guide-item"><span class="guide-number">3</span><strong>Avanzá</strong><span>La respuesta correcta habilita automáticamente el próximo nivel.</span></div>
+    </section>
+
+    <header class="map-heading">
+      <h2>Mapa de la expedición</h2>
+      <p>Las misiones secundarias son opcionales y sirven para practicar, recuperar o profundizar.</p>
+    </header>
+    <section class="world-map" id="worldMap" aria-label="Niveles de Logaria"></section>
+
+    <aside class="teacher-note">
+      <p><strong>Progreso local:</strong> los niveles completados quedan guardados únicamente en este navegador. Cada estudiante puede recorrer el mapa a su ritmo y volver a intentar los desafíos.</p>
+      <button class="reset-btn" id="resetButton">Reiniciar recorrido</button>
+    </aside>
+  </main>
+
+  <dialog id="missionDialog" aria-labelledby="dialogTitle">
+    <div class="modal-head">
+      <div><small id="dialogKicker"></small><h2 id="dialogTitle"></h2></div>
+      <button class="close" id="closeDialog" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body" id="dialogBody"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <footer>Logaria · Una experiencia interactiva para explorar las funciones logarítmicas</footer>
+
+  <script>
+    const worlds = [
+      { title: "El Portal Inverso", subtitle: "Ecuaciones, inversas y el nacimiento del logaritmo", badge: "Llave de la inversión" },
+      { title: "El Bosque de las Bases", subtitle: "Comportamiento de f(x) = log₍c₎(ax)", badge: "Llave de la base" },
+      { title: "Las Cavernas Horizontales", subtitle: "Desplazamientos en f(x) = log₍c₎(ax − k)", badge: "Llave del dominio" },
+      { title: "Las Islas Verticales", subtitle: "Alturas y traslaciones en f(x) = log₍c₎(ax) + b", badge: "Llave de la imagen" },
+      { title: "El Reino de las Transformaciones", subtitle: "Análisis completo de f(x) = log₍c₎(ax − k) + b", badge: "Llave maestra" },
+      { title: "La Fortaleza Final", subtitle: "Ejercitación, revisión e integración", badge: "Insignia de Logaria" }
+    ];
+
+    const levels = [
+      { title:"El código de la definición", formula:"log₂(8) = x", copy:"Aplicá la definición de logaritmo para traducir la ecuación a su forma exponencial.", q:"¿Qué ecuación exponencial es equivalente?", a:["2⁸ = x","2ˣ = 8","8ˣ = 2"], ok:1, hint:"La base se conserva; el resultado del logaritmo pasa a ser exponente.", side:"Escribí dos pares equivalentes: uno en lenguaje logarítmico y otro en lenguaje exponencial." },
+      { title:"El espejo de las funciones", formula:"f(x) = 2ˣ", copy:"Toda función inversa intercambia el papel de las entradas y las salidas.", q:"¿Cuál es la inversa de f(x) = 2ˣ?", a:["f⁻¹(x) = log₂(x)","f⁻¹(x) = x²","f⁻¹(x) = 2x"], ok:0, hint:"La operación que deshace una potencia es un logaritmo de la misma base.", side:"Dibujá mentalmente la recta y = x y explicá qué relación tiene con dos funciones inversas." },
+      { title:"El guardián exponencial", formula:"y = 3ˣ  ↔  y = log₃(x)", copy:"Compará ambas gráficas para reconocer su simetría y sus características.", q:"¿Respecto de qué recta son simétricas una función y su inversa?", a:["El eje x","La recta y = x","La recta x = 0"], ok:1, hint:"Al intercambiar (x,y) por (y,x), los puntos se reflejan en una diagonal.", side:"Clasificá tarjetas con propiedades de la función exponencial y de la logarítmica." },
+      { title:"La senda creciente", formula:"f(x) = log₂(x)", copy:"Observá el efecto de una base mayor que uno.", q:"¿Cómo se comporta f(x) = log₂(x)?", a:["Es creciente","Es decreciente","Es constante"], ok:0, hint:"Probá comparar log₂(1), log₂(2) y log₂(4).", side:"Construí una tabla con x = 1/2, 1, 2 y 4; luego anticipá la gráfica." },
+      { title:"La senda decreciente", formula:"g(x) = log₍₁⁄₂₎(x)", copy:"Una base entre cero y uno invierte el sentido del crecimiento.", q:"¿Cuál afirmación es correcta?", a:["g es creciente","g es decreciente","g no tiene cero"], ok:1, hint:"Calculá g(1), g(2) y g(4).", side:"Compará en una misma pantalla las gráficas con bases 2 y 1/2." },
+      { title:"El claro del análisis", formula:"h(x) = log₃(2x)", copy:"Reuní las propiedades principales de la función sin depender solo de la gráfica.", q:"¿Cuál es el dominio de h?", a:["x > 0","x ≥ 0","Todos los reales"], ok:0, hint:"El argumento del logaritmo debe ser estrictamente positivo: 2x > 0.", side:"Encontrá el cero y los conjuntos de positividad y negatividad de h." },
+      { title:"Entrada a las cavernas", formula:"f(x) = log₂(x − 3)", copy:"El término dentro del argumento modifica el dominio y desplaza la asíntota.", q:"¿Cuál es el dominio?", a:["x > −3","x > 3","x ≠ 3"], ok:1, hint:"Resolvé x − 3 > 0.", side:"Mové k con un deslizador y registrá cómo cambia la asíntota vertical." },
+      { title:"La pared invisible", formula:"g(x) = log₅(2x − 6)", copy:"La frontera del dominio señala la posición de la asíntota vertical.", q:"¿Cuál es la asíntota vertical?", a:["x = 0","x = 3","x = 6"], ok:1, hint:"Igualá el argumento a cero: 2x − 6 = 0.", side:"Explicá por qué la asíntota no pertenece al dominio." },
+      { title:"El túnel de los signos", formula:"p(x) = log₂(x − 1)", copy:"El signo de un logaritmo depende de la posición de su argumento respecto de 1.", q:"¿Dónde es positiva p(x)?", a:["x > 2","x > 1","1 < x < 2"], ok:0, hint:"Para base 2, log₂(u) > 0 cuando u > 1. Entonces x − 1 > 1.", side:"Marcá dominio, cero, positividad y negatividad sobre una recta numérica." },
+      { title:"El ascensor vertical", formula:"f(x) = log₂(x) + 3", copy:"El valor sumado fuera del logaritmo traslada toda la gráfica verticalmente.", q:"¿Qué transformación produce +3?", a:["Tres unidades a la derecha","Tres unidades hacia arriba","Tres unidades hacia abajo"], ok:1, hint:"Los cambios fuera de la función modifican las salidas, es decir, la coordenada y.", side:"Compará f(x)=log₂(x) con tres valores diferentes de b." },
+      { title:"La isla del cero", formula:"g(x) = log₂(x) − 2", copy:"Para hallar el cero, igualá la función a cero y despejá usando la definición.", q:"¿Cuál es el cero de g?", a:["x = 2","x = 4","x = −2"], ok:1, hint:"log₂(x) − 2 = 0 implica log₂(x) = 2.", side:"Resolvé el cero con álgebra y comprobalo en la gráfica interactiva." },
+      { title:"El archipiélago de signos", formula:"q(x) = log₍₁⁄₂₎(x) + 1", copy:"Cuando la base está entre cero y uno, la función es decreciente y cambia el sentido del análisis.", q:"¿Cuál es el cero de q?", a:["x = 1/2","x = 2","x = −1"], ok:1, hint:"log₍₁⁄₂₎(x) = −1. Pasalo a forma exponencial.", side:"Usá el cero para decidir en qué intervalos q es positiva y negativa." },
+      { title:"La fórmula completa", formula:"f(x) = log₂(x − 4) + 1", copy:"Combiná el desplazamiento horizontal y el vertical sin confundir sus efectos.", q:"¿Cuál combinación describe la gráfica?", a:["4 a la derecha y 1 arriba","4 a la izquierda y 1 arriba","1 a la derecha y 4 arriba"], ok:0, hint:"El cambio interior actúa horizontalmente; el cambio exterior, verticalmente.", side:"Reconstruí la fórmula a partir de una gráfica desplazada." },
+      { title:"La llave maestra", formula:"g(x) = log₃(2x − 6) + 2", copy:"Analizá primero la condición del argumento para no perder la frontera del dominio.", q:"¿Cuál es el dominio de g?", a:["x > 2","x > 3","x > 6"], ok:1, hint:"2x − 6 > 0.", side:"Determiná asíntota, imagen y ordenada al origen." },
+      { title:"El consejo de los signos", formula:"h(x) = log₂(x − 2) − 1", copy:"Articulá dominio, cero y crecimiento para estudiar el signo de la función.", q:"¿En qué intervalo h es negativa?", a:["2 < x < 4","x > 4","x < 2"], ok:0, hint:"El cero está donde log₂(x−2)=1, es decir x−2=2. Además, h es creciente.", side:"Defendé tu respuesta con una gráfica, una cuenta y una frase." },
+      { title:"Campo de entrenamiento", formula:"f(x) = log₄(2x − 2) + 1", copy:"Poné en juego todas las herramientas de análisis aprendidas.", q:"¿Cuál es la asíntota vertical?", a:["x = 1","x = 2","x = −1"], ok:0, hint:"Buscá el valor frontera haciendo 2x − 2 = 0.", side:"Completá una ficha: dominio, imagen, cero, monotonía, positividad y negatividad." },
+      { title:"La sala de revisión", formula:"Dominio → Asíntota → Cero → Signo", copy:"Ordenar el procedimiento ayuda a justificar el análisis con claridad.", q:"¿Qué condición conviene revisar primero en una función logarítmica?", a:["Que el argumento sea positivo","Que la función valga cero","Que exista ordenada al origen"], ok:0, hint:"Sin valores permitidos para x, ninguna otra propiedad puede analizarse correctamente.", side:"Corregí una resolución ficticia que incluye tres errores frecuentes." },
+      { title:"La Fortaleza Final", formula:"Desafío integrador", copy:"Llegaste al último portal. Elegí una función, analizala, comprobala con el programa interactivo y explicá tus decisiones.", q:"¿Qué evidencia constituye una justificación completa?", a:["Solo una captura de la gráfica","Solo los resultados finales","Cálculos, gráfica y explicación conectados"], ok:2, hint:"Una buena producción muestra qué se hizo, permite comprobarlo y explica por qué funciona.", side:"Diseñá una pista para que otro equipo descubra tu función misteriosa." }
+    ];
+
+    const STORAGE_KEY = "logaria-progress-v1";
+    let state = loadState();
+    let activeLevel = null;
+    let selectedAnswer = null;
+
+    const mapEl = document.getElementById("worldMap");
+    const dialog = document.getElementById("missionDialog");
+    const dialogBody = document.getElementById("dialogBody");
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return { completed: saved?.completed || [], sides: saved?.sides || [] };
+      } catch { return { completed: [], sides: [] }; }
+    }
+
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function isUnlocked(index) { return index === 0 || state.completed.includes(index - 1) || state.completed.includes(index); }
+
+    function renderMap() {
+      mapEl.innerHTML = worlds.map((world, worldIndex) => {
+        const start = worldIndex * 3;
+        const nodes = levels.slice(start, start + 3).map((level, offset) => {
+          const index = start + offset;
+          const unlocked = isUnlocked(index);
+          const completed = state.completed.includes(index);
+          const sideDone = state.sides.includes(index);
+          return `<div class="stage-wrap" id="level-${index + 1}">
+            <button class="stage ${completed ? "completed" : ""}" data-level="${index}" ${unlocked ? "" : "disabled"} aria-label="${unlocked ? `Abrir nivel ${index + 1}: ${level.title}` : `Nivel ${index + 1} bloqueado`}">${unlocked ? index + 1 : "🔒"}</button>
+            <span class="stage-label">${level.title}</span>
+            <button class="side-mission ${sideDone ? "done" : ""}" data-side="${index}" ${unlocked ? "" : "disabled"}>${sideDone ? "✓ Misión realizada" : "✦ Misión secundaria"}</button>
+          </div>`;
+        }).join("");
+        return `<article class="world">
+          <div class="world-info">
+            <p class="world-kicker">Mundo ${worldIndex + 1} · Semana ${worldIndex + 1}</p>
+            <h3>${world.title}</h3>
+            <p>${world.subtitle}</p>
+            <span class="world-badge">🔑 ${world.badge}</span>
+          </div>
+          <div class="path">${nodes}</div>
+        </article>`;
+      }).join("");
+
+      document.querySelectorAll("[data-level]").forEach(button => button.addEventListener("click", () => openLevel(Number(button.dataset.level))));
+      document.querySelectorAll("[data-side]").forEach(button => button.addEventListener("click", () => openSide(Number(button.dataset.side))));
+      updateProgress();
+    }
+
+    function openLevel(index) {
+      if (!isUnlocked(index)) return;
+      activeLevel = index;
+      selectedAnswer = null;
+      const level = levels[index];
+      document.getElementById("dialogKicker").textContent = `Nivel ${index + 1} · Misión principal`;
+      document.getElementById("dialogTitle").textContent = level.title;
+      dialogBody.innerHTML = `
+        <p class="mission-copy">${level.copy}</p>
+        <div class="formula">${level.formula}</div>
+        <p class="question">${level.q}</p>
+        <div class="answers">${level.a.map((answer, i) => `<button class="answer" data-answer="${i}"><span class="answer-letter">${String.fromCharCode(65+i)}</span><span>${answer}</span></button>`).join("")}</div>
+        <p class="feedback" id="feedback" aria-live="polite"></p>
+        <div class="modal-footer">
+          <button class="hint-btn" id="hintButton">💡 Ver una pista</button>
+          <button class="modal-action" id="checkButton" disabled>Comprobar respuesta</button>
+        </div>`;
+      dialogBody.querySelectorAll("[data-answer]").forEach(button => button.addEventListener("click", () => selectAnswer(Number(button.dataset.answer))));
+      document.getElementById("hintButton").addEventListener("click", showHint);
+      document.getElementById("checkButton").addEventListener("click", checkAnswer);
+      dialog.showModal();
+    }
+
+    function selectAnswer(index) {
+      selectedAnswer = index;
+      dialogBody.querySelectorAll(".answer").forEach((el, i) => el.classList.toggle("selected", i === index));
+      document.getElementById("checkButton").disabled = false;
+    }
+
+    function showHint() {
+      const feedback = document.getElementById("feedback");
+      feedback.className = "feedback";
+      feedback.textContent = `Pista: ${levels[activeLevel].hint}`;
+    }
+
+    function checkAnswer() {
+      const level = levels[activeLevel];
+      const feedback = document.getElementById("feedback");
+      const answers = dialogBody.querySelectorAll(".answer");
+      answers.forEach((el, i) => {
+        el.classList.remove("wrong", "correct");
+        if (i === level.ok) el.classList.add("correct");
+        if (i === selectedAnswer && i !== level.ok) el.classList.add("wrong");
+      });
+      if (selectedAnswer === level.ok) {
+        feedback.className = "feedback ok";
+        feedback.textContent = activeLevel === 17 ? "¡Fortaleza conquistada! Completaste la expedición." : "¡Reto superado! El próximo nivel quedó desbloqueado.";
+        if (!state.completed.includes(activeLevel)) state.completed.push(activeLevel);
+        saveState();
+        renderMap();
+        document.getElementById("checkButton").textContent = "Continuar";
+        document.getElementById("checkButton").onclick = () => { dialog.close(); goToAvailable(); };
+        showToast(activeLevel === 17 ? "🏆 ¡Expedición completada!" : "🔓 Nuevo nivel desbloqueado");
+      } else {
+        feedback.className = "feedback no";
+        feedback.textContent = "Todavía no. Revisá la pista, pensá otra estrategia y volvé a intentar.";
+      }
+    }
+
+    function openSide(index) {
+      const done = state.sides.includes(index);
+      document.getElementById("dialogKicker").textContent = `Nivel ${index + 1} · Misión secundaria`;
+      document.getElementById("dialogTitle").textContent = levels[index].title;
+      dialogBody.innerHTML = `
+        <p class="mission-copy">Esta misión es opcional: podés usarla para practicar, recuperar o profundizar.</p>
+        <div class="side-card"><strong>✦ Tu misión</strong>${levels[index].side}</div>
+        <div class="modal-footer"><span class="feedback">${done ? "Esta misión ya fue registrada." : "Cuando termines, registrá tu estrella."}</span><button class="modal-action" id="completeSide">${done ? "Cerrar" : "Marcar como realizada"}</button></div>`;
+      document.getElementById("completeSide").addEventListener("click", () => {
+        if (!done) {
+          state.sides.push(index); saveState(); renderMap(); showToast("⭐ Misión secundaria completada");
+        }
+        dialog.close();
+      });
+      dialog.showModal();
+    }
+
+    function updateProgress() {
+      const count = state.completed.length;
+      document.getElementById("progressFill").style.width = `${(count / levels.length) * 100}%`;
+      document.getElementById("progressText").textContent = `${count} / ${levels.length}`;
+    }
+
+    function goToAvailable() {
+      const next = levels.findIndex((_, i) => isUnlocked(i) && !state.completed.includes(i));
+      const target = document.getElementById(`level-${(next === -1 ? 17 : next) + 1}`);
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+      target?.querySelector(".stage")?.focus({ preventScroll: true });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    document.getElementById("closeDialog").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); });
+    document.getElementById("startButton").addEventListener("click", () => document.getElementById("map").scrollIntoView({ behavior:"smooth" }));
+    document.getElementById("continueButton").addEventListener("click", goToAvailable);
+    document.getElementById("resetButton").addEventListener("click", () => {
+      if (!confirm("¿Querés borrar todo el progreso guardado y volver al nivel 1?")) return;
+      state = { completed: [], sides: [] }; saveState(); renderMap(); showToast("Recorrido reiniciado");
+    });
+
+    renderMap();
+  </script>
+</body>
+</html>
