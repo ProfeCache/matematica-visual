@@ -20,7 +20,7 @@ Antes de modificar archivos, leer este README completo. Usar las secciones sigui
 - Tratar lo marcado como **Pendiente** como una decisión que todavía necesita definición.
 - No inventar contenido pedagógico, público objetivo ni requisitos que contradigan este documento.
 - Si falta un dato menor, elegir la opción más simple y coherente con el proyecto.
-- Si falta una decisión que cambia mucho el resultado, preguntar antes de implementarla.
+- Si falta una decisión que cambia mucho el resultado, preguntar antes de implementarla. Las que ya están identificadas están reunidas en *[Decisiones pendientes antes de implementar](#decisiones-pendientes-antes-de-implementar)*: leer esa sección antes de tocar `Plan aulico/`.
 - Mantener las experiencias simples, visuales, interactivas y utilizables en celular.
 - Al terminar un cambio, explicar qué se hizo, qué archivos se tocaron y cómo comprobarlo.
 
@@ -201,7 +201,7 @@ Ver la sección completa [Aventura Logarítmica](#aventura-logarítmica-plan-aul
 | 5 – "Control total" | `f(x) = logc(ax - k) + b`. Integración de parámetros y análisis | 13 a 15 |
 | 6 – "Desafío final" | Ejercitación, revisión y trabajo final | 16 a 18 |
 
-> **[PENDIENTE]** Notación de los parámetros: el documento fuente escribe a veces `logc(ax - k)` y a veces `logc(ax + k)` para el Mundo 5. Acá se usa `- k` en todo el recorrido, igual que en el Mundo 3. Confirmar antes de implementar.
+> **[PENDIENTE]** Notación de los parámetros: el documento fuente escribe a veces `logc(ax - k)` y a veces `logc(ax + k)` para el Mundo 5. Acá se usa `- k` en todo el recorrido, igual que en el Mundo 3. Ver *[Decisiones pendientes antes de implementar](#decisiones-pendientes-antes-de-implementar)*, duda 1.
 
 ### Mundo 1 – El código logarítmico
 
@@ -441,6 +441,55 @@ Los 18 niveles forman el recorrido mínimo. Las misiones secundarias pueden colg
 - **[DEFINIDO]** **Diseño móvil primero:** el recorrido debe funcionar desde celular y además proyectarse en computadora para la clase.
 - **[DEFINIDO]** **Retroalimentación gradual:** primer error, indicio visual o conceptual; segundo error, pregunta orientadora; recién después, una pista más explícita.
 - **[DEFINIDO]** **Accesibilidad matemática:** buen contraste, controles grandes, ingreso de valores exactos además de sliders y textos legibles.
+
+---
+
+## Decisiones pendientes antes de implementar
+
+> Cada una de estas dudas cambia el resultado. La IA **no debe resolverlas por su cuenta**: hay que preguntarlas antes de escribir código que dependa de ellas. Cuando una se resuelva, pasarla al *Registro de decisiones* y borrarla de acá.
+
+### 1. Notación del parámetro `k` · **[PENDIENTE]**
+
+- **La duda:** el documento fuente escribe `logc(ax - k)` en el mapa de mundos y `logc(ax + k)` en el texto del Nivel 13.
+- **Provisorio:** se usa `- k` en todo el recorrido, por coherencia con el Mundo 3.
+- **Por qué importa:** cambia el signo de las respuestas y de las consignas de los niveles 7 a 15, y también la dirección del desplazamiento que se trabaja como error frecuente.
+- **Bloquea a:** Mundos 3, 4 y 5 completos.
+
+### 2. Nombres de mundos y niveles · **[PENDIENTE]**
+
+- **La duda:** existen dos conjuntos de nombres distintos. La implementación actual usa los de Logaria ("El Portal Inverso", "El espejo de las funciones"); el documento fuente usa otros ("El código logarítmico", "La calculadora desconfigurada"). No son variantes del mismo nombre: son dos narrativas paralelas.
+- **Opciones:** (a) adoptar los del documento y reescribir el mapa; (b) conservar los de Logaria y tratar los del documento solo como referencia interna; (c) mezclar, con nombre de mundo de un lado y de nivel del otro.
+- **Por qué importa:** afecta todos los textos visibles de la experiencia, y el README prohíbe inventar contenido narrativo nuevo.
+- **Bloquea a:** cualquier reescritura del mapa de `Plan aulico/index.html`.
+
+### 3. Cómo se abre y se distribuye la aplicación · **[PENDIENTE]**
+
+- **La duda:** ¿el recorrido sigue siendo un HTML que se abre con doble clic (`file://`), o se va a servir desde una URL?
+- **Por qué importa:** con `file://` los módulos ES no cargan, así que la definición de niveles tendría que ir en un `<script>` clásico y no en archivos importados. Es la restricción que decide cómo se separan los datos del HTML, que es un criterio ya definido en el documento.
+- **Bloquea a:** la prioridad 1 (definición de niveles por datos).
+
+### 4. Tolerancia de las validaciones · **[PENDIENTE]**
+
+- **La duda:** con qué margen se da por correcta una respuesta que no es de opción múltiple: puntos cargados, intervalos escritos de distintas formas equivalentes y sobre todo la superposición de una curva propia sobre una curva objetivo (niveles 9 y 15).
+- **Por qué importa:** demasiado estricta, el estudiante se traba sin entender por qué; demasiado laxa, el reto deja de validar el aprendizaje. Es una decisión pedagógica, no técnica.
+- **Bloquea a:** los validadores de punto, intervalo y superposición.
+
+### 5. Alcance y forma de entrega · **[PENDIENTE]**
+
+- **La duda:** los 18 niveles con laboratorio propio no entran en una sola tanda de trabajo. ¿Se entrega mundo por mundo, con el mapa siempre jugable y los niveles todavía no migrados señalados como tales?
+- **Propuesta:** empezar por una rebanada vertical completa con el **Nivel 4 ("Se rompió el graficador")**, porque ejercita el ciclo entero —predicción, modo hoja, carga de puntos, validación, reconstrucción de la curva y reto nuevo—. Si ese nivel funciona, el resto es contenido y variantes de validador, no arquitectura nueva.
+- **Por qué importa:** define si el archivo queda a medio migrar entre entregas.
+
+### 6. Progreso ya guardado en los navegadores · **[PENDIENTE]**
+
+- **La duda:** el avance actual se guarda con la clave `logaria-progress-v1`. Al cambiar el modelo de niveles hay que decidir si se migra el progreso existente o se reinicia.
+- **Por qué importa:** si algún curso ya venía usando la experiencia, un cambio de clave sin migración le borra el recorrido.
+- **Bloquea a:** la prioridad 3 (progreso y estrellas).
+
+### 7. Curso y edad del grupo · **[PENDIENTE]**
+
+- **La duda:** el documento fuente no indica el curso exacto (ver *Público*).
+- **Por qué importa:** define el nivel de vocabulario y cuánta formalización algebraica se puede exigir en los puentes a la carpeta.
 
 ---
 
