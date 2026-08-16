@@ -72,7 +72,7 @@ Cada idea puede escribirse así:
 
 ## Público
 
-- **Nivel o edad:** **[PENDIENTE]** _Completar acá._ (La Aventura Logarítmica corresponde a función logarítmica de escuela secundaria, pero el curso exacto no está definido en el documento fuente.)
+- **Nivel o edad:** **[PENDIENTE]** _Sexto año de secundaria, edad de 17 años_ (La Aventura Logarítmica corresponde a función logarítmica de escuela secundaria, pero el curso exacto no está definido en el documento fuente.)
 - **Conocimientos previos:** función exponencial, potencias y lectura de gráficos en el plano cartesiano.
 - **Contexto de uso:** clase de seis semanas con carpeta o cuaderno siempre a mano; se usa en celular y también proyectado en computadora para trabajo colectivo.
 
@@ -84,9 +84,367 @@ Cada idea puede escribirse así:
 - **[DEFINIDO]** La interfaz debe adaptarse a pantallas de celular (diseño móvil primero) y además poder proyectarse en computadora.
 - **[DEFINIDO]** El estado de cada nodo del mapa (disponible, superado, bloqueado) debe ser visible.
 - **[DEFINIDO]** Buen contraste, controles grandes y textos legibles.
-- **[PENDIENTE]** Paleta de colores: _Completar acá._
-- **[PENDIENTE]** Tipografías: _Completar acá._
-- **[PENDIENTE]** Estilo general: _Completar acá._
+- **[PENDIENTE]** Paleta de colores: _## Identidad visual de Logaria
+
+La interfaz de **Logaria** debe transmitir una combinación de:
+
+* matemática;
+* tecnología;
+* exploración;
+* aventura;
+* claridad visual;
+* profesionalismo docente.
+
+El objetivo es evitar una estética excesivamente infantil o de videojuego genérico. La aplicación debe conservar una identidad lúdica y atractiva para estudiantes, pero al mismo tiempo verse como una herramienta educativa seria y cuidada.
+
+---
+
+## Paleta de colores
+
+Usar la siguiente paleta como base de toda la aplicación:
+
+```css
+:root {
+  --background: #0F172A;
+  --surface: #1E293B;
+
+  --primary: #3B82F6;
+  --secondary: #8B5CF6;
+  --exploration: #14B8A6;
+
+  --challenge: #F59E0B;
+  --success: #22C55E;
+  --error: #EF4444;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+
+  --border: #334155;
+  --axis: #94A3B8;
+}
+```
+
+### Función de cada color
+
+| Color          | HEX       | Uso                                                              |
+| -------------- | --------- | ---------------------------------------------------------------- |
+| Azul noche     | `#0F172A` | Fondo principal                                                  |
+| Azul pizarra   | `#1E293B` | Tarjetas, paneles y menús                                        |
+| Azul eléctrico | `#3B82F6` | Acciones principales, botones y función base                     |
+| Violeta        | `#8B5CF6` | Identidad de Logaria, mundos, portales y funciones transformadas |
+| Turquesa       | `#14B8A6` | Exploración, laboratorios y puntos del estudiante                |
+| Ámbar          | `#F59E0B` | Retos, estrellas, recompensas y asíntotas                        |
+| Verde          | `#22C55E` | Respuesta correcta, misión completada                            |
+| Rojo           | `#EF4444` | Error o respuesta que debe revisarse                             |
+| Blanco azulado | `#F8FAFC` | Texto principal                                                  |
+| Gris claro     | `#CBD5E1` | Texto secundario                                                 |
+| Gris azulado   | `#334155` | Bordes y cuadrícula                                              |
+
+---
+
+## Significado pedagógico de los colores
+
+Los colores no deben utilizarse únicamente de forma decorativa. Deben conservar un significado estable durante toda la experiencia.
+
+* **Azul:** información, acción principal o función de referencia.
+* **Violeta:** narrativa, mundos, portales y transformaciones.
+* **Turquesa:** exploración matemática y producción del estudiante.
+* **Ámbar:** desafío, misión especial, recompensa o elemento a observar.
+* **Verde:** respuesta correcta o objetivo alcanzado.
+* **Rojo:** error o elemento que necesita ser revisado.
+
+No depender exclusivamente del color para comunicar correcto/incorrecto. Utilizar también iconos, texto y feedback visible.
+
+---
+
+## Tipografías
+
+Utilizar como máximo dos tipografías principales.
+
+### Space Grotesk
+
+Usar **Space Grotesk** para:
+
+* logo de Logaria;
+* nombres de mundos;
+* títulos de niveles;
+* pantallas de desbloqueo;
+* recompensas;
+* elementos narrativos destacados.
+
+Pesos recomendados:
+
+```css
+font-weight: 600;
+font-weight: 700;
+```
+
+### Inter
+
+Usar **Inter** para:
+
+* consignas;
+* explicaciones;
+* botones;
+* menús;
+* tarjetas;
+* formularios;
+* tablas;
+* ayudas;
+* feedback;
+* textos de interfaz.
+
+Pesos recomendados:
+
+```css
+font-weight: 400; /* texto normal */
+font-weight: 500; /* controles */
+font-weight: 600; /* subtítulos */
+font-weight: 700; /* elementos destacados */
+```
+
+Ejemplo:
+
+```css
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+h1,
+h2,
+h3,
+.world-title,
+.level-title,
+.logo {
+  font-family: "Space Grotesk", sans-serif;
+}
+```
+
+---
+
+## Expresiones matemáticas
+
+Las expresiones matemáticas no deben escribirse utilizando manualmente la tipografía general de la interfaz.
+
+Cuando sea posible utilizar:
+
+* KaTeX;
+* MathJax;
+* otra herramienta específica de renderizado matemático.
+
+Ejemplo:
+
+[
+f(x)=\log_c(ax-k)
+]
+
+Debe existir una diferencia visual clara entre el lenguaje natural de la consigna y el lenguaje matemático.
+
+---
+
+## Gráficos matemáticos
+
+Mantener una convención cromática estable en todos los graficadores.
+
+```css
+--graph-grid: #334155;
+--graph-axis: #94A3B8;
+
+--graph-function-base: #3B82F6;
+--graph-function-transformed: #8B5CF6;
+--graph-student: #14B8A6;
+
+--graph-asymptote: #F59E0B;
+```
+
+### Convención
+
+* **Función original:** azul.
+* **Función transformada:** violeta.
+* **Producción o puntos del estudiante:** turquesa.
+* **Asíntota o elemento destacado:** ámbar.
+* **Ejes:** gris claro.
+* **Cuadrícula:** gris azulado oscuro.
+
+Esta convención debe conservarse entre niveles siempre que sea matemáticamente posible.
+
+---
+
+## Tarjetas y paneles
+
+Las tarjetas deben utilizar fondos ligeramente más claros que el fondo general.
+
+Ejemplo:
+
+```css
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+```
+
+Evitar:
+
+* bordes excesivamente gruesos;
+* demasiadas sombras;
+* efectos brillantes constantes;
+* degradados en todas las superficies;
+* demasiados colores dentro de una misma tarjeta.
+
+Priorizar jerarquía, espacio y legibilidad.
+
+---
+
+## Botones
+
+### Acción principal
+
+```css
+background: #3B82F6;
+color: #F8FAFC;
+```
+
+Ejemplos:
+
+* Continuar
+* Comprobar
+* Iniciar nivel
+* Volver al mapa
+
+### Acción secundaria
+
+Utilizar fondo transparente o `#1E293B` con borde visible.
+
+### Acción completada
+
+Utilizar verde únicamente cuando represente una acción efectivamente completada.
+
+---
+
+## Degradados
+
+Los degradados pueden utilizarse de manera limitada para reforzar la identidad de Logaria.
+
+Degradado principal:
+
+```css
+background: linear-gradient(
+  90deg,
+  #3B82F6,
+  #8B5CF6
+);
+```
+
+Reservarlo principalmente para:
+
+* logo;
+* portales;
+* desbloqueos;
+* mundos especiales;
+* recompensas;
+* elementos narrativos importantes.
+
+No utilizar degradados como fondo de todos los botones o tarjetas.
+
+---
+
+## Estilo general
+
+La interfaz debe sentirse:
+
+**moderna + matemática + tecnológica + exploratoria + profesional**
+
+Evitar que se vea:
+
+* infantil;
+* excesivamente caricaturesca;
+* sobrecargada;
+* similar a un juego móvil genérico;
+* llena de efectos visuales sin función pedagógica.
+
+La gamificación debe estar presente principalmente en:
+
+* mapa de mundos;
+* desbloqueo de niveles;
+* estrellas;
+* misiones;
+* progreso;
+* narrativa.
+
+Dentro de las actividades matemáticas debe priorizarse la claridad.
+
+---
+
+## Principio de diseño
+
+La estética debe acompañar la filosofía didáctica de Logaria:
+
+**Explorar → predecir → hacer matemática → comprobar → explicar → desbloquear.**
+
+La interfaz no debe resolver la matemática por el estudiante.
+
+Los elementos visuales, animaciones, colores y gráficos deben utilizarse para favorecer:
+
+* la observación;
+* la formulación de conjeturas;
+* la experimentación;
+* la comparación;
+* la visualización de propiedades;
+* la interpretación de errores;
+* la construcción progresiva del conocimiento.
+
+---
+
+## Identidad visual resumida
+
+```text
+LOGARIA
+
+Fondo:
+#0F172A
+
+Superficies:
+#1E293B
+
+Principal:
+#3B82F6
+
+Secundario / Logaria:
+#8B5CF6
+
+Exploración:
+#14B8A6
+
+Desafíos:
+#F59E0B
+
+Correcto:
+#22C55E
+
+Error:
+#EF4444
+
+Texto principal:
+#F8FAFC
+
+Texto secundario:
+#CBD5E1
+
+Títulos:
+Space Grotesk
+
+Interfaz:
+Inter
+
+Matemática:
+KaTeX / MathJax
+```
+
+Esta identidad visual debe mantenerse de manera consistente en todos los mundos, niveles, laboratorios y futuras ampliaciones de Logaria.
+_
 
 ### Ideas visuales
 
@@ -95,7 +453,242 @@ Cada idea puede escribirse así:
 ### Evitar
 
 - **[DEFINIDO]** Evitar que el gráfico aparezca antes de la producción del estudiante: el sistema colorea, grafica o valida recién después de la respuesta.
-- **[PENDIENTE]** _Anotar estilos, colores o recursos visuales que no querés usar._
+- **[DEFINIDO]** ## Estilos, colores y recursos visuales que no se deben utilizar
+
+Para mantener una identidad visual coherente, profesional y vinculada con la matemática, la tecnología y la exploración, en **Logaria** se deben evitar los siguientes recursos:
+
+### Estilos visuales a evitar
+
+* Estética excesivamente infantil o caricaturesca.
+* Interfaces que parezcan un juego móvil genérico.
+* Estilo tipo “Candy Crush” llevado de manera literal.
+* Exceso de elementos decorativos sin función pedagógica.
+* Interfaces recargadas con demasiadas tarjetas, botones o información simultánea.
+* Diseño excesivamente futurista, “cyberpunk” o de videojuego de ciencia ficción.
+* Estética escolar tradicional basada en pizarrones, tizas, reglas, cuadernos o lápices como decoración constante.
+* Uso excesivo de efectos 3D.
+* Elementos con apariencia plástica o brillante.
+* Estilo skeuomórfico que intente imitar objetos reales.
+* Diseños donde cada nivel tenga una estética completamente diferente.
+* Cambios bruscos de estilo entre el mapa, los laboratorios y las actividades.
+* Uso de fondos con demasiados detalles que dificulten leer gráficos o consignas.
+
+---
+
+## Colores a evitar
+
+No incorporar colores nuevos de manera arbitraria fuera de la paleta definida.
+
+Evitar especialmente:
+
+* colores neón extremadamente saturados;
+* rosas fluorescentes;
+* verdes fluorescentes;
+* amarillos demasiado brillantes como fondo;
+* combinaciones de muchos colores saturados simultáneamente;
+* fondos completamente negros `#000000`;
+* blanco puro `#FFFFFF` utilizado como fondo principal;
+* grandes superficies rojas;
+* grandes superficies verdes;
+* degradados arcoíris;
+* combinaciones que reduzcan el contraste entre texto y fondo.
+
+El rojo y el verde deben utilizarse principalmente como **colores de estado**, no como colores decorativos permanentes.
+
+---
+
+## Degradados
+
+Evitar:
+
+* degradados en todas las tarjetas;
+* degradados en todos los botones;
+* degradados con tres o más colores;
+* degradados arcoíris;
+* degradados extremadamente luminosos.
+
+El degradado azul-violeta de Logaria debe reservarse para elementos importantes como:
+
+* logo;
+* portales;
+* desbloqueos;
+* mundos destacados;
+* recompensas;
+* momentos narrativos especiales.
+
+---
+
+## Sombras y brillos
+
+Evitar:
+
+* sombras muy grandes;
+* sombras negras demasiado intensas;
+* efecto glow permanente;
+* bordes luminosos alrededor de todos los elementos;
+* luces de neón;
+* animaciones de brillo constantes.
+
+Las sombras deben ser discretas y utilizarse únicamente para separar niveles de profundidad.
+
+---
+
+## Bordes y formas
+
+Evitar:
+
+* bordes excesivamente gruesos;
+* bordes de varios colores;
+* marcos decorativos complejos;
+* esquinas excesivamente redondeadas que hagan que toda la interfaz parezca infantil;
+* formas irregulares sin una función clara.
+
+Mantener un sistema consistente de radios y bordes.
+
+Como referencia general:
+
+```css
+border-radius: 12px;
+border-radius: 16px;
+```
+
+No utilizar un radio diferente arbitrariamente para cada componente.
+
+---
+
+## Tipografías que no deben utilizarse
+
+Evitar:
+
+* Comic Sans;
+* tipografías manuscritas;
+* fuentes estilo cómic;
+* fuentes excesivamente decorativas;
+* tipografías pixeladas;
+* fuentes de videojuegos arcade;
+* tipografías futuristas difíciles de leer;
+* mezclar muchas familias tipográficas.
+
+La aplicación debe mantenerse principalmente en:
+
+* **Space Grotesk** para títulos y narrativa;
+* **Inter** para interfaz y textos;
+* **KaTeX/MathJax** para matemática.
+
+---
+
+## Iconografía
+
+Evitar:
+
+* emojis como elemento principal de la interfaz;
+* iconos de estilos diferentes mezclados;
+* ilustraciones infantiles;
+* iconos excesivamente detallados;
+* iconos puramente decorativos sin significado.
+
+Preferir iconos simples, geométricos y consistentes.
+
+Cuando un icono represente una acción importante debe acompañarse de texto si existe riesgo de ambigüedad.
+
+Por ejemplo:
+
+**✓ Comprobar**
+
+en lugar de utilizar solamente:
+
+**✓**
+
+---
+
+## Animaciones
+
+Evitar:
+
+* animaciones constantes;
+* elementos que se muevan sin interacción del estudiante;
+* rebotes repetitivos;
+* flashes;
+* partículas permanentes;
+* transiciones excesivamente largas;
+* animaciones que retrasen el acceso a una actividad.
+
+Las animaciones deben aparecer principalmente cuando existe un propósito claro:
+
+* desbloquear un nivel;
+* completar una misión;
+* mostrar una transformación;
+* indicar una relación matemática;
+* proporcionar feedback.
+
+---
+
+## Recursos visuales matemáticos
+
+Evitar gráficos sobrecargados.
+
+No utilizar simultáneamente:
+
+* demasiadas funciones;
+* demasiados colores;
+* etiquetas innecesarias;
+* cuadrículas demasiado visibles;
+* animaciones que oculten el comportamiento matemático.
+
+Los gráficos deben priorizar siempre la lectura matemática.
+
+La estética nunca debe dificultar observar:
+
+* crecimiento y decrecimiento;
+* dominio;
+* imagen;
+* desplazamientos;
+* asíntotas;
+* intersecciones;
+* puntos relevantes;
+* comportamiento de una función.
+
+---
+
+## Feedback de respuestas
+
+Evitar que el feedback se limite únicamente a:
+
+* rojo = incorrecto;
+* verde = correcto.
+
+Siempre que sea posible acompañar el color con información textual.
+
+Ejemplo adecuado:
+
+> **Revisá el desplazamiento horizontal. Observá nuevamente dónde quedó ubicada la asíntota.**
+
+Evitar mensajes como:
+
+> **ERROR**
+
+o:
+
+> **RESPUESTA INCORRECTA**
+
+sin ninguna orientación adicional.
+
+---
+
+## Principio general
+
+Ante una decisión entre una interfaz más llamativa y una interfaz más clara, se debe priorizar siempre:
+
+**claridad > decoración**
+
+**matemática > efectos visuales**
+
+**exploración > automatización**
+
+**consistencia > variedad**
+
+La identidad visual de Logaria debe sentirse atractiva y diferente de una plataforma escolar tradicional, pero los recursos gráficos nunca deben competir con el contenido matemático.
+_
 
 ## Parte práctica e interacción
 
@@ -152,9 +745,393 @@ Cada idea puede escribirse así:
 - **[DEFINIDO]** Las actividades deben poder usarse en celular.
 - **[DEFINIDO]** Accesibilidad matemática: además de los sliders, siempre debe existir la posibilidad de ingresar valores exactos por campo numérico.
 - **[DEFINIDO]** Buen contraste, controles grandes y textos legibles.
-- **[PENDIENTE]** Uso completo con teclado: _sí / no / según la actividad._
-- **[PENDIENTE]** Contraste y tamaño mínimo de texto: _Completar acá._
-- **[PENDIENTE]** Sonido, subtítulos o alternativas textuales: _Completar acá._
+- **[DEFINIDO]** según la actividad._
+- **[PENDIENTE]** Contraste y tamaño mínimo de texto:## Contraste y tamaño mínimo de texto
+
+Para garantizar legibilidad y accesibilidad en **Logaria**, especialmente en celulares y pantallas de aula, se deben respetar criterios mínimos de contraste y tamaño tipográfico.
+
+### Contraste
+
+* El texto normal debe tener una relación de contraste mínima de **4.5:1** respecto del fondo.
+* El texto grande puede utilizar un contraste mínimo de **3:1**.
+* Los botones, bordes importantes, controles interactivos y estados visuales deben mantener un contraste suficiente respecto de los elementos que los rodean.
+* No utilizar texto gris muy tenue sobre fondos oscuros.
+* No utilizar color como único recurso para comunicar información.
+
+En la paleta definida, priorizar:
+
+```css
+--background: #0F172A;
+--surface: #1E293B;
+
+--text-primary: #F8FAFC;
+--text-secondary: #CBD5E1;
+```
+
+El texto principal debe utilizar `#F8FAFC` sobre fondos oscuros.
+
+El texto secundario puede utilizar `#CBD5E1`, siempre que conserve buena legibilidad.
+
+Evitar textos importantes con baja opacidad, por ejemplo:
+
+```css
+opacity: 0.4;
+```
+
+Especialmente en consignas, botones, resultados y ayudas.
+
+---
+
+## Tamaño mínimo de texto
+
+El tamaño base recomendado para la interfaz es:
+
+```css
+font-size: 16px;
+```
+
+No utilizar textos de lectura habitual por debajo de **14 px**.
+
+### Escala recomendada
+
+```css
+--text-xs: 14px;
+--text-sm: 16px;
+--text-md: 18px;
+--text-lg: 22px;
+--text-xl: 28px;
+--text-2xl: 36px;
+```
+
+### Uso
+
+* **14 px:** etiquetas auxiliares, datos secundarios o información breve.
+* **16 px:** texto base de interfaz.
+* **18 px:** consignas y explicaciones importantes.
+* **22 px:** subtítulos.
+* **28 px:** títulos de nivel.
+* **36 px o más:** nombres de mundos, pantallas de apertura o títulos principales.
+
+---
+
+## Consignas matemáticas
+
+Las consignas deben tener como mínimo:
+
+```css
+font-size: 18px;
+line-height: 1.5;
+```
+
+Esto es especialmente importante porque representan el contenido central que el estudiante debe interpretar.
+
+Evitar consignas extensas en tamaños pequeños.
+
+---
+
+## Expresiones matemáticas
+
+Las expresiones matemáticas deben ser iguales o ligeramente mayores que el texto que las rodea.
+
+Como referencia:
+
+```css
+.math {
+  font-size: 1.1em;
+}
+```
+
+Cuando una fórmula sea central en una actividad, puede presentarse entre **20 px y 24 px** o su equivalente relativo.
+
+No reducir las fórmulas para hacerlas entrar en un espacio pequeño.
+
+En dispositivos angostos, preferir desplazamiento horizontal o reorganización del contenido antes que disminuir excesivamente su tamaño.
+
+---
+
+## Botones
+
+El texto de los botones debe tener como mínimo:
+
+```css
+font-size: 16px;
+font-weight: 600;
+```
+
+Los botones importantes no deben contener texto diminuto.
+
+Ejemplos:
+
+* Comprobar
+* Continuar
+* Volver al mapa
+* Iniciar misión
+
+---
+
+## Tamaño de controles interactivos
+
+Además del texto, los elementos que el estudiante debe tocar o seleccionar deben ser suficientemente grandes.
+
+Como referencia mínima:
+
+```css
+min-width: 44px;
+min-height: 44px;
+```
+
+Esto se aplica especialmente a:
+
+* botones;
+* controles `+` y `−`;
+* sliders;
+* casillas;
+* puntos interactivos;
+* navegación entre niveles.
+
+---
+
+## Diseño responsive
+
+No utilizar tamaños fijos que solo funcionen correctamente en computadora.
+
+Preferir unidades relativas:
+
+```css
+rem
+em
+clamp()
+```
+
+Ejemplo:
+
+```css
+.level-title {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+```
+
+Esto permite mantener una jerarquía tipográfica adecuada entre celular, tablet y computadora.
+
+---
+
+## Regla general
+
+Nunca reducir el texto simplemente para lograr que entre dentro de una tarjeta o botón.
+
+Ante un problema de espacio, priorizar:
+
+1. ampliar el componente;
+2. reorganizar el contenido;
+3. permitir salto de línea;
+4. adaptar la disposición para móvil.
+
+Reducir la tipografía debe ser la última opción.
+
+### Criterio final
+
+La interfaz debe poder leerse cómodamente sin esfuerzo y sin necesidad de hacer zoom.
+
+**Texto base:** mínimo `16 px`.
+
+**Texto auxiliar:** nunca menor a `14 px`.
+
+**Consignas:** recomendado `18 px`.
+
+**Contraste:** mínimo `4.5:1` para texto normal y `3:1` para texto grande.
+ __
+- **[PENDIENTE]** Sonido, subtítulos o alternativas textuales: _## Sonido, subtítulos y alternativas textuales
+
+### Sonido
+
+**Logaria no debe utilizar sonido.**
+
+No incorporar:
+
+* música de fondo;
+* efectos de sonido;
+* sonidos al presionar botones;
+* sonidos de respuesta correcta o incorrecta;
+* sonidos al desbloquear niveles;
+* narraciones automáticas;
+* voces sintetizadas;
+* audio ambiental;
+* alertas sonoras.
+
+La experiencia debe poder utilizarse completamente en silencio.
+
+Esta decisión responde también al contexto de uso en el aula: varios estudiantes pueden utilizar la aplicación simultáneamente desde celulares o computadoras sin generar distracciones ni interferencias.
+
+Por lo tanto, **ninguna acción, información o feedback puede depender del audio**.
+
+---
+
+## Feedback visual en lugar de sonido
+
+Toda información que normalmente podría comunicarse mediante un sonido debe tener una alternativa visual clara.
+
+Por ejemplo, al completar correctamente un desafío se puede utilizar:
+
+* cambio visual de estado;
+* animación breve;
+* mensaje textual;
+* icono;
+* cambio de color;
+* aparición de estrellas;
+* desbloqueo visual del siguiente nivel.
+
+Ejemplo:
+
+> ✓ **¡Reto superado! El siguiente nivel fue desbloqueado.**
+
+Nunca depender únicamente de una animación o cambio de color.
+
+---
+
+## Subtítulos
+
+Como la aplicación no utilizará videos o narraciones con audio como parte central de la experiencia, **no será necesario incorporar un sistema general de subtítulos**.
+
+Sin embargo, si en una futura versión se incorpora algún recurso audiovisual externo, toda información relevante debe estar disponible también en formato textual.
+
+Un video nunca debe ser la única forma de acceder a una explicación matemática.
+
+---
+
+## Alternativas textuales
+
+Los elementos visuales que transmitan información relevante deben contar, cuando corresponda, con una alternativa textual comprensible.
+
+Esto se aplica especialmente a:
+
+* imágenes;
+* ilustraciones;
+* iconos;
+* botones;
+* gráficos;
+* diagramas;
+* indicadores de progreso.
+
+### Imágenes
+
+Las imágenes con contenido relevante deben incluir texto alternativo mediante `alt`.
+
+Ejemplo:
+
+```html
+<img
+  src="grafico-logaritmica.png"
+  alt="Gráfico de una función logarítmica creciente con asíntota vertical en x igual a 0."
+>
+```
+
+Las imágenes puramente decorativas deben utilizar:
+
+```html
+alt=""
+```
+
+para evitar que los lectores de pantalla anuncien información innecesaria.
+
+---
+
+## Iconos
+
+Los iconos que representen una acción no deben utilizarse sin contexto cuando su significado pueda resultar ambiguo.
+
+Evitar:
+
+```text
+↻
+```
+
+Preferir:
+
+```text
+↻ Reiniciar gráfico
+```
+
+O proporcionar una etiqueta accesible:
+
+```html
+<button aria-label="Reiniciar gráfico">
+  ↻
+</button>
+```
+
+---
+
+## Gráficos matemáticos
+
+Los gráficos son una parte central de Logaria, pero la información matemática importante no debe depender exclusivamente de poder verlos.
+
+Cuando sea pertinente, acompañar el gráfico con información textual como:
+
+* función representada;
+* valores de los parámetros;
+* coordenadas de puntos importantes;
+* posición de la asíntota;
+* dominio;
+* comportamiento creciente o decreciente.
+
+Por ejemplo:
+
+> Función actual: (f(x)=\log_2(x-3))
+> Asíntota vertical: (x=3)
+
+Esto no significa describir automáticamente todo el gráfico, sino garantizar que los elementos matemáticos centrales también puedan identificarse mediante información textual.
+
+---
+
+## Animaciones
+
+Las animaciones tampoco deben ser la única forma de transmitir una transformación matemática.
+
+Si una curva se desplaza, además de mostrar el movimiento se debe indicar qué parámetro cambió.
+
+Ejemplo:
+
+> `k = 3`
+> La asíntota vertical se encuentra ahora en (x=3).
+
+---
+
+## Principio general
+
+La experiencia debe cumplir la siguiente regla:
+
+**Todo lo importante debe poder comprenderse sin sonido.**
+
+Por lo tanto:
+
+```text
+SONIDO:
+No utilizar.
+
+MÚSICA:
+No utilizar.
+
+EFECTOS SONOROS:
+No utilizar.
+
+NARRACIÓN AUTOMÁTICA:
+No utilizar.
+
+FEEDBACK:
+Visual + textual.
+
+IMÁGENES:
+Texto alternativo cuando sea necesario.
+
+ICONOS:
+Acompañados de texto o aria-label.
+
+GRÁFICOS:
+Complementados con información matemática textual relevante.
+```
+
+La ausencia de sonido es una **decisión de diseño permanente de Logaria** y no debe modificarse sin una decisión explícita posterior.
+_
 
 ## Ideas por experiencia
 
@@ -454,6 +1431,13 @@ Los 18 niveles forman el recorrido mínimo. Las misiones secundarias pueden colg
 - **Provisorio:** se usa `- k` en todo el recorrido, por coherencia con el Mundo 3.
 - **Por qué importa:** cambia el signo de las respuestas y de las consignas de los niveles 7 a 15, y también la dirección del desplazamiento que se trabaja como error frecuente.
 - **Bloquea a:** Mundos 3, 4 y 5 completos.
+  -Respuesta para Notacion del parámetro "k":
+   -Decisión 1. Notación del parámetro k
+Decisión adoptada: utilizar de manera consistente la forma log_c(ax - k) en los Mundos 3, 4 y 5.
+Se descarta la alternancia entre “+ k” y “- k” para evitar que la propia aplicación introduzca una dificultad artificial. La convención elegida también permite trabajar de forma explícita uno de los errores más frecuentes al estudiar transformaciones horizontales: interpretar el signo interno como si indicara directamente el sentido del desplazamiento.
+Ejemplo didáctico: si f(x) = log_c(x), entonces g(x) = log_c(x - 3) representa un desplazamiento de 3 unidades hacia la derecha. La aparente oposición entre “-3” dentro de la expresión y “+3” en la dirección del movimiento puede convertirse en una pregunta de exploración y no solamente en una regla para memorizar.
+Consecuencia para los niveles
+Las consignas, respuestas esperadas, pistas, errores frecuentes y validaciones de los niveles 7 a 15 deberán construirse con la misma convención de signo.
 
 ### 2. Nombres de mundos y niveles · **[PENDIENTE]**
 
@@ -461,30 +1445,123 @@ Los 18 niveles forman el recorrido mínimo. Las misiones secundarias pueden colg
 - **Opciones:** (a) adoptar los del documento y reescribir el mapa; (b) conservar los de Logaria y tratar los del documento solo como referencia interna; (c) mezclar, con nombre de mundo de un lado y de nivel del otro.
 - **Por qué importa:** afecta todos los textos visibles de la experiencia, y el README prohíbe inventar contenido narrativo nuevo.
 - **Bloquea a:** cualquier reescritura del mapa de `Plan aulico/index.html`.
+ -Respuesta Duda Nombre de mundos y niveles:
+  -Decisión adoptada: conservar Logaria como narrativa visible principal y utilizar los nombres del documento fuente como nombres de niveles, misiones o referencias internas cuando corresponda.
+La solución establece una jerarquía narrativa estable, en lugar de mezclar dos sistemas de nombres al mismo nivel. De este modo se mantiene la identidad del mapa y, a la vez, se aprovechan denominaciones del documento fuente que resultan adecuadas para situaciones problemáticas concretas.
+UNIVERSO: LOGARIA
+    ↓
+MUNDO: El Portal Inverso
+    ↓
+NIVEL: La calculadora desconfigurada
+    ↓
+MISIÓN: reconstruir los valores faltantes para recuperar el graficador
+La arquitectura narrativa queda entonces organizada como: Universo → Mundo → Nivel → Misión.
 
 ### 3. Cómo se abre y se distribuye la aplicación · **[PENDIENTE]**
 
 - **La duda:** ¿el recorrido sigue siendo un HTML que se abre con doble clic (`file://`), o se va a servir desde una URL?
 - **Por qué importa:** con `file://` los módulos ES no cargan, así que la definición de niveles tendría que ir en un `<script>` clásico y no en archivos importados. Es la restricción que decide cómo se separan los datos del HTML, que es un criterio ya definido en el documento.
 - **Bloquea a:** la prioridad 1 (definición de niveles por datos).
+ -Respuesta de duda Como se abre y se distribuye la aplicación:
+  - Decisión adoptada: diseñar Logaria como una aplicación web servida desde una URL, utilizando GitHub Pages como forma principal de acceso.
+La aplicación no se diseñará bajo la restricción de abrir el archivo directamente mediante file://. Esto habilita el uso de módulos ES y una separación clara entre estructura, datos, lógica de validación, progreso y estilos. Para el aula, además, simplifica el acceso desde computadoras y celulares: el estudiante ingresa mediante un enlace y no necesita manipular carpetas o archivos locales.
+Plan aulico/
+├── index.html
+├── css/
+│   └── styles.css
+├── js/
+│   ├── app.js
+│   ├── progress.js
+│   ├── validators.js
+│   └── levels.js
+├── levels/
+│   ├── world-1.js
+│   ├── world-2.js
+│   ├── world-3.js
+│   └── ...
+└── assets/
+Los niveles deberán definirse principalmente como datos. Esto permitirá modificar consignas, prerequisitos, estrellas o tipos de reto sin reescribir la estructura visual del mapa.
+{
+  id: 4,
+  world: 2,
+  title: "Se rompió el graficador",
+  type: "points",
+  stars: 3,
+  prerequisite: 3
+}
 
 ### 4. Tolerancia de las validaciones · **[PENDIENTE]**
 
 - **La duda:** con qué margen se da por correcta una respuesta que no es de opción múltiple: puntos cargados, intervalos escritos de distintas formas equivalentes y sobre todo la superposición de una curva propia sobre una curva objetivo (niveles 9 y 15).
 - **Por qué importa:** demasiado estricta, el estudiante se traba sin entender por qué; demasiado laxa, el reto deja de validar el aprendizaje. Es una decisión pedagógica, no técnica.
 - **Bloquea a:** los validadores de punto, intervalo y superposición.
+ -Respuesta de duda Tolerancia de las validaciones:
+  -Decisión adoptada: validar significado matemático y equivalencia, evitando comparar únicamente la forma textual exacta escrita por el estudiante.
+La aplicación debe aceptar distintas representaciones matemáticamente equivalentes siempre que el tipo de actividad lo permita. Por ejemplo, un mismo intervalo podría expresarse con notación de intervalo, desigualdad o selección gráfica. El objetivo del validador no será detectar una cadena de caracteres específica, sino comprobar si la producción representa correctamente el objeto matemático solicitado.
+Tipo de respuesta	Criterio	Tolerancia / regla	Sentido pedagógico
+Puntos	Comparación numérica con tolerancia	±0,05 o ±0,1 según la escala del gráfico	Evita penalizar diferencias mínimas de lectura o redondeo.
+Intervalos	Interpretación de expresiones equivalentes	Sin igualdad textual estricta	Debe reconocer formas matemáticamente equivalentes.
+Superposición de curvas	Comparación sobre varios puntos de control	Tolerancia gráfica pequeña	No se exige coincidencia píxel a píxel.
+Feedback gradual. El resultado de la validación deberá transformarse en una intervención didáctica. Se priorizarán mensajes que orienten la revisión por encima de un simple “incorrecto”.
+Casi: Revisá el desplazamiento horizontal antes de volver a mover la curva.
+Todavía no: Observá dónde se encuentra la asíntota y comparala con la curva objetivo.
+Correcto: Reconstrucción completada. Explicá ahora qué cambió y por qué.
 
 ### 5. Alcance y forma de entrega · **[PENDIENTE]**
 
 - **La duda:** los 18 niveles con laboratorio propio no entran en una sola tanda de trabajo. ¿Se entrega mundo por mundo, con el mapa siempre jugable y los niveles todavía no migrados señalados como tales?
 - **Propuesta:** empezar por una rebanada vertical completa con el **Nivel 4 ("Se rompió el graficador")**, porque ejercita el ciclo entero —predicción, modo hoja, carga de puntos, validación, reconstrucción de la curva y reto nuevo—. Si ese nivel funciona, el resto es contenido y variantes de validador, no arquitectura nueva.
 - **Por qué importa:** define si el archivo queda a medio migrar entre entregas.
+ -Respuesta duda Alcance y forma de entrega:
+  -Decisión adoptada: implementar el proyecto de manera incremental, manteniendo siempre el mapa coherente y comenzando por una rebanada vertical completa del Nivel 4: “Se rompió el graficador”.
+Este nivel se toma como prototipo funcional porque contiene el ciclo completo que se desea repetir con variantes en el resto del recorrido: predicción, salida de la pantalla, trabajo en hoja, carga de resultados, validación, reconstrucción gráfica, explicación y desbloqueo.
+OBSERVAR
+   ↓
+CONJETURAR
+   ↓
+TRABAJAR EN LA HOJA
+   ↓
+VOLVER A LA APLICACIÓN
+   ↓
+INTRODUCIR RESULTADOS
+   ↓
+RECIBIR FEEDBACK
+   ↓
+RECONSTRUIR
+   ↓
+EXPLICAR
+   ↓
+DESBLOQUEAR
+La implementación se organizará en fases:
+•	Fase 1: Mapa completo visible y navegación base.
+•	Fase 2: Nivel 4 completamente jugable y validado.
+•	Fase 3: Migración y construcción completa del Mundo 1.
+•	Fase 4: Construcción del Mundo 2.
+•	Fases siguientes: Migración de los mundos restantes reutilizando componentes y validadores ya probados.
+Los niveles aún no desarrollados se mostrarán bloqueados o identificados como “Próximamente”, evitando presentar como jugable una sección incompleta.
 
 ### 6. Progreso ya guardado en los navegadores · **[PENDIENTE]**
 
 - **La duda:** el avance actual se guarda con la clave `logaria-progress-v1`. Al cambiar el modelo de niveles hay que decidir si se migra el progreso existente o se reinicia.
 - **Por qué importa:** si algún curso ya venía usando la experiencia, un cambio de clave sin migración le borra el recorrido.
 - **Bloquea a:** la prioridad 3 (progreso y estrellas).
+ -Respuesta duda Progreso ya guardado en los navegadores:
+  -Decisión adoptada: crear una nueva versión de persistencia, logaria-progress-v2, con migración automática desde logaria-progress-v1 cuando exista información previa.
+El cambio de modelo de niveles no debe eliminar el avance de un grupo que ya haya utilizado la experiencia. La aplicación comprobará primero si existe la versión nueva; en caso contrario buscará la versión anterior y realizará la migración compatible.
+¿Existe logaria-progress-v2?
+   ├── Sí → cargar v2
+   └── No
+        ├── ¿Existe logaria-progress-v1? → migrar a v2
+        └── No → crear progreso nuevo
+La nueva estructura de progreso deberá poder registrar algo más que el nivel máximo desbloqueado, por ejemplo:
+{
+  levelId: 4,
+  unlocked: true,
+  completed: true,
+  stars: 2,
+  attempts: 3
+}
+En esta etapa se priorizará un progreso local y anónimo. No es necesario almacenar nombres, correos u otros datos personales para que la mecánica pedagógica funcione.
 
 ### 7. Curso y edad del grupo · **[PENDIENTE]**
 
@@ -492,6 +1569,18 @@ Los 18 niveles forman el recorrido mínimo. Las misiones secundarias pueden colg
 - **Por qué importa:** define el nivel de vocabulario y cuánta formalización algebraica se puede exigir en los puentes a la carpeta.
 
 ---
+ -Respuesta de duda Curso y edad del grupo:
+  -Decisión adoptada: diseñar el recorrido para 6.º año de secundaria, incorporando apoyos breves para recuperar conocimientos previos que el grupo necesite durante la experiencia.
+El año escolar funciona como referencia para el vocabulario, la complejidad de las consignas y el nivel de formalización algebraica. Sin embargo, el diseño no supondrá que todos los saberes previos están consolidados. Cuando una dificultad previa impida avanzar, la aplicación podrá ofrecer una misión breve de recuperación en lugar de convertir esa dificultad en un bloqueo permanente.
+Entre los conocimientos susceptibles de recuperación se contemplan:
+•	potencias y propiedades de potencias;
+•	exponentes negativos;
+•	lectura e interpretación de gráficos;
+•	dominio e imagen;
+•	coordenadas cartesianas;
+•	transformaciones y desplazamientos de funciones.
+Principio de diseño
+El programa no parte de “son de sexto, deberían saberlo”, sino de “son estudiantes de sexto y necesitan herramientas para seguir construyendo desde lo que efectivamente pueden recuperar y poner en juego”.
 
 ## Prioridades actuales
 
