@@ -84,7 +84,7 @@ Cada idea puede escribirse así:
 - **[DEFINIDO]** La interfaz debe adaptarse a pantallas de celular (diseño móvil primero) y además poder proyectarse en computadora.
 - **[DEFINIDO]** El estado de cada nodo del mapa (disponible, superado, bloqueado) debe ser visible.
 - **[DEFINIDO]** Buen contraste, controles grandes y textos legibles.
-- **[PENDIENTE]** Paleta de colores: _## Identidad visual de Logaria
+- **[DEFINIDO]** Paleta de colores: _## Identidad visual de Logaria
 
 La interfaz de **Logaria** debe transmitir una combinación de:
 
