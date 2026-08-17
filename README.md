@@ -1589,6 +1589,69 @@ El programa no parte de “son de sexto, deberían saberlo”, sino de “son es
 3. **[DEFINIDO]** Implementar el progreso: estrellas, reintentos con pistas escalonadas y bloqueo del botón "siguiente" hasta aprobar el reto.
 4. **[PENDIENTE]** Modo docente y misiones secundarias.
 
+## Estado de la implementación
+
+<!-- Se actualiza cada vez que se termina una fase. -->
+
+| Fase | Alcance | Estado |
+|---|---|---|
+| 1 | Mapa completo visible y navegación base | Terminada |
+| 2 | Nivel 4 «Se rompió el graficador» completamente jugable y validado | Terminada |
+| 3 | Mundo 1 completo: niveles 1, 2 y 3 jugables | Terminada |
+| 4 | Construcción del Mundo 2 (niveles 5 y 6) | Pendiente |
+| 5+ | Mundos 3 a 6 reutilizando componentes y validadores probados | Pendiente |
+
+Los 14 niveles todavía no construidos figuran en el mapa como **Próximamente**: muestran su plan (contenido, puente a la carpeta, regreso y reto) pero no se presentan como jugables. No bloquean el recorrido: los prerrequisitos solo miran los niveles ya construidos.
+
+### Tipos de paso disponibles
+
+Un nivel es una lista de pasos y cada paso declara su tipo. Agregar un nivel nuevo consiste en combinar estos tipos, no en escribir interfaz:
+
+| Tipo | Para qué sirve |
+|---|---|
+| `brief` | Disparador narrativo, con fórmula o plano de observación |
+| `prediction` | Anticipación, registrada o evaluada según el caso |
+| `paper` | Consigna explícita de carpeta con confirmación |
+| `match` | Emparejar equivalencias entre dos columnas |
+| `machine` | Probar una secuencia de operaciones y registrar entradas y salidas |
+| `sequence` | Armar una cadena de operaciones en el orden correcto |
+| `points` | Cargar puntos calculados: solo la imagen o el par completo |
+| `fields` | Cargar valores, intervalos o elegir una escritura equivalente |
+| `graph-choice` | Elegir entre varias gráficas |
+| `lab` | Laboratorio con sliders, campo exacto y requisitos de exploración |
+| `check` | Comprobación: gráfico, ficha de datos y contraste con la predicción |
+| `conclusion` | Registrar la regularidad observada |
+
+### Estructura de archivos
+
+```text
+Plan aulico/
+├── index.html          Estructura mínima; todo lo demás se dibuja desde los módulos
+├── css/styles.css      Paleta, tipografías, escalas y componentes
+├── js/
+│   ├── app.js          Arranque y navegación (#/mapa, #/nivel/<id>)
+│   ├── map-view.js     Mapa de mundos y estado de cada nodo
+│   ├── level-view.js   Recorrido y estado de un nivel
+│   ├── steps.js        Un renderizador por tipo de paso
+│   ├── levels.js       Catálogo y reglas de desbloqueo
+│   ├── progress.js     Progreso local v2 con migración desde v1
+│   ├── validators.js   Puntos, intervalos, opciones y superposición
+│   ├── graph.js        Plano cartesiano en SVG
+│   ├── math.js         Funciones logarítmicas y renderizado con KaTeX
+│   └── ui.js           Piezas de interfaz compartidas
+└── levels/             Un archivo por mundo: los niveles son datos
+```
+
+### Cómo probarlo
+
+La aplicación usa módulos ES, así que necesita un servidor y no funciona abriendo el archivo con doble clic. Desde la raíz del repositorio:
+
+```bash
+npx --yes serve .
+```
+
+Después, abrir `http://localhost:3000/Plan%20aulico/`. En producción se sirve desde GitHub Pages.
+
 ## Criterios generales de calidad
 
 Un cambio está terminado cuando:
@@ -1611,6 +1674,14 @@ Un cambio está terminado cuando:
 | 2026-08-14 | Definido | Ningún nivel se habilita por haberlo abierto: hace falta superar un reto de desbloqueo distinto de la práctica guiada | Evitar el avance por repetición mecánica | `Plan aulico/` |
 | 2026-08-14 | Definido | Toda actividad incluye un puente obligatorio a la carpeta y la carga posterior de esa producción en el programa | La aplicación no debe reemplazar el cálculo del estudiante | Proyecto completo |
 | 2026-08-14 | Definido | Los niveles se describen como datos, no como HTML fijo | Poder agregar misiones sin reescribir la interfaz | `Plan aulico/` |
+| 2026-08-17 | Definido | Notación `logc(ax - k)` en todo el recorrido | Evitar una dificultad artificial y poder trabajar el error frecuente del signo interno | Mundos 3, 4 y 5 |
+| 2026-08-17 | Definido | Jerarquía narrativa Universo → Mundo → Nivel → Misión: nombres de Logaria para los mundos, nombres del documento fuente para los niveles | Conservar la identidad del mapa sin perder las denominaciones del documento | `Plan aulico/` |
+| 2026-08-17 | Definido | La aplicación se sirve desde una URL (GitHub Pages), con módulos ES y carpetas `css/`, `js/`, `levels/` | Permite separar datos, validación, progreso y estilos; el acceso en el aula es por enlace | `Plan aulico/` |
+| 2026-08-17 | Definido | Los validadores comprueban significado matemático, no coincidencia textual (puntos ±0,05; intervalos equivalentes; superposición por puntos de control) | Un mismo objeto matemático puede escribirse de varias formas correctas | `Plan aulico/js/validators.js` |
+| 2026-08-17 | Definido | Entrega incremental por fases, empezando por la rebanada vertical del Nivel 4 | Ese nivel contiene el ciclo completo que se repite con variantes en el resto | `Plan aulico/` |
+| 2026-08-17 | Definido | Persistencia `logaria-progress-v2` con migración automática desde `logaria-progress-v1` | No borrar el avance de un grupo que ya usó la experiencia | `Plan aulico/js/progress.js` |
+| 2026-08-17 | Definido | El recorrido se diseña para 6.º año de secundaria, con apoyos breves de recuperación de saberes previos | Fijar vocabulario y nivel de formalización sin suponer que todo está consolidado | Proyecto completo |
+| 2026-08-17 | Definido | Donde el documento fuente dice «arrastrar tarjetas», la interacción se resuelve tocando una tarjeta de cada columna | El arrastre es poco confiable en celular y rompe el criterio de controles grandes; la actividad matemática es la misma | Niveles 1 y 11 |
 
 ## Próximo pedido para la IA
 
