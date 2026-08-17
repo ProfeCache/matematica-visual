@@ -1597,11 +1597,30 @@ El programa no parte de “son de sexto, deberían saberlo”, sino de “son es
 |---|---|---|
 | 1 | Mapa completo visible y navegación base | Terminada |
 | 2 | Nivel 4 «Se rompió el graficador» completamente jugable y validado | Terminada |
-| 3 | Migración y construcción completa del Mundo 1 | Pendiente |
+| 3 | Mundo 1 completo: niveles 1, 2 y 3 jugables | Terminada |
 | 4 | Construcción del Mundo 2 (niveles 5 y 6) | Pendiente |
 | 5+ | Mundos 3 a 6 reutilizando componentes y validadores probados | Pendiente |
 
-Los 17 niveles todavía no construidos figuran en el mapa como **Próximamente**: muestran su plan (contenido, puente a la carpeta, regreso y reto) pero no se presentan como jugables. No bloquean el recorrido: los prerrequisitos solo miran los niveles ya construidos.
+Los 14 niveles todavía no construidos figuran en el mapa como **Próximamente**: muestran su plan (contenido, puente a la carpeta, regreso y reto) pero no se presentan como jugables. No bloquean el recorrido: los prerrequisitos solo miran los niveles ya construidos.
+
+### Tipos de paso disponibles
+
+Un nivel es una lista de pasos y cada paso declara su tipo. Agregar un nivel nuevo consiste en combinar estos tipos, no en escribir interfaz:
+
+| Tipo | Para qué sirve |
+|---|---|
+| `brief` | Disparador narrativo, con fórmula o plano de observación |
+| `prediction` | Anticipación, registrada o evaluada según el caso |
+| `paper` | Consigna explícita de carpeta con confirmación |
+| `match` | Emparejar equivalencias entre dos columnas |
+| `machine` | Probar una secuencia de operaciones y registrar entradas y salidas |
+| `sequence` | Armar una cadena de operaciones en el orden correcto |
+| `points` | Cargar puntos calculados: solo la imagen o el par completo |
+| `fields` | Cargar valores, intervalos o elegir una escritura equivalente |
+| `graph-choice` | Elegir entre varias gráficas |
+| `lab` | Laboratorio con sliders, campo exacto y requisitos de exploración |
+| `check` | Comprobación: gráfico, ficha de datos y contraste con la predicción |
+| `conclusion` | Registrar la regularidad observada |
 
 ### Estructura de archivos
 
@@ -1612,7 +1631,8 @@ Plan aulico/
 ├── js/
 │   ├── app.js          Arranque y navegación (#/mapa, #/nivel/<id>)
 │   ├── map-view.js     Mapa de mundos y estado de cada nodo
-│   ├── level-view.js   Ciclo de un nivel paso por paso
+│   ├── level-view.js   Recorrido y estado de un nivel
+│   ├── steps.js        Un renderizador por tipo de paso
 │   ├── levels.js       Catálogo y reglas de desbloqueo
 │   ├── progress.js     Progreso local v2 con migración desde v1
 │   ├── validators.js   Puntos, intervalos, opciones y superposición
@@ -1661,6 +1681,7 @@ Un cambio está terminado cuando:
 | 2026-08-17 | Definido | Entrega incremental por fases, empezando por la rebanada vertical del Nivel 4 | Ese nivel contiene el ciclo completo que se repite con variantes en el resto | `Plan aulico/` |
 | 2026-08-17 | Definido | Persistencia `logaria-progress-v2` con migración automática desde `logaria-progress-v1` | No borrar el avance de un grupo que ya usó la experiencia | `Plan aulico/js/progress.js` |
 | 2026-08-17 | Definido | El recorrido se diseña para 6.º año de secundaria, con apoyos breves de recuperación de saberes previos | Fijar vocabulario y nivel de formalización sin suponer que todo está consolidado | Proyecto completo |
+| 2026-08-17 | Definido | Donde el documento fuente dice «arrastrar tarjetas», la interacción se resuelve tocando una tarjeta de cada columna | El arrastre es poco confiable en celular y rompe el criterio de controles grandes; la actividad matemática es la misma | Niveles 1 y 11 |
 
 ## Próximo pedido para la IA
 

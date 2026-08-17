@@ -236,6 +236,25 @@ export function validateMultiChoice(selected, correct) {
 }
 
 /* ---------------------------------------------------------
+   Secuencias de operaciones
+   --------------------------------------------------------- */
+
+/**
+ * Compara una cadena de operaciones con la esperada.
+ * Distingue el error de orden del error de operaciones porque son dos
+ * dificultades distintas: invertir cada operación y además invertir el orden.
+ */
+export function validateSequence(answer, expected) {
+  const ok = answer.length === expected.length && answer.every((item, index) => item === expected[index]);
+  if (ok) return { ok: true, reason: "match" };
+
+  const sameItems =
+    answer.length === expected.length &&
+    [...answer].sort().join("|") === [...expected].sort().join("|");
+  return { ok: false, reason: sameItems ? "order" : "items" };
+}
+
+/* ---------------------------------------------------------
    Superposición de curvas
    --------------------------------------------------------- */
 

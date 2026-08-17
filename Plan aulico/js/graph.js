@@ -22,12 +22,23 @@ const LAYOUTS = {
   compact: { width: 400, height: 340, padding: 30, font: 16 }
 };
 
+/**
+ * Lienzo cuadrado: se usa cuando la actividad necesita que las dos escalas
+ * coincidan, por ejemplo para que la recta y = x se vea a 45° y la simetría
+ * entre una función y su inversa sea creíble.
+ */
+const SQUARE_LAYOUTS = {
+  wide: { width: 460, height: 460, padding: 34, font: 13 },
+  compact: { width: 360, height: 360, padding: 30, font: 15 }
+};
+
 const COLORS = {
   base: "var(--graph-function-base)",
   transformed: "var(--graph-function-transformed)",
   student: "var(--graph-student)",
   target: "var(--graph-function-transformed)",
-  asymptote: "var(--graph-asymptote)"
+  asymptote: "var(--graph-asymptote)",
+  guide: "var(--graph-axis)"
 };
 
 export function createGraph(container, initial = {}) {
@@ -54,7 +65,8 @@ export function createGraph(container, initial = {}) {
     // Antes de estar en el documento el contenedor no tiene ancho medible:
     // en ese caso se decide con el ancho de la ventana.
     const available = shell.clientWidth || container.clientWidth || window.innerWidth;
-    const layout = available < 480 ? LAYOUTS.compact : LAYOUTS.wide;
+    const set = state.square ? SQUARE_LAYOUTS : LAYOUTS;
+    const layout = available < 480 ? set.compact : set.wide;
     WIDTH = layout.width;
     HEIGHT = layout.height;
     PADDING = layout.padding;

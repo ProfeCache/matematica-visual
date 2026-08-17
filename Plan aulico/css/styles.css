@@ -504,6 +504,141 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .option[data-result="correct"] { border-color: var(--success); }
 .option[data-result="wrong"] { border-color: var(--error); }
 
+.options-compact .option { font-size: var(--text-sm); padding: .6rem .8rem; }
+
+/* Emparejar equivalencias */
+.match-grid {
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 1rem;
+}
+.match-column { display: grid; gap: .6rem; align-content: start; }
+.match-title {
+  margin: 0 0 .2rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.match-card {
+  min-height: var(--tap);
+  padding: .75rem .6rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--text-md);
+}
+.match-card:hover:not(:disabled) { border-color: var(--primary); }
+.match-card[aria-pressed="true"] { border-color: var(--primary); background: rgba(59, 130, 246, .14); }
+.match-card[data-result="matched"] { border-color: var(--success); opacity: .75; cursor: default; }
+.match-card[data-result="matched"]::after { content: " ✓"; color: var(--success); font-weight: 700; }
+.match-card[data-result="wrong"] { border-color: var(--error); }
+
+/* Máquina de operaciones */
+.machine-diagram {
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-md);
+  text-align: center;
+  overflow-x: auto;
+}
+.machine-output { color: var(--exploration); font-weight: 700; }
+
+/* Cadena de operaciones */
+.chain {
+  margin: 1rem 0 0;
+  padding: .9rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: var(--text-md);
+  text-align: center;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: .6rem; }
+.chip {
+  min-height: var(--tap);
+  min-width: 4rem;
+  padding: .6rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+.chip:hover:not(:disabled) { border-color: var(--exploration); }
+.chip:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Elección de gráfica */
+.graph-choice {
+  display: grid;
+  gap: .75rem;
+  margin-top: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) { .graph-choice { grid-template-columns: repeat(3, 1fr); } }
+.graph-option {
+  display: grid;
+  gap: .5rem;
+  padding: .85rem;
+  text-align: left;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.graph-option:hover:not(:disabled) { border-color: var(--primary); }
+.graph-option[aria-pressed="true"] { border-color: var(--primary); background: rgba(59, 130, 246, .1); }
+.graph-option[data-result="correct"] { border-color: var(--success); }
+.graph-option[data-result="wrong"] { border-color: var(--error); }
+.graph-option-label { font-weight: 700; font-size: var(--text-sm); }
+.graph-option-alt { font-size: var(--text-xs); color: var(--text-secondary); }
+.graph-option .graph-shell svg { border: 0; }
+
+/* Ficha de datos */
+.facts {
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.facts dl { display: grid; gap: .4rem 1rem; grid-template-columns: auto 1fr; margin: 0; }
+.facts dt { font-weight: 600; color: var(--text-secondary); font-size: var(--text-xs); }
+.facts dd { margin: 0; font-size: var(--text-sm); }
+
+/* Requisitos de exploración */
+.requirement-list { margin: .5rem 0 0; padding-left: 1.2rem; color: var(--text-secondary); }
+.requirement-list li { margin-bottom: .4rem; }
+.requirement-list li[data-state="done"] { color: var(--success); }
+
+/* Confirmación del trabajo en carpeta */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: var(--tap);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.checkbox {
+  width: 1.35rem;
+  height: 1.35rem;
+  min-height: auto;
+  accent-color: var(--exploration);
+  cursor: pointer;
+}
+
 /* Formularios de carga */
 .field-grid { display: grid; gap: .85rem; margin-top: 1rem; }
 @media (min-width: 640px) { .field-grid.cols-2 { grid-template-columns: repeat(2, 1fr); } }
